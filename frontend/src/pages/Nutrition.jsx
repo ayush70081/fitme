@@ -3,7 +3,6 @@ import { FiBookmark, FiTarget, FiTrendingUp, FiClock } from 'react-icons/fi';
 import DayPlan from '../components/NutritionPage_Component/DayPlan';
 import RecipeModal from '../components/NutritionPage_Component/RecipeModal';
 import AddMealModal from '../components/NutritionPage_Component/AddMealModal';
-import SavedMealsModal from '../components/NutritionPage_Component/SavedMealsModal';
 import DailyMealPlanGenerator from '../components/DailyMealPlanGenerator';
 import { useToast } from '../hooks/useToast';
 
@@ -11,8 +10,6 @@ const Nutrition = () => {
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [currentPlan, setCurrentPlan] = useState({});
     const [showAddMealModal, setShowAddMealModal] = useState(false);
-    const [showSavedMealsModal, setShowSavedMealsModal] = useState(false);
-    const [selectedMealTypeForSaved, setSelectedMealTypeForSaved] = useState(null);
     const [showRoutineModal, setShowRoutineModal] = useState(false);
     const [routineModalMeal, setRoutineModalMeal] = useState(null);
     const [routineModalMealType, setRoutineModalMealType] = useState(null);
@@ -41,26 +38,6 @@ const Nutrition = () => {
 
     const handleCloseModal = () => {
         setSelectedRecipe(null);
-    };
-
-    const handleShowSavedMeals = (mealType = null) => {
-        setSelectedMealTypeForSaved(mealType);
-        setShowSavedMealsModal(true);
-    };
-
-    const handleSelectSavedMeal = (meal) => {
-        if (selectedMealTypeForSaved) {
-            // Add to specific meal type
-            setCurrentPlan(prev => ({
-                ...prev,
-                    [selectedMealTypeForSaved]: meal
-            }));
-        } else {
-            // Let user choose meal type
-            setShowAddMealModal(true);
-            // Store the selected meal for the AddMealModal
-            setSelectedRecipe({ meal });
-        }
     };
 
     // Add to Routine logic
@@ -124,22 +101,16 @@ const Nutrition = () => {
 
     // Calculate daily stats
     const getDailyStats = () => {
-        let totalMeals = 0;
         let totalCalories = 0;
-            
         Object.values(currentPlan).forEach(meal => {
-            if (meal?.name) {
-                totalMeals++;
-                if (meal?.nutrition?.calories) {
-                    totalCalories += meal.nutrition.calories;
-                }
+            if (meal?.name && meal?.nutrition?.calories) {
+                totalCalories += meal.nutrition.calories;
             }
         });
-
-        return { totalMeals, totalCalories };
+        return { totalCalories };
     };
 
-    const { totalMeals, totalCalories } = getDailyStats();
+    const { totalCalories } = getDailyStats();
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
@@ -158,16 +129,7 @@ const Nutrition = () => {
                         
                         {/* Stats Cards */}
                         <div className="flex gap-4">
-                            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                                <div className="flex items-center gap-2">
-                                    <FiTarget className="w-5 h-5 text-green-500" />
-                                    <div>
-                                        <p className="text-sm text-gray-600">Total Meals</p>
-                                        <p className="text-lg font-semibold text-gray-900">{totalMeals}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
+                            {/* Removed Total Meals card */}
                             {totalCalories > 0 && (
                                 <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                                     <div className="flex items-center gap-2">
@@ -184,15 +146,7 @@ const Nutrition = () => {
                 </header>
 
                 {/* Quick Actions */}
-                <div className="mb-8 flex flex-wrap gap-3">
-                    <button
-                        onClick={() => handleShowSavedMeals()}
-                        className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm"
-                    >
-                        <FiBookmark className="w-4 h-4 mr-2" />
-                        Saved Meals
-                    </button>
-                </div>
+                {/* Removed Saved Meals button */}
 
                 {/* Daily AI Meal Plan Generator */}
                 <DailyMealPlanGenerator 
@@ -221,12 +175,6 @@ const Nutrition = () => {
                     isOpen={showAddMealModal}
                     onClose={() => setShowAddMealModal(false)}
                     onSave={handleSaveMeal}
-                />
-
-                <SavedMealsModal
-                    isOpen={showSavedMealsModal}
-                    onClose={() => setShowSavedMealsModal(false)}
-                    onSelectMeal={handleSelectSavedMeal}
                 />
 
                 {/* Routine Modal */}

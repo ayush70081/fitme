@@ -1,29 +1,8 @@
 import { useState } from "react";
 import { FiBookmark, FiTrash2 } from 'react-icons/fi';
-import { saveMeal } from '../../utils/savedMeals';
 
-const MealCard = ({ meal, mealType, onMealClick, onSaveMeal, onDeleteMeal, onAddToRoutine, showSaveButton = true, showDeleteButton = false }) => {
+const MealCard = ({ meal, mealType, onMealClick, onAddToRoutine, showDeleteButton = false }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-
-  const handleSaveMeal = async (e) => {
-    e.stopPropagation();
-    if (!meal?.name) return;
-    
-    setIsSaving(true);
-    try {
-      const savedMeal = saveMeal(meal);
-      if (onSaveMeal) {
-        onSaveMeal(savedMeal);
-      }
-      // Show success feedback
-      alert('Meal saved successfully!');
-    } catch (error) {
-      alert('Error saving meal. Please try again.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   const handleDeleteMeal = (e) => {
     e.stopPropagation();
@@ -49,16 +28,6 @@ const MealCard = ({ meal, mealType, onMealClick, onSaveMeal, onDeleteMeal, onAdd
               <span className="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
                 {Math.round(meal?.nutrition?.calories || meal?.calories || 0)} kcal
               </span>
-            )}
-            {meal?.name && showSaveButton && (
-              <button
-                onClick={handleSaveMeal}
-                disabled={isSaving}
-                className="p-1 text-gray-400 hover:text-blue-500 transition-colors"
-                title="Save meal for later"
-              >
-                <FiBookmark className={`w-4 h-4 ${isSaving ? 'animate-pulse' : ''}`} />
-              </button>
             )}
             {meal?.name && onAddToRoutine && (
               <button

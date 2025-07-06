@@ -98,10 +98,3 @@ class NutrientSearchResponse(BaseModel):
     success: bool
     message: str
     nutrition_data: Dict
-
-class SavedMealPlan(BaseModel):
-    id: Optional[str] = None
-    user_id: str
-    plan: MealPlan
-    saved_at: datetime = Field(default_factory=datetime.utcnow)
-    label: Optional[str] = None  # Optional: allow user to name the plan
