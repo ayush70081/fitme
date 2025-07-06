@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FiBookmark, FiTrash2 } from 'react-icons/fi';
 import { saveMeal } from '../../utils/savedMeals';
 
-const MealCard = ({ meal, mealType, onMealClick, onSaveMeal, onDeleteMeal, showSaveButton = true, showDeleteButton = false }) => {
+const MealCard = ({ meal, mealType, onMealClick, onSaveMeal, onDeleteMeal, onAddToRoutine, showSaveButton = true, showDeleteButton = false }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -58,6 +58,15 @@ const MealCard = ({ meal, mealType, onMealClick, onSaveMeal, onDeleteMeal, showS
                 title="Save meal for later"
               >
                 <FiBookmark className={`w-4 h-4 ${isSaving ? 'animate-pulse' : ''}`} />
+              </button>
+            )}
+            {meal?.name && onAddToRoutine && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onAddToRoutine(meal, mealType); }}
+                className="p-1 px-3 text-xs font-semibold rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-white shadow hover:from-blue-500 hover:to-green-400 transition-colors duration-200"
+                title="Add this meal to your Daily Routine"
+              >
+                + Add to Routine
               </button>
             )}
             {showDeleteButton && meal?.id && (

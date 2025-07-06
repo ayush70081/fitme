@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { FiBookmark, FiTarget, FiTrendingUp } from 'react-icons/fi';
+import { FiBookmark, FiTarget, FiTrendingUp, FiClock } from 'react-icons/fi';
 import DayPlan from '../components/NutritionPage_Component/DayPlan';
 import RecipeModal from '../components/NutritionPage_Component/RecipeModal';
 import AddMealModal from '../components/NutritionPage_Component/AddMealModal';
 import SavedMealsModal from '../components/NutritionPage_Component/SavedMealsModal';
 import DailyMealPlanGenerator from '../components/DailyMealPlanGenerator';
+import { useToast } from '../hooks/useToast';
 
 const Nutrition = () => {
     const [selectedRecipe, setSelectedRecipe] = useState(null);
@@ -12,6 +13,11 @@ const Nutrition = () => {
     const [showAddMealModal, setShowAddMealModal] = useState(false);
     const [showSavedMealsModal, setShowSavedMealsModal] = useState(false);
     const [selectedMealTypeForSaved, setSelectedMealTypeForSaved] = useState(null);
+    const [showRoutineModal, setShowRoutineModal] = useState(false);
+    const [routineModalMeal, setRoutineModalMeal] = useState(null);
+    const [routineModalMealType, setRoutineModalMealType] = useState(null);
+    const [routineSelectedTime, setRoutineSelectedTime] = useState("07:00");
+    const { showToast } = useToast();
 
     const handleMealClick = (day, mealType, meal) => {
         if (!meal?.name) return;
@@ -55,6 +61,65 @@ const Nutrition = () => {
             // Store the selected meal for the AddMealModal
             setSelectedRecipe({ meal });
         }
+    };
+
+    // Add to Routine logic
+    const handleAddToRoutine = (meal, mealType) => {
+      setRoutineModalMeal(meal);
+      setRoutineModalMealType(mealType);
+      setRoutineSelectedTime("07:00");
+      setShowRoutineModal(true);
+    };
+
+    // Helper to format time as h:mm AM/PM
+    const formatTime = (time24) => {
+      if (!time24) return '';
+      const [hourStr, minuteStr] = time24.split(":");
+      let hour = parseInt(hourStr, 10);
+      const minute = minuteStr;
+      const ampm = hour >= 12 ? "PM" : "AM";
+      hour = hour % 12;
+      if (hour === 0) hour = 12;
+      return `${hour}:${minute} ${ampm}`;
+    };
+
+    const handleRoutineModalConfirm = () => {
+      if (!routineModalMeal || !routineSelectedTime) return;
+      // Prepare the task object
+      const task = {
+        time: formatTime(routineSelectedTime),
+        category: routineModalMealType.charAt(0).toUpperCase() + routineModalMealType.slice(1),
+        name: routineModalMeal.name,
+        calories: Math.round(routineModalMeal.nutrition?.calories || routineModalMeal.calories || 0),
+        completed: false,
+        color: "bg-blue-100",
+        addedTime: new Date(),
+      };
+      // Get current date and tasks from localStorage in {date, tasks} format
+      const today = new Date().toISOString().slice(0, 10);
+      let parsed = { date: today, tasks: [] };
+      try {
+        const saved = localStorage.getItem("dailyTasks");
+        if (saved) {
+          parsed = JSON.parse(saved);
+          if (parsed.date !== today) {
+            parsed = { date: today, tasks: [] };
+          }
+        }
+      } catch {
+        parsed = { date: today, tasks: [] };
+      }
+      // Remove any existing task at the same time
+      parsed.tasks = parsed.tasks.filter(t => t.time !== task.time);
+      // Add new task
+      parsed.tasks.push(task);
+      localStorage.setItem("dailyTasks", JSON.stringify(parsed));
+      setShowRoutineModal(false);
+      setRoutineModalMeal(null);
+      setRoutineModalMealType(null);
+      setRoutineSelectedTime("07:00");
+      showToast('success', 'Meal added to Daily Routine!');
+      window.dispatchEvent(new Event('storage'));
     };
 
     // Calculate daily stats
@@ -141,6 +206,7 @@ const Nutrition = () => {
                     meals={currentPlan}
                     onMealClick={handleMealClick}
                     onAddMealClick={handleAddMealClick}
+                    onAddToRoutine={handleAddToRoutine}
                 />
                 
                 {selectedRecipe && (
@@ -162,6 +228,41 @@ const Nutrition = () => {
                     onClose={() => setShowSavedMealsModal(false)}
                     onSelectMeal={handleSelectSavedMeal}
                 />
+
+                {/* Routine Modal */}
+                {showRoutineModal && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-[6px]">
+                    <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md animate-fade-in border-2" style={{ borderColor: '#db2777' }}>
+                      <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#db2777' }}><FiClock style={{ color: '#ec4899' }} />Add to Daily Routine</h3>
+                      <p className="mb-2 text-gray-600">Select a time for <span className="font-semibold" style={{ color: '#db2777' }}>{routineModalMeal?.name}</span> ({routineModalMealType})</p>
+                      <div className="mb-4 flex flex-col items-center">
+                        <input
+                          type="time"
+                          value={routineSelectedTime}
+                          onChange={e => setRoutineSelectedTime(e.target.value)}
+                          className="w-40 p-2 border-2 rounded-lg focus:outline-none focus:ring-2 text-lg text-center"
+                          style={{ borderColor: '#db2777', boxShadow: '0 0 0 2px #fbcfe8' }}
+                        />
+                        <span className="mt-2 text-gray-500 text-sm">Selected: <span className="font-semibold">{formatTime(routineSelectedTime)}</span></span>
+                      </div>
+                      <div className="flex gap-3 mt-6">
+                        <button
+                          onClick={handleRoutineModalConfirm}
+                          className="flex-1 text-white py-2 rounded-lg font-semibold shadow transition-all"
+                          style={{ backgroundColor: '#ec4899' }}
+                        >
+                          Add to Routine
+                        </button>
+                        <button
+                          onClick={() => setShowRoutineModal(false)}
+                          className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-all"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
             </div>
         </div>
     );

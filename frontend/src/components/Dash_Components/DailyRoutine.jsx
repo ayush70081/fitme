@@ -1,45 +1,28 @@
 import React, { useState, useEffect } from "react";
 
+// Helper to get today's date in YYYY-MM-DD format
+const getTodayDate = () => {
+  const today = new Date();
+  return today.toISOString().slice(0, 10);
+};
+
 const DailyRoutine = () => {
+  // Load tasks from localStorage, but only if date matches today
   const [tasks, setTasks] = useState(() => {
-    const savedTasks = localStorage.getItem("dailyTasks");
-    return savedTasks
-      ? JSON.parse(savedTasks).map((task) => ({
-          ...task,
-          addedTime: new Date(task.addedTime),
-        }))
-      : [
-          {
-            time: "7:00 AM",
-            category: "Breakfast",
-            name: "Overnight oat",
-            calories: 280,
-            completed: false,
-            color: "bg-green-100",
-            isPermanent: true,
-            addedTime: new Date(),
-          },
-          {
-            time: "9:00 AM",
-            category: "Snacks",
-            name: "Banana",
-            calories: 88.7,
-            completed: false,
-            color: "bg-yellow-100",
-            isPermanent: true,
-            addedTime: new Date(),
-          },
-          {
-            time: "1:00 PM",
-            category: "Lunch",
-            name: "Banana",
-            calories: 88.7,
-            completed: false,
-            color: "bg-orange-100",
-            isPermanent: true,
-            addedTime: new Date(),
-          },
-        ];
+    const saved = localStorage.getItem("dailyTasks");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.date === getTodayDate() && Array.isArray(parsed.tasks)) {
+          return parsed.tasks.map((task) => ({
+            ...task,
+            addedTime: new Date(task.addedTime),
+          }));
+        }
+      } catch {}
+    }
+    // If no valid tasks for today, start empty
+    return [];
   });
 
   const [showModal, setShowModal] = useState(false);
@@ -47,35 +30,61 @@ const DailyRoutine = () => {
   const [newTask, setNewTask] = useState({
     category: "",
     name: "",
-    calories: "",
-    isPermanent: true,
+    calories: ""
   });
 
   const colors = ["bg-green-100", "bg-yellow-100", "bg-orange-100", "bg-blue-100", "bg-pink-100"];
 
-  const timeSlots = [
+  // Default time slots
+  const defaultTimeSlots = [
     "7:00 AM",
     "8:00 AM",
     "9:00 AM",
     "10:00 AM",
     "11:00 AM",
     "12:00 PM",
-    "1:00 PM",
+    "7:00 PM",
   ];
 
+  // Helper to parse time string (e.g., '8:00 PM') to minutes since midnight
+  const parseTimeToMinutes = (timeStr) => {
+    if (!timeStr) return 0;
+    const [time, modifier] = timeStr.split(' ');
+    let [hours, minutes] = time.split(':').map(Number);
+    if (modifier === 'PM' && hours !== 12) hours += 12;
+    if (modifier === 'AM' && hours === 12) hours = 0;
+    return hours * 60 + minutes;
+  };
+
+  // Collect all unique times from tasks
+  const taskTimes = tasks.map(task => task.time).filter(Boolean);
+  const allTimesSet = new Set([...defaultTimeSlots, ...taskTimes]);
+  const allTimesSorted = Array.from(allTimesSet).sort((a, b) => parseTimeToMinutes(a) - parseTimeToMinutes(b));
+
+  // When tasks change, save with today's date
   useEffect(() => {
-    localStorage.setItem("dailyTasks", JSON.stringify(tasks));
+    localStorage.setItem(
+      "dailyTasks",
+      JSON.stringify({ date: getTodayDate(), tasks })
+    );
   }, [tasks]);
 
+  // When checking for temporary tasks, also check if date changed (in case app left open overnight)
   useEffect(() => {
     const checkTemporaryTasks = () => {
       const now = new Date();
+      // If date changed, clear tasks
+      if (getTodayDate() !== (JSON.parse(localStorage.getItem("dailyTasks") || '{}').date)) {
+        setTasks([]);
+        localStorage.setItem(
+          "dailyTasks",
+          JSON.stringify({ date: getTodayDate(), tasks: [] })
+        );
+        return;
+      }
       const updatedTasks = tasks.filter((task) => {
-        if (!task.isPermanent) {
-          const timeDiff = (now - new Date(task.addedTime)) / (1000 * 60 * 60);
-          return timeDiff < 12;
-        }
-        return true;
+        const timeDiff = (now - new Date(task.addedTime)) / (1000 * 60 * 60);
+        return timeDiff < 12;
       });
       setTasks(updatedTasks);
     };
@@ -97,16 +106,12 @@ const DailyRoutine = () => {
 
   const closeModal = () => {
     setShowModal(false);
-    setNewTask({ category: "", name: "", calories: "", isPermanent: true });
+    setNewTask({ category: "", name: "", calories: "" });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewTask({ ...newTask, [name]: value });
-  };
-
-  const handlePermanenceChange = (e) => {
-    setNewTask({ ...newTask, isPermanent: e.target.value === "permanent" });
   };
 
   const addTask = () => {
@@ -119,7 +124,6 @@ const DailyRoutine = () => {
         calories: parseFloat(newTask.calories),
         completed: false,
         color: randomColor,
-        isPermanent: newTask.isPermanent,
         addedTime: new Date(),
       };
       setTasks([...tasks, taskToAdd]);
@@ -136,7 +140,7 @@ const DailyRoutine = () => {
 
         {/* Timeline */}
         <div className="space-y-2">
-          {timeSlots.map((time, index) => {
+          {allTimesSorted.map((time, index) => {
             const taskAtTime = tasks.find((task) => task.time === time);
 
             return (
@@ -227,33 +231,6 @@ const DailyRoutine = () => {
                 placeholder="Calories (e.g., 280)"
                 className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <div className="space-y-2">
-                <p className="text-sm text-gray-600">Save this task as:</p>
-                <div className="flex space-x-4">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="permanence"
-                      value="permanent"
-                      checked={newTask.isPermanent}
-                      onChange={handlePermanenceChange}
-                      className="mr-2"
-                    />
-                    Permanent
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="permanence"
-                      value="temporary"
-                      checked={!newTask.isPermanent}
-                      onChange={handlePermanenceChange}
-                      className="mr-2"
-                    />
-                    Temporary (12 hours)
-                  </label>
-                </div>
-              </div>
               <div className="flex space-x-2">
                 <button
                   onClick={addTask}
