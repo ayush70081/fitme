@@ -21,11 +21,11 @@ yarn-error.log*
 .env
 .env.*
 backend/.env
-backend/.env.*
+# backend/.env.*
 frontend/.env
-frontend/.env.*
+# frontend/.env.*
 fastapi_backend/.env
-fastapi_backend/.env.*
+# fastapi_backend/.env.*
 
 # OS generated files
 .DS_Store
