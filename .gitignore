@@ -74,6 +74,13 @@ coverage/
 # Ignore temporary files
 *.tmp.js
 
+# Ignore everything in dist/assets
+/frontend/dist/assets/*
+
+# But keep the image file
+!frontend/dist/assets/fit_couple_wh*
+
+
 # Ignore package manager lock files at root and subfolders (except package.json and requirements.txt)
 # (Uncomment if you want to ignore lock files)
 # package-lock.json
