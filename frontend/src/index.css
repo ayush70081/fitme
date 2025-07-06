@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+@theme {
+  --color-prime-blue: #1a1a2e;
+}
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Hide native password reveal eye icon for Edge/IE */
+input[type='password']::-ms-reveal,
+input[type='password']::-ms-clear {
+  display: none;
+}
+
+/* Hide Chrome/Chromium built-in password reveal icon (autofill eye) */
+input[type='password']::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+}
+
+/* Safari & other webkit variants */
+input[type='password']::-webkit-textfield-decoration-container {
+  visibility: hidden;
+}

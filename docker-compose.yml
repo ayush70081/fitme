@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: fitness_tracker_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: fitness_tracker
+
+  redis:
+    image: redis:alpine
+    container_name: fitness_tracker_redis
+    ports:
+      - "6379:6379"
+
+  express_backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fitness_tracker_express
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017/fitness_tracker
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  fastapi_backend:
+    build:
+      context: ./fastapi_backend
+      dockerfile: Dockerfile
+    container_name: fitness_tracker_fastapi
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+      - redis
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/fitness_tracker
+      - REDIS_URL=redis://redis:6379
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - USDA_API_KEY=${USDA_API_KEY}
+    volumes:
+      - ./fastapi_backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fitness_tracker_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - express_backend
+      - fastapi_backend
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+      - VITE_FASTAPI_URL=http://localhost:8000/api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  mongodb_data:

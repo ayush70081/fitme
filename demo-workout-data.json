@@ -1,0 +1,138 @@
+{
+  "workout_plan": {
+    "goal": "Weight Loss",
+    "duration_per_day_minutes": 30,
+    "preference": ["Yoga", "Cycling", "Cardio"],
+    "days": [
+      {
+        "day": "Day 1",
+        "workout_type": "Yoga + Light Cardio",
+        "estimated_calories_burned": 250,
+        "exercises": [
+          {
+            "name": "Sun Salutation (Surya Namaskar)",
+            "type": "Yoga",
+            "rounds": 4,
+            "duration_minutes": 10,
+            "description": "A flowing sequence of 12 yoga poses that improves flexibility, strength, and boosts heart rate.",
+            "calories_burned": 60
+          },
+          {
+            "name": "Warrior Pose Sequence",
+            "type": "Yoga",
+            "duration_minutes": 5,
+            "description": "Includes Warrior I, II, and III poses to strengthen legs, improve balance and posture.",
+            "calories_burned": 30
+          },
+          {
+            "name": "Jumping Jacks",
+            "type": "Cardio",
+            "sets": 3,
+            "reps": 25,
+            "rest_between_sets_seconds": 20,
+            "description": "Stand upright and jump while spreading your legs and arms; return to start position.",
+            "calories_burned": 40
+          },
+          {
+            "name": "Mountain Climbers",
+            "type": "Cardio/Core",
+            "sets": 3,
+            "duration_seconds": 30,
+            "description": "Start in a plank position and rapidly alternate knees toward your chest.",
+            "calories_burned": 60
+          },
+          {
+            "name": "Cool-down Stretch",
+            "type": "Yoga",
+            "duration_minutes": 5,
+            "description": "Gentle seated and lying stretches to release tension and relax muscles.",
+            "calories_burned": 20
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "workout_type": "Cycling",
+        "estimated_calories_burned": 280,
+        "exercises": [
+          {
+            "name": "Warm-up Ride",
+            "type": "Cycling",
+            "duration_minutes": 5,
+            "description": "Ride at an easy pace to prepare muscles and raise heart rate slightly.",
+            "calories_burned": 30
+          },
+          {
+            "name": "Moderate-Speed Ride",
+            "type": "Cycling",
+            "duration_minutes": 15,
+            "description": "Maintain a steady pace where talking becomes slightly difficult.",
+            "calories_burned": 160
+          },
+          {
+            "name": "Interval Sprints",
+            "type": "Cycling",
+            "sets": 3,
+            "duration_seconds": 30,
+            "rest_between_sets_seconds": 60,
+            "description": "Cycle fast for 30 seconds, then slow pace recovery for 1 minute.",
+            "calories_burned": 60
+          },
+          {
+            "name": "Cool-down Ride",
+            "type": "Cycling",
+            "duration_minutes": 5,
+            "description": "Easy pedaling to return heart rate to normal and relax leg muscles.",
+            "calories_burned": 30
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "workout_type": "Yoga + Cardio",
+        "estimated_calories_burned": 260,
+        "exercises": [
+          {
+            "name": "Dynamic Vinyasa Flow",
+            "type": "Yoga",
+            "duration_minutes": 10,
+            "description": "A continuous flow of yoga poses synchronized with breathing, boosting flexibility and strength.",
+            "calories_burned": 70
+          },
+          {
+            "name": "High Knees",
+            "type": "Cardio",
+            "sets": 3,
+            "duration_seconds": 30,
+            "rest_between_sets_seconds": 20,
+            "description": "Jog in place while lifting knees as high as possible, engaging your core.",
+            "calories_burned": 50
+          },
+          {
+            "name": "Bodyweight Squats",
+            "type": "Cardio/Strength",
+            "sets": 3,
+            "reps": 15,
+            "description": "Stand with feet shoulder-width apart, bend knees and lower into a squat, then return.",
+            "calories_burned": 40
+          },
+          {
+            "name": "Plank Hold",
+            "type": "Core",
+            "sets": 2,
+            "duration_seconds": 40,
+            "description": "Hold a straight-body position on elbows and toes, engaging your abs and glutes.",
+            "calories_burned": 30
+          },
+          {
+            "name": "Guided Breathing & Stretch",
+            "type": "Yoga",
+            "duration_minutes": 5,
+            "description": "Deep breathing paired with gentle stretches to calm the body and mind.",
+            "calories_burned": 20
+          }
+        ]
+      }
+    ]
+  }
+}
