@@ -214,6 +214,35 @@ const Profile = () => {
     recentWorkouts: []
   });
 
+  // Function to get cumulative nutrition data (persists across days)
+  const getCumulativeNutrition = () => {
+    try {
+      const nutritionData = JSON.parse(localStorage.getItem('cumulativeNutrition') || '{}');
+      const today = new Date().toISOString().slice(0, 10);
+      
+      if (nutritionData[today]) {
+        return {
+          calories: nutritionData[today].calories || 0,
+          protein: nutritionData[today].protein || 0,
+          carbs: nutritionData[today].carbs || 0,
+          fat: nutritionData[today].fat || 0
+        };
+      }
+      
+      return { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    } catch (error) {
+      console.error('Error getting cumulative nutrition:', error);
+      return { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    }
+  };
+
+  const [nutritionStats, setNutritionStats] = useState({
+    calories: 0,
+    protein: 0,
+    carbs: 0,
+    fat: 0
+  });
+
   useEffect(() => {
     async function fetchStats() {
       try {
@@ -249,6 +278,34 @@ const Profile = () => {
       }
     }
     fetchStats();
+  }, []);
+
+  // Update nutrition stats whenever component mounts or nutrition data changes
+  useEffect(() => {
+    const updateNutritionStats = () => {
+      const cumulativeData = getCumulativeNutrition();
+      setNutritionStats(cumulativeData);
+    };
+
+    // Initial load
+    updateNutritionStats();
+
+    // Listen for nutrition data updates
+    const handleNutritionUpdate = () => {
+      updateNutritionStats();
+    };
+
+    window.addEventListener('nutritionDataUpdated', handleNutritionUpdate);
+    
+    // Also listen for storage events and daily tasks updates
+    window.addEventListener('storage', handleNutritionUpdate);
+    window.addEventListener('dailyTasksUpdated', handleNutritionUpdate);
+
+    return () => {
+      window.removeEventListener('nutritionDataUpdated', handleNutritionUpdate);
+      window.removeEventListener('storage', handleNutritionUpdate);
+      window.removeEventListener('dailyTasksUpdated', handleNutritionUpdate);
+    };
   }, []);
 
   const tabs = [
@@ -946,7 +1003,7 @@ const Profile = () => {
           <div className="text-center p-4 bg-orange-50 rounded-lg">
             <TrendingUp className="w-8 h-8 text-orange-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-orange-600">{fitnessStats.totalCaloriesBurned}</div>
-            <div className="text-sm text-gray-600">Total Calories</div>
+            <div className="text-sm text-gray-600">Workout Calories</div>
           </div>
           <div className="text-center p-4 bg-blue-50 rounded-lg">
             <Clock className="w-8 h-8 text-blue-600 mx-auto mb-2" />
@@ -957,6 +1014,39 @@ const Profile = () => {
             <Activity className="w-8 h-8 text-green-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-green-600">{Math.round((fitnessStats.totalWorkoutTimeMinutes || 0) / 60)}</div>
             <div className="text-sm text-gray-600">Total Hours</div>
+          </div>
+        </div>
+        
+        {/* Today's Nutrition Section */}
+        <div className="mt-6">
+          <h4 className="text-md font-semibold text-gray-900 mb-4">Today's Nutrition Progress</h4>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-4 bg-emerald-50 rounded-lg">
+              <Utensils className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-emerald-600">{nutritionStats.calories}</div>
+              <div className="text-sm text-gray-600">Calories</div>
+            </div>
+            <div className="text-center p-4 bg-red-50 rounded-lg">
+              <div className="w-8 h-8 bg-red-500 rounded-full mx-auto mb-2 flex items-center justify-center">
+                <span className="text-white text-xs font-bold">P</span>
+              </div>
+              <div className="text-2xl font-bold text-red-600">{Math.round(nutritionStats.protein)}g</div>
+              <div className="text-sm text-gray-600">Protein</div>
+            </div>
+            <div className="text-center p-4 bg-yellow-50 rounded-lg">
+              <div className="w-8 h-8 bg-yellow-500 rounded-full mx-auto mb-2 flex items-center justify-center">
+                <span className="text-white text-xs font-bold">C</span>
+              </div>
+              <div className="text-2xl font-bold text-yellow-600">{Math.round(nutritionStats.carbs)}g</div>
+              <div className="text-sm text-gray-600">Carbs</div>
+            </div>
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <div className="w-8 h-8 bg-purple-500 rounded-full mx-auto mb-2 flex items-center justify-center">
+                <span className="text-white text-xs font-bold">F</span>
+              </div>
+              <div className="text-2xl font-bold text-purple-600">{Math.round(nutritionStats.fat)}g</div>
+              <div className="text-sm text-gray-600">Fat</div>
+            </div>
           </div>
         </div>
       </div>

@@ -30,7 +30,10 @@ const DailyRoutine = () => {
   const [newTask, setNewTask] = useState({
     category: "",
     name: "",
-    calories: ""
+    calories: "",
+    protein: "",
+    carbs: "",
+    fat: ""
   });
 
   const colors = ["bg-green-100", "bg-yellow-100", "bg-orange-100", "bg-blue-100", "bg-pink-100"];
@@ -67,6 +70,8 @@ const DailyRoutine = () => {
       "dailyTasks",
       JSON.stringify({ date: getTodayDate(), tasks })
     );
+    // Dispatch custom event to notify other components (like Profile stats)
+    window.dispatchEvent(new Event('dailyTasksUpdated'));
   }, [tasks]);
 
   // When checking for temporary tasks, also check if date changed (in case app left open overnight)
@@ -93,9 +98,74 @@ const DailyRoutine = () => {
     return () => clearInterval(interval);
   }, [tasks]);
 
+  // Function to track cumulative nutrition when tasks are completed
+  const trackCumulativeNutrition = (task, isCompleting) => {
+    if (!isCompleting) return; // Only track when completing, not uncompleting
+    
+    console.log('Tracking nutrition for task:', task); // Debug log
+    
+    const today = getTodayDate();
+    const nutritionKey = 'cumulativeNutrition';
+    
+    try {
+      let nutritionData = JSON.parse(localStorage.getItem(nutritionKey) || '{}');
+      
+      // Initialize today's data if it doesn't exist
+      if (!nutritionData[today]) {
+        nutritionData[today] = {
+          calories: 0,
+          protein: 0,
+          carbs: 0,
+          fat: 0,
+          completedMeals: []
+        };
+      }
+      
+      // Check if this specific task was already counted to avoid duplicates
+      const taskId = `${task.time}-${task.name}`;
+      if (nutritionData[today].completedMeals.includes(taskId)) {
+        console.log('Task already counted, skipping:', taskId);
+        return; // Already counted
+      }
+      
+      // Add nutrition values
+      const caloriesAdded = Number(task.calories) || 0;
+      const proteinAdded = Number(task.protein) || 0;
+      const carbsAdded = Number(task.carbs) || 0;
+      const fatAdded = Number(task.fat) || 0;
+      
+      nutritionData[today].calories += caloriesAdded;
+      nutritionData[today].protein += proteinAdded;
+      nutritionData[today].carbs += carbsAdded;
+      nutritionData[today].fat += fatAdded;
+      nutritionData[today].completedMeals.push(taskId);
+      
+      console.log('Added nutrition:', { caloriesAdded, proteinAdded, carbsAdded, fatAdded });
+      console.log('Total nutrition now:', nutritionData[today]);
+      
+      // Save back to localStorage
+      localStorage.setItem(nutritionKey, JSON.stringify(nutritionData));
+      
+      // Dispatch event to notify Profile component
+      window.dispatchEvent(new Event('nutritionDataUpdated'));
+    } catch (error) {
+      console.error('Error tracking cumulative nutrition:', error);
+    }
+  };
+
   const toggleTaskCompletion = (index) => {
     const updatedTasks = [...tasks];
-    updatedTasks[index].completed = !updatedTasks[index].completed;
+    const task = updatedTasks[index];
+    const wasCompleted = task.completed;
+    const isBeingCompleted = !wasCompleted;
+    
+    task.completed = !task.completed;
+    
+    // Track cumulative nutrition only when completing (not uncompleting)
+    if (isBeingCompleted && task.calories) {
+      trackCumulativeNutrition(task, true);
+    }
+    
     setTasks(updatedTasks);
   };
 
@@ -106,7 +176,7 @@ const DailyRoutine = () => {
 
   const closeModal = () => {
     setShowModal(false);
-    setNewTask({ category: "", name: "", calories: "" });
+    setNewTask({ category: "", name: "", calories: "", protein: "", carbs: "", fat: "" });
   };
 
   const handleInputChange = (e) => {
@@ -122,6 +192,9 @@ const DailyRoutine = () => {
         category: newTask.category,
         name: newTask.name,
         calories: parseFloat(newTask.calories),
+        protein: parseFloat(newTask.protein) || 0,
+        carbs: parseFloat(newTask.carbs) || 0,
+        fat: parseFloat(newTask.fat) || 0,
         completed: false,
         color: randomColor,
         addedTime: new Date(),
@@ -129,7 +202,7 @@ const DailyRoutine = () => {
       setTasks([...tasks, taskToAdd]);
       closeModal();
     } else {
-      alert("Please fill in all fields!");
+      alert("Please fill in category, name, and calories!");
     }
   };
 
@@ -166,6 +239,19 @@ const DailyRoutine = () => {
                         <div>
                           <p className="text-sm font-medium text-gray-800">{taskAtTime.category}</p>
                           <p className="text-sm text-gray-600">{taskAtTime.name}</p>
+                          {(taskAtTime.protein > 0 || taskAtTime.carbs > 0 || taskAtTime.fat > 0) && (
+                            <div className="flex gap-1 mt-1">
+                              {taskAtTime.protein > 0 && (
+                                <span className="text-xs bg-red-100 text-red-600 px-1 rounded">P:{taskAtTime.protein}g</span>
+                              )}
+                              {taskAtTime.carbs > 0 && (
+                                <span className="text-xs bg-yellow-100 text-yellow-600 px-1 rounded">C:{taskAtTime.carbs}g</span>
+                              )}
+                              {taskAtTime.fat > 0 && (
+                                <span className="text-xs bg-purple-100 text-purple-600 px-1 rounded">F:{taskAtTime.fat}g</span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                       <p className="text-sm text-gray-600">{taskAtTime.calories} kcal</p>
@@ -229,6 +315,30 @@ const DailyRoutine = () => {
                 value={newTask.calories}
                 onChange={handleInputChange}
                 placeholder="Calories (e.g., 280)"
+                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="number"
+                name="protein"
+                value={newTask.protein}
+                onChange={handleInputChange}
+                placeholder="Protein in grams (optional)"
+                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="number"
+                name="carbs"
+                value={newTask.carbs}
+                onChange={handleInputChange}
+                placeholder="Carbs in grams (optional)"
+                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="number"
+                name="fat"
+                value={newTask.fat}
+                onChange={handleInputChange}
+                placeholder="Fat in grams (optional)"
                 className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <div className="flex space-x-2">
