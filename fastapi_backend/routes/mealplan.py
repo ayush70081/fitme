@@ -7,7 +7,7 @@ import logging
 
 from models.mealplan import (
     MealPlanRequest, MealPlanResponse, MealPlan,
-    UserProfile, NutrientSearchRequest, NutrientSearchResponse, SavedMealPlan
+    UserProfile, NutrientSearchRequest, NutrientSearchResponse
 )
 from models.user import User
 from services.mealplan_service import MealPlanService

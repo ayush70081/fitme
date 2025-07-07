@@ -2,8 +2,11 @@ import MealCard from './MealCard';
 import { FiPlus } from 'react-icons/fi';
 
 const DayPlan = ({ day, meals, onMealClick, onAddMealClick, onAddToRoutine }) => {
-    // Only show meals that actually have data (name exists)
-    const actualMeals = Object.entries(meals).filter(([mealType, meal]) => meal && meal.name);
+    // Filter out non-meal properties (like dailyTotals) and only show meals that actually have data (name exists)
+    const validMealTypes = ['breakfast', 'lunch', 'dinner', 'snack'];
+    const actualMeals = Object.entries(meals).filter(([mealType, meal]) => 
+        validMealTypes.includes(mealType) && meal && meal.name
+    );
     
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">

@@ -184,7 +184,7 @@ const MealPlanSaveLoad = ({ currentPlan, onPlanLoaded, isVisible, onClose }) => 
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <h4 className="font-semibold text-gray-900 mb-1">
-                        {plan.name}
+                        {typeof plan.name === 'string' ? plan.name : 'Untitled Plan'}
                       </h4>
                       <div className="flex items-center text-sm text-gray-500 mb-2">
                         <FiClock className="w-4 h-4 mr-1" />
@@ -208,7 +208,7 @@ const MealPlanSaveLoad = ({ currentPlan, onPlanLoaded, isVisible, onClose }) => 
                         <FiDownload className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDeletePlan(plan.id, plan.name)}
+                        onClick={() => handleDeletePlan(plan.id, typeof plan.name === 'string' ? plan.name : 'Untitled Plan')}
                         disabled={isLoading}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Delete this plan"
@@ -305,7 +305,7 @@ const MealPlanSaveLoad = ({ currentPlan, onPlanLoaded, isVisible, onClose }) => 
                     className="p-3 border border-gray-200 rounded-lg mb-2 hover:bg-gray-50 cursor-pointer transition-colors"
                     onClick={() => handleLoadPlan(plan.id)}
                   >
-                    <div className="font-medium text-gray-900">{plan.name}</div>
+                    <div className="font-medium text-gray-900">{typeof plan.name === 'string' ? plan.name : 'Untitled Plan'}</div>
                     <div className="text-sm text-gray-500">
                       {formatDate(plan.savedAt)}
                       {plan.summary && (
