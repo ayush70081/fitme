@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Flame } from 'lucide-react';
 
 const ProgressBar = ({ label, value, max, suffix }) => {
@@ -19,14 +19,59 @@ const ProgressBar = ({ label, value, max, suffix }) => {
 };
 
 const CalorieOverview = ({ caloriesBurned = 0 }) => {
-  const [eaten] = useState(1100);
+  // Get today's nutrition progress from cumulative data
+  const getTodaysNutrition = () => {
+    try {
+      const nutritionData = JSON.parse(localStorage.getItem('cumulativeNutrition') || '{}');
+      const today = new Date().toISOString().slice(0, 10);
+      
+      if (nutritionData[today]) {
+        return {
+          calories: nutritionData[today].calories || 0,
+          protein: nutritionData[today].protein || 0,
+          carbs: nutritionData[today].carbs || 0,
+          fat: nutritionData[today].fat || 0
+        };
+      }
+      
+      return { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    } catch (error) {
+      console.error('Error getting today\'s nutrition:', error);
+      return { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    }
+  };
+
+  const [todaysNutrition, setTodaysNutrition] = useState(getTodaysNutrition());
+
+  // Listen for nutrition updates
+  useEffect(() => {
+    const updateTodaysNutrition = () => {
+      setTodaysNutrition(getTodaysNutrition());
+    };
+
+    // Initial load
+    updateTodaysNutrition();
+
+    // Listen for nutrition data updates
+    window.addEventListener('nutritionDataUpdated', updateTodaysNutrition);
+    window.addEventListener('storage', updateTodaysNutrition);
+    window.addEventListener('dailyTasksUpdated', updateTodaysNutrition);
+
+    return () => {
+      window.removeEventListener('nutritionDataUpdated', updateTodaysNutrition);
+      window.removeEventListener('storage', updateTodaysNutrition);
+      window.removeEventListener('dailyTasksUpdated', updateTodaysNutrition);
+    };
+  }, []);
+
+  const eaten = todaysNutrition.calories;
   const burned = caloriesBurned;
-  const total = 2200;
+  const total = 2200; // Daily calorie goal (could be made configurable)
   const left = total - eaten + burned;
 
-  const carbs = 0;
-  const protein = 14;
-  const fat = 10;
+  const carbs = todaysNutrition.carbs;
+  const protein = todaysNutrition.protein;
+  const fat = todaysNutrition.fat;
 
   const radius = 60;
   const strokeWidth = 8;
@@ -104,9 +149,9 @@ const CalorieOverview = ({ caloriesBurned = 0 }) => {
 
         {/* Macros Progress */}
         <div className="flex gap-3">
-          <ProgressBar label="Carbs" value={carbs} max={100} suffix="g" />
-          <ProgressBar label="Protein" value={protein} max={200} suffix="g" />
-          <ProgressBar label="Body Fat" value={fat} max={100} suffix="%" />
+          <ProgressBar label="Carbs" value={Math.round(carbs)} max={275} suffix="g" />
+          <ProgressBar label="Protein" value={Math.round(protein)} max={110} suffix="g" />
+          <ProgressBar label="Fat" value={Math.round(fat)} max={73} suffix="g" />
         </div>
       </div>
     </div>

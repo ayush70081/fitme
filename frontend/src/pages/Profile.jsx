@@ -214,24 +214,26 @@ const Profile = () => {
     recentWorkouts: []
   });
 
-  // Function to get cumulative nutrition data (persists across days)
-  const getCumulativeNutrition = () => {
+  // Function to get total cumulative nutrition data across ALL days
+  const getTotalCumulativeNutrition = () => {
     try {
       const nutritionData = JSON.parse(localStorage.getItem('cumulativeNutrition') || '{}');
-      const today = new Date().toISOString().slice(0, 10);
       
-      if (nutritionData[today]) {
-        return {
-          calories: nutritionData[today].calories || 0,
-          protein: nutritionData[today].protein || 0,
-          carbs: nutritionData[today].carbs || 0,
-          fat: nutritionData[today].fat || 0
-        };
-      }
+      // Sum up all days
+      let totalNutrition = { calories: 0, protein: 0, carbs: 0, fat: 0 };
       
-      return { calories: 0, protein: 0, carbs: 0, fat: 0 };
+      Object.values(nutritionData).forEach(dayData => {
+        if (dayData && typeof dayData === 'object') {
+          totalNutrition.calories += dayData.calories || 0;
+          totalNutrition.protein += dayData.protein || 0;
+          totalNutrition.carbs += dayData.carbs || 0;
+          totalNutrition.fat += dayData.fat || 0;
+        }
+      });
+      
+      return totalNutrition;
     } catch (error) {
-      console.error('Error getting cumulative nutrition:', error);
+      console.error('Error getting total cumulative nutrition:', error);
       return { calories: 0, protein: 0, carbs: 0, fat: 0 };
     }
   };
@@ -283,8 +285,8 @@ const Profile = () => {
   // Update nutrition stats whenever component mounts or nutrition data changes
   useEffect(() => {
     const updateNutritionStats = () => {
-      const cumulativeData = getCumulativeNutrition();
-      setNutritionStats(cumulativeData);
+      const totalData = getTotalCumulativeNutrition();
+      setNutritionStats(totalData);
     };
 
     // Initial load
@@ -1017,35 +1019,35 @@ const Profile = () => {
           </div>
         </div>
         
-        {/* Today's Nutrition Section */}
+        {/* Total Nutrition Section */}
         <div className="mt-6">
-          <h4 className="text-md font-semibold text-gray-900 mb-4">Today's Nutrition Progress</h4>
+          <h4 className="text-md font-semibold text-gray-900 mb-4">Total Nutrition Progress</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-4 bg-emerald-50 rounded-lg">
               <Utensils className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-emerald-600">{nutritionStats.calories}</div>
-              <div className="text-sm text-gray-600">Calories</div>
+              <div className="text-2xl font-bold text-emerald-600">{nutritionStats.calories.toLocaleString()}</div>
+              <div className="text-sm text-gray-600">Total Calories</div>
             </div>
             <div className="text-center p-4 bg-red-50 rounded-lg">
               <div className="w-8 h-8 bg-red-500 rounded-full mx-auto mb-2 flex items-center justify-center">
                 <span className="text-white text-xs font-bold">P</span>
               </div>
-              <div className="text-2xl font-bold text-red-600">{Math.round(nutritionStats.protein)}g</div>
-              <div className="text-sm text-gray-600">Protein</div>
+              <div className="text-2xl font-bold text-red-600">{Math.round(nutritionStats.protein).toLocaleString()}g</div>
+              <div className="text-sm text-gray-600">Total Protein</div>
             </div>
             <div className="text-center p-4 bg-yellow-50 rounded-lg">
               <div className="w-8 h-8 bg-yellow-500 rounded-full mx-auto mb-2 flex items-center justify-center">
                 <span className="text-white text-xs font-bold">C</span>
               </div>
-              <div className="text-2xl font-bold text-yellow-600">{Math.round(nutritionStats.carbs)}g</div>
-              <div className="text-sm text-gray-600">Carbs</div>
+              <div className="text-2xl font-bold text-yellow-600">{Math.round(nutritionStats.carbs).toLocaleString()}g</div>
+              <div className="text-sm text-gray-600">Total Carbs</div>
             </div>
             <div className="text-center p-4 bg-purple-50 rounded-lg">
               <div className="w-8 h-8 bg-purple-500 rounded-full mx-auto mb-2 flex items-center justify-center">
                 <span className="text-white text-xs font-bold">F</span>
               </div>
-              <div className="text-2xl font-bold text-purple-600">{Math.round(nutritionStats.fat)}g</div>
-              <div className="text-sm text-gray-600">Fat</div>
+              <div className="text-2xl font-bold text-purple-600">{Math.round(nutritionStats.fat).toLocaleString()}g</div>
+              <div className="text-sm text-gray-600">Total Fat</div>
             </div>
           </div>
         </div>
