@@ -18,6 +18,7 @@ import {
   RefreshCw,
   HelpCircle
 } from 'lucide-react';
+import OTPVerification from '../components/OTPVerification';
 
 const Login = () => {
   const { login } = useAuth();
@@ -33,6 +34,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [lastError, setLastError] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [showOTPVerification, setShowOTPVerification] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
 
   // Get the redirect path from location state or default to dashboard
   const from = location.state?.from?.pathname || '/dashboard';
@@ -173,6 +176,13 @@ const Login = () => {
       { message: errorResult, errorCode: 'GENERIC_ERROR' } : 
       errorResult;
 
+    // Handle email not verified error
+    if (errorInfo.errorCode === 'EMAIL_NOT_VERIFIED') {
+      setUnverifiedEmail(errorInfo.data?.email || formData.email);
+      setShowOTPVerification(true);
+      return;
+    }
+
     setLastError(errorInfo);
     setRetryCount(prev => prev + 1);
     
@@ -187,6 +197,20 @@ const Login = () => {
         missingFields: errorInfo.missingFields
       }
     });
+  };
+
+  const handleOTPSuccess = (data) => {
+    // OTP verification successful, redirect to appropriate page
+    if (data.user?.profileCompleted) {
+      navigate('/dashboard', { replace: true });
+    } else {
+      navigate('/onboarding', { replace: true });
+    }
+  };
+
+  const handleBackToLogin = () => {
+    setShowOTPVerification(false);
+    setUnverifiedEmail('');
   };
 
   const renderErrorMessage = (error) => {
@@ -292,6 +316,17 @@ const Login = () => {
       </motion.div>
     );
   };
+
+  // Show OTP verification if user needs email verification
+  if (showOTPVerification) {
+    return (
+      <OTPVerification 
+        email={unverifiedEmail}
+        onSuccess={handleOTPSuccess}
+        onBack={handleBackToLogin}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-pink-50 flex items-center justify-center p-4">

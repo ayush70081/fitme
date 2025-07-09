@@ -30,6 +30,7 @@ const setToken = (token) => {
     // Update Authorization header for future requests on both instances
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     fastapi.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    console.log('Token set on both API instances:', token.substring(0, 20) + '...');
   }
 };
 const removeToken = () => {
@@ -58,6 +59,13 @@ const addAuthInterceptor = (instance) => {
 // Add auth interceptors to both instances
 addAuthInterceptor(api);
 addAuthInterceptor(fastapi);
+
+// Ensure token is set on both instances if it exists
+const existingToken = getToken();
+if (existingToken) {
+  api.defaults.headers.common['Authorization'] = `Bearer ${existingToken}`;
+  fastapi.defaults.headers.common['Authorization'] = `Bearer ${existingToken}`;
+}
 
 // Response interceptor for error handling
 api.interceptors.response.use(
@@ -143,6 +151,22 @@ export const authAPI = {
 
   verifyToken: async () => {
     const response = await api.get('/auth/verify');
+    return response.data;
+  },
+
+  // OTP verification endpoints
+  sendOTP: async (email) => {
+    const response = await api.post('/auth/send-otp', { email });
+    return response.data;
+  },
+
+  verifyOTP: async (email, otp) => {
+    const response = await api.post('/auth/verify-otp', { email, otp });
+    return response.data;
+  },
+
+  resendOTP: async (email) => {
+    const response = await api.post('/auth/resend-otp', { email });
     return response.data;
   }
 };
@@ -322,10 +346,15 @@ export const aiCoachAPI = {
 
   getSuggestions: async () => {
     try {
+      const token = getToken();
+      console.log('getSuggestions: Token exists:', !!token);
+      console.log('getSuggestions: Making request to /aicoach/suggestions');
       const response = await fastapi.get('/aicoach/suggestions');
       return response.data;
     } catch (error) {
       console.error('AI Coach suggestions error:', error);
+      console.error('Error status:', error.response?.status);
+      console.error('Error data:', error.response?.data);
       throw error;
     }
   },

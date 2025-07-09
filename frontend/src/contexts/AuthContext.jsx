@@ -90,10 +90,20 @@ export const AuthProvider = ({ children }) => {
         lastName 
       })).unwrap();
       
-      // After successful registration, fetch the full user profile
-      await dispatch(getCurrentUser()).unwrap();
+      // Only fetch user profile if tokens are available (after email verification)
+      if (result.tokens && result.tokens.accessToken) {
+        await dispatch(getCurrentUser()).unwrap();
+      }
       
-      console.log('Registration successful:', result);
+      console.log('✅ AuthContext registration result:', result);
+      
+      // Check if email verification is required
+      if (result.requiresEmailVerification) {
+        console.log('✅ Email verification required, returning flag');
+        return { success: true, requiresEmailVerification: true };
+      }
+      
+      console.log('✅ No email verification required, going to onboarding');
       return { success: true, onboarding: true };
     } catch (error) {
       console.error('Registration error in AuthContext:', error);
@@ -108,6 +118,28 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       // Even if logout fails on server, clear local state
       return { success: true };
+    }
+  };
+
+  // Manual login function for OTP verification (bypasses redux login)
+  const manualLogin = (userData, tokens) => {
+    // Store tokens
+    if (tokens) {
+      localStorage.setItem('fitme_token', tokens.accessToken);
+      localStorage.setItem('fitme_refresh_token', tokens.refreshToken);
+    }
+    
+    // Store user data
+    if (userData) {
+      localStorage.setItem('fitme_user', JSON.stringify(userData));
+    }
+    
+    // Refresh auth state
+    dispatch(initializeAuth());
+    
+    // Fetch updated user profile
+    if (tokens) {
+      dispatch(getCurrentUser());
     }
   };
 
@@ -126,7 +158,8 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated,
     isInitialized,
     clearError: clearAuthError,
-    clearSuccessMessage: clearAuthSuccess
+    clearSuccessMessage: clearAuthSuccess,
+    manualLogin
   };
 
   return (

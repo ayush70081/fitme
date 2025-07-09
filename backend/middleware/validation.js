@@ -306,6 +306,38 @@ const validateRefreshToken = [
   handleValidationErrors
 ];
 
+/**
+ * Validation rules for email OTP requests
+ */
+const validateEmailOTP = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email address'),
+    
+  handleValidationErrors
+];
+
+/**
+ * Validation rules for OTP verification
+ */
+const validateOTP = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email address'),
+    
+  body('otp')
+    .notEmpty()
+    .withMessage('OTP is required')
+    .isLength({ min: 6, max: 6 })
+    .withMessage('OTP must be exactly 6 digits')
+    .matches(/^[0-9]{6}$/)
+    .withMessage('OTP must contain only numbers'),
+    
+  handleValidationErrors
+];
+
 module.exports = {
   validateRegistration,
   validateLogin,
@@ -314,5 +346,7 @@ module.exports = {
   validateProfileUpdate,
   validatePasswordChange,
   validateRefreshToken,
+  validateEmailOTP,
+  validateOTP,
   handleValidationErrors
 }; 

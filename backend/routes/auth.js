@@ -9,7 +9,10 @@ const {
   logout,
   getMe,
   changePassword,
-  verifyToken
+  verifyToken,
+  sendOTP,
+  verifyOTP,
+  resendOTP
 } = require('../controllers/authController');
 
 // Import middleware
@@ -18,7 +21,9 @@ const {
   validateRegistration,
   validateLogin,
   validatePasswordChange,
-  validateRefreshToken: validateRefreshTokenBody
+  validateRefreshToken: validateRefreshTokenBody,
+  validateOTP,
+  validateEmailOTP
 } = require('../middleware/validation');
 
 /**
@@ -69,5 +74,26 @@ router.put('/change-password', authenticate, validatePasswordChange, changePassw
  * @access  Private
  */
 router.get('/verify', authenticate, verifyToken);
+
+/**
+ * @route   POST /api/auth/send-otp
+ * @desc    Send OTP for email verification
+ * @access  Public
+ */
+router.post('/send-otp', validateEmailOTP, sendOTP);
+
+/**
+ * @route   POST /api/auth/verify-otp
+ * @desc    Verify OTP and activate account
+ * @access  Public
+ */
+router.post('/verify-otp', validateOTP, verifyOTP);
+
+/**
+ * @route   POST /api/auth/resend-otp
+ * @desc    Resend OTP for email verification
+ * @access  Public
+ */
+router.post('/resend-otp', validateEmailOTP, resendOTP);
 
 module.exports = router; 

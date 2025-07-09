@@ -59,7 +59,7 @@ async def get_suggested_questions(
 ):
     """Get personalized question suggestions for the user"""
     try:
-        logger.info(f"Getting suggestions for user: {current_user.email}")
+        logger.info(f"✅ Getting suggestions for user: {current_user.email}")
         
         suggestions = ai_coach_service.get_suggested_questions(current_user)
         
@@ -69,7 +69,7 @@ async def get_suggested_questions(
         )
         
     except Exception as e:
-        logger.error(f"Error getting suggestions: {e}")
+        logger.error(f"❌ Error getting suggestions: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get suggestions"

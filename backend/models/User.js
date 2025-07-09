@@ -159,6 +159,21 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  
+  // Email verification OTP fields
+  emailOTP: {
+    type: String,
+    select: false // Don't include in queries by default
+  },
+  otpExpiresAt: {
+    type: Date,
+    select: false
+  },
+  otpAttempts: {
+    type: Number,
+    default: 0,
+    select: false
+  },
   profileCompleted: {
     type: Boolean,
     default: false

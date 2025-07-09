@@ -26,7 +26,9 @@ logger.info(f"🔍 Environment variable check:")
 logger.info(f"   Raw JWT_SECRET from env: {repr(raw_jwt_secret)}")
 logger.info(f"   JWT_SECRET exists: {raw_jwt_secret is not None}")
 
-SECRET_KEY = raw_jwt_secret or "your-secret-key-change-this-in-production"
+# Use the same JWT secret as Express backend for consistency
+# Both backends must use the same secret for JWT token compatibility
+SECRET_KEY = raw_jwt_secret or "your-fallback-secret-key"
 ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "30"))
 
@@ -68,8 +70,10 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     try:
         # Extract token from credentials
         token = credentials.credentials
-        logger.info(f"Attempting to decode token: {token[:20]}...")
-        logger.info(f"Full token length: {len(token)}")
+        logger.info(f"🔑 Attempting to decode token: {token[:20]}...")
+        logger.info(f"🔑 Full token length: {len(token)}")
+        logger.info(f"🔑 Using SECRET_KEY: {SECRET_KEY[:10]}...{SECRET_KEY[-10:]}")
+        logger.info(f"🔑 Algorithm: {ALGORITHM}")
         
         # Decode token without verification to see payload
         try:
@@ -160,45 +164,45 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             logger.error(f"❌ Error finding user by email: {e}")
     
     if user_doc is None:
-        logger.error(f"❌ User not found for user_id: {user_id}, email: {email}")
-        logger.error(f"🔍 Available users in database:")
-        try:
-            # Show first few users in database for debugging
-            sample_users = []
-            async for doc in users_collection.find({}).limit(3):
-                sample_users.append({
-                    "id": str(doc["_id"]), 
-                    "email": doc.get("email"), 
-                    "name": doc.get("first_name", "N/A")
-                })
-            logger.error(f"📊 Sample users: {sample_users}")
-        except Exception as e:
-            logger.error(f"❌ Error fetching sample users: {e}")
+        logger.warning(f"⚠️ User not found in FastAPI database for user_id: {user_id}, email: {email}")
+        logger.info(f"🔄 Creating temporary user object from JWT token data")
         
-        # Create a user with real name from token instead of "Demo"
-        username = payload.get("username", "User")
-        return User(
-            id=user_id or "temp_user_id",
-            email=email or "unknown@example.com",
-            username=username,
-            password_hash="dummy_hash",
-            first_name=username,  # Use username instead of "Demo"
-            last_name="",
-            age=30,
-            weight=70.0,
-            height=175.0,
-            gender="other",
-            activity_level="moderately_active",
-            fitness_goal="maintenance",
-            dietary_preferences=[],
-            allergies=[],
-            disliked_foods=[],
-            preferred_cuisines=[],
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
-            is_active=True,
-            is_verified=True
-        )
+        # Since the JWT token is valid and issued by our Express backend,
+        # create a temporary user object with the token data
+        try:
+            username = payload.get("username", email.split('@')[0] if email else "User")
+            
+            temp_user = User(
+                id=user_id or "temp_user_id",
+                email=email or "unknown@example.com",
+                username=username,
+                password_hash="temp_hash",
+                first_name=username,
+                last_name="",
+                age=25,  # Default age
+                weight=70.0,  # Default weight
+                height=170.0,  # Default height
+                gender="other",  # Default gender
+                activity_level="moderately_active",  # Default activity level
+                fitness_goal=None,  # Will be set by the enum system
+                dietary_preferences=[],
+                allergies=[],
+                disliked_foods=[],
+                preferred_cuisines=[],
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow(),
+                is_active=True,
+                is_verified=True
+            )
+            
+            logger.info(f"✅ Created temporary user object for: {temp_user.email}")
+            return temp_user
+        except Exception as e:
+            logger.error(f"❌ Error creating temporary user: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create user session"
+            )
     
     # Convert MongoDB document to User model
     user = User(

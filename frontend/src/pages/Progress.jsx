@@ -156,7 +156,7 @@ const Progress = () => {
     return (
       <div className="flex flex-col items-center">
         <div className="grid grid-cols-7 gap-2 text-center p-2">
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => <div key={day} className="font-bold text-xs text-gray-500">{day}</div>)}
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => <div key={index} className="font-bold text-xs text-gray-500">{day}</div>)}
           {calendarDays.map((day, i) => (
             <motion.div
               key={i}

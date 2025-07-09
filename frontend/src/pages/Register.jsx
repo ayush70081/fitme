@@ -1,5 +1,5 @@
 // pages/Register.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
@@ -91,9 +91,28 @@ const Register = () => {
       );
       
       if (result.success) {
-        // Registration successful, redirect to login
-        navigate('/login', { state: { message: 'Registration successful. Please log in.', email: formData.email } });
+        console.log('✅ Register component result:', result);
+        
+        if (result.requiresEmailVerification) {
+          console.log('✅ Navigating to OTP verification');
+          // Navigate to OTP verification page with email as state
+          navigate('/otp-verification', { 
+            state: { 
+              email: formData.email,
+              message: 'Please check your email for the verification code'
+            }
+          });
+        } else if (result.onboarding) {
+          console.log('✅ Going to onboarding');
+          // Direct login successful, go to onboarding
+          navigate('/onboarding');
+        } else {
+          console.log('❌ Unexpected success case');
+          // Unexpected success case
+          setErrors({ submit: 'Registration completed but something went wrong' });
+        }
       } else {
+        console.log('❌ Registration failed:', result);
         setErrors({ submit: result.message || 'Registration failed' });
       }
     } catch (error) {
@@ -102,6 +121,9 @@ const Register = () => {
       setLoading(false);
     }
   };
+
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-pink-50 flex items-center justify-center p-4">
