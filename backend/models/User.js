@@ -174,6 +174,25 @@ const userSchema = new mongoose.Schema({
     default: 0,
     select: false
   },
+
+  // Password reset OTP fields
+  passwordResetOTP: {
+    type: String,
+    select: false
+  },
+  passwordResetExpiresAt: {
+    type: Date,
+    select: false
+  },
+  passwordResetAttempts: {
+    type: Number,
+    default: 0,
+    select: false
+  },
+  passwordResetLastSentAt: {
+    type: Date,
+    select: false
+  },
   profileCompleted: {
     type: Boolean,
     default: false

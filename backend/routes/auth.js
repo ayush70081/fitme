@@ -12,7 +12,9 @@ const {
   verifyToken,
   sendOTP,
   verifyOTP,
-  resendOTP
+  resendOTP,
+  requestPasswordReset,
+  resetPasswordWithOTP
 } = require('../controllers/authController');
 
 // Import middleware
@@ -23,7 +25,9 @@ const {
   validatePasswordChange,
   validateRefreshToken: validateRefreshTokenBody,
   validateOTP,
-  validateEmailOTP
+  validateEmailOTP,
+  validatePasswordResetRequest,
+  validatePasswordReset
 } = require('../middleware/validation');
 
 /**
@@ -95,5 +99,19 @@ router.post('/verify-otp', validateOTP, verifyOTP);
  * @access  Public
  */
 router.post('/resend-otp', validateEmailOTP, resendOTP);
+
+/**
+ * @route   POST /api/auth/forgot-password/request
+ * @desc    Request password reset code
+ * @access  Public
+ */
+router.post('/forgot-password/request', validatePasswordResetRequest, requestPasswordReset);
+
+/**
+ * @route   POST /api/auth/forgot-password/confirm
+ * @desc    Confirm password reset with OTP
+ * @access  Public
+ */
+router.post('/forgot-password/confirm', validatePasswordReset, resetPasswordWithOTP);
 
 module.exports = router; 

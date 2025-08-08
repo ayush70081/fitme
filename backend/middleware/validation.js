@@ -33,8 +33,16 @@ const validateRegistration = [
     .withMessage('Please provide a valid email address'),
     
   body('password')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long'),
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters long')
+    .matches(/[a-z]/)
+    .withMessage('Password must include at least one lowercase letter')
+    .matches(/[A-Z]/)
+    .withMessage('Password must include at least one uppercase letter')
+    .matches(/[0-9]/)
+    .withMessage('Password must include at least one number')
+    .matches(/[^A-Za-z0-9]/)
+    .withMessage('Password must include at least one special character'),
     
   body('firstName')
     .trim()
@@ -90,17 +98,34 @@ const validatePasswordResetRequest = [
 ];
 
 /**
- * Validation rules for password reset
+ * Validation rules for password reset (email + otp + password)
  */
 const validatePasswordReset = [
-  body('token')
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email address'),
+
+  body('otp')
     .notEmpty()
-    .withMessage('Reset token is required'),
-    
+    .withMessage('OTP is required')
+    .isLength({ min: 6, max: 6 })
+    .withMessage('OTP must be exactly 6 digits')
+    .matches(/^[0-9]{6}$/)
+    .withMessage('OTP must contain only numbers'),
+
   body('password')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long'),
-    
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters long')
+    .matches(/[a-z]/)
+    .withMessage('Password must include at least one lowercase letter')
+    .matches(/[A-Z]/)
+    .withMessage('Password must include at least one uppercase letter')
+    .matches(/[0-9]/)
+    .withMessage('Password must include at least one number')
+    .matches(/[^A-Za-z0-9]/)
+    .withMessage('Password must include at least one special character'),
+
   body('confirmPassword')
     .custom((value, { req }) => {
       if (value !== req.body.password) {
@@ -108,7 +133,7 @@ const validatePasswordReset = [
       }
       return true;
     }),
-    
+
   handleValidationErrors
 ];
 
@@ -281,8 +306,16 @@ const validatePasswordChange = [
     .withMessage('Current password is required'),
     
   body('newPassword')
-    .isLength({ min: 6 })
-    .withMessage('New password must be at least 6 characters long'),
+    .isLength({ min: 8 })
+    .withMessage('New password must be at least 8 characters long')
+    .matches(/[a-z]/)
+    .withMessage('New password must include at least one lowercase letter')
+    .matches(/[A-Z]/)
+    .withMessage('New password must include at least one uppercase letter')
+    .matches(/[0-9]/)
+    .withMessage('New password must include at least one number')
+    .matches(/[^A-Za-z0-9]/)
+    .withMessage('New password must include at least one special character'),
     
   body('confirmNewPassword')
     .custom((value, { req }) => {

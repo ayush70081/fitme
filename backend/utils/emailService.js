@@ -86,6 +86,102 @@ class EmailService {
     }
   }
 
+  async sendPasswordResetOTP(email, otp, firstName = '') {
+    if (!this.transporter) {
+      console.log('\n' + '='.repeat(60));
+      console.log('📧 PASSWORD RESET EMAIL SIMULATION (Development Mode)');
+      console.log('='.repeat(60));
+      console.log(`To: ${email}`);
+      console.log(`Subject: Password Reset - FitMe App`);
+      console.log(`RESET OTP: ${otp}`);
+      console.log(`Name: ${firstName}`);
+      console.log('='.repeat(60));
+      console.log('Copy this OTP code to reset your password in the frontend');
+      console.log('='.repeat(60) + '\n');
+      return { messageId: 'simulated-reset-' + Date.now() };
+    }
+
+    const { html, text } = this.getPasswordResetEmailTemplate(otp, firstName);
+
+    const mailOptions = {
+      from: `"FitMe App" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'Password Reset - FitMe App',
+      html,
+      text
+    };
+
+    try {
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('Password reset OTP email sent successfully:', info.messageId);
+      return info;
+    } catch (error) {
+      console.error('Failed to send password reset OTP email:', error);
+      throw error;
+    }
+  }
+
+  getPasswordResetEmailTemplate(otp, firstName) {
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Password Reset - FitMe</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+          .container { background-color: #f9f9f9; padding: 30px; border-radius: 10px; border: 1px solid #e0e0e0; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .logo { color: #4f46e5; font-size: 32px; font-weight: bold; margin-bottom: 10px; }
+          .otp-box { background-color: #111827; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; }
+          .otp-code { font-size: 32px; font-weight: bold; letter-spacing: 8px; margin: 10px 0; }
+          .warning { background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px; }
+          .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <div class="logo">FitMe</div>
+            <h2>Password Reset</h2>
+          </div>
+          <p>Hello ${firstName ? firstName : 'there'},</p>
+          <p>We received a request to reset your password. Use the verification code below to continue:</p>
+          <div class="otp-box">
+            <div>Your password reset code is:</div>
+            <div class="otp-code">${otp}</div>
+          </div>
+          <p>This code expires in 5 minutes. If you didn't request this, you can ignore this email.</p>
+          <div class="footer">
+            <p>Best regards,<br>The FitMe Team</p>
+            <p>This is an automated email. Please do not reply to this message.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const text = `
+      FitMe - Password Reset
+
+      Hello ${firstName ? firstName : 'there'},
+
+      We received a request to reset your password. Use the verification code below to continue:
+
+      Your password reset code is: ${otp}
+
+      This code expires in 5 minutes. If you didn't request this, you can ignore this email.
+
+      Best regards,
+      The FitMe Team
+
+      This is an automated email. Please do not reply to this message.
+    `;
+
+    return { html, text };
+  }
+
   getOTPEmailTemplate(otp, firstName) {
     const html = `
       <!DOCTYPE html>

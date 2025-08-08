@@ -60,8 +60,16 @@ const Register = () => {
 
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters long';
+    } else if (!/[a-z]/.test(formData.password)) {
+      newErrors.password = 'Password must include at least one lowercase letter';
+    } else if (!/[A-Z]/.test(formData.password)) {
+      newErrors.password = 'Password must include at least one uppercase letter';
+    } else if (!/[0-9]/.test(formData.password)) {
+      newErrors.password = 'Password must include at least one number';
+    } else if (!/[^A-Za-z0-9]/.test(formData.password)) {
+      newErrors.password = 'Password must include at least one special character';
     }
 
     if (!formData.confirmPassword) {
@@ -255,7 +263,7 @@ const Register = () => {
                   className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-colors duration-200 ${
                     errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
-                  placeholder="Create a password (min. 6 characters)"
+                  placeholder="Create a password"
                 />
                 <button
                   type="button"

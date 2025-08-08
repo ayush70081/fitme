@@ -450,6 +450,20 @@ const changePassword = async (req, res) => {
       });
     }
 
+    // Prevent reusing the current password
+    const isSameAsOld = await user.comparePassword(newPassword);
+    if (isSameAsOld) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password cannot be the same as your current password',
+        errorCode: 'PASSWORD_REUSE_NOT_ALLOWED',
+        suggestions: [
+          'Choose a password you have not used before',
+          'Add length (12+ chars) and mix letters, numbers, symbols'
+        ]
+      });
+    }
+
     // Update password
     user.password = newPassword;
     await user.save();
@@ -812,6 +826,192 @@ const resendOTP = async (req, res) => {
   }
 };
 
+/**
+ * Request password reset (send OTP to email)
+ * @route POST /api/auth/forgot-password/request
+ * @access Public
+ */
+const requestPasswordReset = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required',
+        errorCode: 'EMAIL_REQUIRED'
+      });
+    }
+
+    // Find user and include password reset fields
+    const user = await User.findOne({ email }).select('+passwordResetOTP +passwordResetExpiresAt +passwordResetAttempts');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'No account found with this email address',
+        errorCode: 'EMAIL_NOT_FOUND'
+      });
+    }
+
+    // Allow resend after 60 seconds regardless of OTP validity
+    const now = new Date();
+    if (user.passwordResetLastSentAt) {
+      const secondsSinceLast = Math.floor((now - user.passwordResetLastSentAt) / 1000);
+      if (secondsSinceLast < 60) {
+        return res.status(429).json({
+          success: false,
+          message: `Please wait ${60 - secondsSinceLast} seconds before requesting a new code`,
+          errorCode: 'RESEND_COOLDOWN',
+          timeRemaining: 60 - secondsSinceLast
+        });
+      }
+    }
+
+    // Simple rate-limit based on attempts
+    if (user.passwordResetAttempts >= 5) {
+      return res.status(429).json({
+        success: false,
+        message: 'Too many password reset requests. Please try again later.',
+        errorCode: 'TOO_MANY_ATTEMPTS'
+      });
+    }
+
+    // Generate new OTP for password reset
+    const otp = OTPGenerator.generateOTP();
+    const hashedOTP = await OTPGenerator.hashOTP(otp);
+    const otpExpiry = OTPGenerator.getOTPExpiry();
+
+    user.passwordResetOTP = hashedOTP;
+    user.passwordResetExpiresAt = otpExpiry;
+    user.passwordResetAttempts = 0;
+    user.passwordResetLastSentAt = now;
+    await user.save();
+
+    // Send password reset email
+    await emailService.sendPasswordResetOTP(user.email, otp, user.firstName);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password reset code sent successfully',
+      data: { email: user.email, expiresIn: '5 minutes' }
+    });
+  } catch (error) {
+    console.error('Request password reset error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to send password reset code',
+      errorCode: 'PASSWORD_RESET_EMAIL_ERROR'
+    });
+  }
+};
+
+/**
+ * Reset password using OTP
+ * @route POST /api/auth/forgot-password/confirm
+ * @access Public
+ */
+const resetPasswordWithOTP = async (req, res) => {
+  try {
+    // Accept 'password' as the new password field (matches validator and frontend)
+    const { email, otp, password } = req.body;
+
+    if (!email || !otp || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email, OTP and new password are required',
+        errorCode: 'MISSING_REQUIRED_FIELDS'
+      });
+    }
+
+    if (!OTPGenerator.validateOTPFormat(otp)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP format. OTP must be 6 digits.',
+        errorCode: 'INVALID_OTP_FORMAT'
+      });
+    }
+
+    // Find user with reset fields
+    const user = await User.findOne({ email }).select('+password +passwordResetOTP +passwordResetExpiresAt +passwordResetAttempts');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'No account found with this email address',
+        errorCode: 'EMAIL_NOT_FOUND'
+      });
+    }
+
+    if (!user.passwordResetOTP || !user.passwordResetExpiresAt) {
+      return res.status(400).json({
+        success: false,
+        message: 'No password reset request found. Please request a new code.',
+        errorCode: 'NO_RESET_REQUEST'
+      });
+    }
+
+    if (OTPGenerator.isOTPExpired(user.passwordResetExpiresAt)) {
+      return res.status(400).json({
+        success: false,
+        message: 'OTP has expired. Please request a new code.',
+        errorCode: 'OTP_EXPIRED'
+      });
+    }
+
+    if (user.passwordResetAttempts >= 3) {
+      return res.status(429).json({
+        success: false,
+        message: 'Too many incorrect attempts. Please request a new code.',
+        errorCode: 'TOO_MANY_ATTEMPTS'
+      });
+    }
+
+    const isValid = await OTPGenerator.verifyOTP(otp, user.passwordResetOTP);
+    if (!isValid) {
+      user.passwordResetAttempts += 1;
+      await user.save();
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP. Please try again.',
+        errorCode: 'INVALID_OTP',
+        attemptsRemaining: Math.max(0, 3 - user.passwordResetAttempts)
+      });
+    }
+
+    // Prevent using the same password as current
+    const isSameAsOld = await user.comparePassword(password);
+    if (isSameAsOld) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password cannot be the same as your current password',
+        errorCode: 'PASSWORD_REUSE_NOT_ALLOWED',
+        suggestions: [
+          'Choose a password you have not used before',
+          'Add length (12+ chars) and mix letters, numbers, symbols'
+        ]
+      });
+    }
+
+    // Update password and clear reset fields
+    user.password = password;
+    user.passwordResetOTP = undefined;
+    user.passwordResetExpiresAt = undefined;
+    user.passwordResetAttempts = 0;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password has been reset successfully'
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to reset password',
+      errorCode: 'PASSWORD_RESET_ERROR'
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -822,5 +1022,7 @@ module.exports = {
   verifyToken,
   sendOTP,
   verifyOTP,
-  resendOTP
+  resendOTP,
+  requestPasswordReset,
+  resetPasswordWithOTP
 }; 

@@ -168,6 +168,17 @@ export const authAPI = {
   resendOTP: async (email) => {
     const response = await api.post('/auth/resend-otp', { email });
     return response.data;
+  },
+
+  // Password reset (OTP by email)
+  requestPasswordReset: async (email) => {
+    const response = await api.post('/auth/forgot-password/request', { email });
+    return response.data;
+  },
+
+  resetPasswordWithOTP: async ({ email, otp, newPassword, confirmPassword }) => {
+    const response = await api.post('/auth/forgot-password/confirm', { email, otp, password: newPassword, confirmPassword });
+    return response.data;
   }
 };
 
