@@ -41,14 +41,24 @@ export const registerUser = createAsyncThunk(
       const response = await authAPI.register(userData);
       
       if (response.success) {
-        const { user, tokens } = response.data;
-        
-        // Store both tokens in localStorage and set auth header
-        apiUtils.setAuthToken(tokens.accessToken);
-        localStorage.setItem('fitme_refresh_token', tokens.refreshToken);
+        const { user } = response.data;
+        const tokens = response.data?.tokens;
+
+        // Always store user data
         localStorage.setItem('fitme_user', JSON.stringify(user));
-        
-        return { user, tokens };
+
+        // If tokens are present (legacy or direct-login flows), store them
+        if (tokens && tokens.accessToken) {
+          apiUtils.setAuthToken(tokens.accessToken);
+          if (tokens.refreshToken) {
+            localStorage.setItem('fitme_refresh_token', tokens.refreshToken);
+          }
+          return { user, tokens, requiresEmailVerification: false };
+        }
+
+        // New flow: registration requires email verification and returns no tokens
+        const requiresEmailVerification = !!response.data?.requiresEmailVerification;
+        return { user, requiresEmailVerification };
       } else {
         return rejectWithValue(response.message || 'Registration failed');
       }
@@ -289,11 +299,15 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
-        state.isAuthenticated = true;
+        state.isAuthenticated = Boolean(action.payload.tokens && action.payload.tokens.accessToken);
         state.error = null;
-        state.successMessage = 'Registration successful!';
-        // Ensure token is set in axios defaults
-        apiUtils.setAuthToken(action.payload.tokens.accessToken);
+        state.successMessage = action.payload.requiresEmailVerification
+          ? 'Registration successful! Please verify your email.'
+          : 'Registration successful!';
+        // Ensure token is set in axios defaults when available
+        if (action.payload.tokens && action.payload.tokens.accessToken) {
+          apiUtils.setAuthToken(action.payload.tokens.accessToken);
+        }
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;

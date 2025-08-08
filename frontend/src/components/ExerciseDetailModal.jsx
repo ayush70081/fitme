@@ -70,7 +70,7 @@ const ExerciseDetailModal = ({
           className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
         >
           {/* Header */}
-          <div className="relative bg-gradient-to-r from-pink-500 to-pink-600 text-white p-6 rounded-t-2xl">
+          <div className="relative bg-black text-white p-6 rounded-t-2xl">
             <button
               onClick={onClose}
               className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-lg transition-colors"
@@ -83,11 +83,11 @@ const ExerciseDetailModal = ({
               <div>
                 <h2 className="text-2xl font-bold mb-1">{exercise.name}</h2>
                 <div className="flex items-center gap-2">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getDifficultyColor(exercise.type)}`}>
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium border bg-[#F5EFE6] text-gray-900 border-[#EADFD0]`}>
                     {exercise.type}
                   </span>
                   {isCompleted && (
-                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium border border-green-200">
+                    <span className="px-3 py-1 bg-[#F5EFE6] text-gray-900 rounded-full text-sm font-medium border border-[#EADFD0]">
                       ✅ Completed
                     </span>
                   )}
@@ -101,32 +101,32 @@ const ExerciseDetailModal = ({
             {/* Exercise Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {exercise.sets && (
-                <div className="text-center p-4 bg-blue-50 rounded-xl border border-blue-100">
-                  <div className="text-2xl font-bold text-blue-600">{exercise.sets}</div>
-                  <div className="text-sm text-blue-700">Sets</div>
+                <div className="text-center p-4 bg-[#F5EFE6] rounded-xl border border-[#EADFD0]">
+                  <div className="text-2xl font-bold text-gray-900">{exercise.sets}</div>
+                  <div className="text-sm text-gray-600">Sets</div>
                 </div>
               )}
               {exercise.reps && (
-                <div className="text-center p-4 bg-green-50 rounded-xl border border-green-100">
-                  <div className="text-2xl font-bold text-green-600">{exercise.reps}</div>
-                  <div className="text-sm text-green-700">Reps</div>
+                <div className="text-center p-4 bg-[#F5EFE6] rounded-xl border border-[#EADFD0]">
+                  <div className="text-2xl font-bold text-gray-900">{exercise.reps}</div>
+                  <div className="text-sm text-gray-600">Reps</div>
                 </div>
               )}
               {exercise.duration_minutes && exercise.duration_minutes > 0 && (
-                <div className="text-center p-4 bg-purple-50 rounded-xl border border-purple-100">
-                  <div className="text-2xl font-bold text-purple-600">{exercise.duration_minutes}</div>
-                  <div className="text-sm text-purple-700">Minutes</div>
+                <div className="text-center p-4 bg-[#F5EFE6] rounded-xl border border-[#EADFD0]">
+                  <div className="text-2xl font-bold text-gray-900">{exercise.duration_minutes}</div>
+                  <div className="text-sm text-gray-600">Minutes</div>
                 </div>
               )}
               {exercise.duration_seconds && exercise.duration_seconds > 0 && (
-                <div className="text-center p-4 bg-purple-50 rounded-xl border border-purple-100">
-                  <div className="text-2xl font-bold text-purple-600">{exercise.duration_seconds}</div>
-                  <div className="text-sm text-purple-700">Seconds</div>
+                <div className="text-center p-4 bg-[#F5EFE6] rounded-xl border border-[#EADFD0]">
+                  <div className="text-2xl font-bold text-gray-900">{exercise.duration_seconds}</div>
+                  <div className="text-sm text-gray-600">Seconds</div>
                 </div>
               )}
-              <div className="text-center p-4 bg-orange-50 rounded-xl border border-orange-100">
-                <div className="text-2xl font-bold text-orange-600">{exercise.calories_burned}</div>
-                <div className="text-sm text-orange-700">Calories</div>
+              <div className="text-center p-4 bg-[#F5EFE6] rounded-xl border border-[#EADFD0]">
+                <div className="text-2xl font-bold text-gray-900">{exercise.calories_burned}</div>
+                <div className="text-sm text-gray-600">Calories</div>
               </div>
               {exercise.rest_between_sets_seconds && (
                 <div className="text-center p-4 bg-gray-50 rounded-xl border border-gray-100">
@@ -156,12 +156,12 @@ const ExerciseDetailModal = ({
 
             {/* Tips & Benefits */}
             <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+              <div className="bg-[#F5EFE6] rounded-xl p-4 border border-[#EADFD0]">
                 <div className="flex items-center gap-2 mb-2">
-                  <Target className="w-4 h-4 text-blue-600" />
-                  <h4 className="font-semibold text-blue-900">Form Tips</h4>
+                  <Target className="w-4 h-4 text-gray-900" />
+                  <h4 className="font-semibold text-gray-900">Form Tips</h4>
                 </div>
-                <ul className="text-sm text-blue-800 space-y-1">
+                <ul className="text-sm text-gray-700 space-y-1">
                   <li>• Maintain proper posture throughout</li>
                   <li>• Control the movement, don't rush</li>
                   <li>• Breathe properly during execution</li>
@@ -169,12 +169,12 @@ const ExerciseDetailModal = ({
                 </ul>
               </div>
               
-              <div className="bg-green-50 rounded-xl p-4 border border-green-100">
+              <div className="bg-[#F5EFE6] rounded-xl p-4 border border-[#EADFD0]">
                 <div className="flex items-center gap-2 mb-2">
-                  <Zap className="w-4 h-4 text-green-600" />
-                  <h4 className="font-semibold text-green-900">Benefits</h4>
+                  <Zap className="w-4 h-4 text-gray-900" />
+                  <h4 className="font-semibold text-gray-900">Benefits</h4>
                 </div>
-                <ul className="text-sm text-green-800 space-y-1">
+                <ul className="text-sm text-gray-700 space-y-1">
                   <li>• Improves strength and endurance</li>
                   <li>• Enhances muscle coordination</li>
                   <li>• Boosts cardiovascular health</li>
@@ -191,7 +191,7 @@ const ExerciseDetailModal = ({
                     onComplete(exerciseIndex);
                     onClose();
                   }}
-                  className="flex-1 py-3 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-green-700 transition-all duration-200"
+                  className="flex-1 py-3 px-6 bg-black text-white rounded-xl font-medium hover:opacity-90 transition-all duration-200"
                 >
                   Mark as Complete
                 </button>
@@ -206,7 +206,7 @@ const ExerciseDetailModal = ({
             
             {isCompleted && (
               <div className="text-center py-4">
-                <div className="text-green-600 font-medium">✅ Exercise completed!</div>
+                <div className="text-gray-900 font-medium">✅ Exercise completed!</div>
                 <button
                   onClick={onClose}
                   className="mt-3 px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"

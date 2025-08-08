@@ -104,8 +104,8 @@ const PasswordChangeModal = ({ isOpen, onClose, onSubmit }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center">
-              <Shield className="w-5 h-5 text-pink-600" />
+            <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
+              <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
               <h2 className="text-xl font-semibold text-gray-900">Change Password</h2>
@@ -133,7 +133,7 @@ const PasswordChangeModal = ({ isOpen, onClose, onSubmit }) => {
                 name="currentPassword"
                 value={formData.currentPassword}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 pr-12 border rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 pr-12 border rounded-xl focus:ring-2 focus:ring-black focus:border-transparent transition-all ${
                   errors.currentPassword ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
                 }`}
                 placeholder="Enter your current password"
@@ -165,7 +165,7 @@ const PasswordChangeModal = ({ isOpen, onClose, onSubmit }) => {
                 name="newPassword"
                 value={formData.newPassword}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 pr-12 border rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 pr-12 border rounded-xl focus:ring-2 focus:ring-black focus:border-transparent transition-all ${
                   errors.newPassword ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
                 }`}
                 placeholder="Enter a new password"
@@ -218,7 +218,7 @@ const PasswordChangeModal = ({ isOpen, onClose, onSubmit }) => {
                 name="confirmNewPassword"
                 value={formData.confirmNewPassword}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 pr-12 border rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 pr-12 border rounded-xl focus:ring-2 focus:ring-black focus:border-transparent transition-all ${
                   errors.confirmNewPassword ? 'border-red-300 bg-red-50' : 
                   formData.confirmNewPassword && formData.newPassword === formData.confirmNewPassword ? 'border-green-300 bg-green-50' :
                   'border-gray-200 hover:border-gray-300'
@@ -281,7 +281,7 @@ const PasswordChangeModal = ({ isOpen, onClose, onSubmit }) => {
             type="submit"
             onClick={handleSubmit}
             disabled={isLoading || !formData.currentPassword || !formData.newPassword || !formData.confirmNewPassword}
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-xl hover:from-pink-600 hover:to-pink-700 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="flex-1 px-4 py-3 bg-black text-white rounded-xl hover:opacity-90 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>

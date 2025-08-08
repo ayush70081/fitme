@@ -183,7 +183,7 @@ const OTPVerificationPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#FAF7F2' }}>
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
         {/* Back button */}
         <div className="mb-6">
@@ -197,8 +197,8 @@ const OTPVerificationPage = () => {
         </div>
 
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 7.89a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
@@ -206,7 +206,7 @@ const OTPVerificationPage = () => {
           <p className="text-gray-600">
             We've sent a 6-digit verification code to
           </p>
-          <p className="text-blue-600 font-medium break-all">{email}</p>
+          <p className="text-black font-medium break-all">{email}</p>
           {message && (
             <p className="text-sm text-gray-500 mt-2">{message}</p>
           )}
@@ -231,7 +231,7 @@ const OTPVerificationPage = () => {
                   onChange={(e) => handleInputChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
-                  className="w-12 h-12 text-center text-lg font-semibold border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                  className="w-12 h-12 text-center text-lg font-semibold border-2 border-gray-300 rounded-lg focus:border-black focus:ring-2 focus:ring-black/20 transition-colors"
                   disabled={loading}
                 />
               ))}
@@ -261,7 +261,7 @@ const OTPVerificationPage = () => {
           <button
             onClick={() => handleVerifyOTP()}
             disabled={loading || otp.some(digit => !digit)}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-black text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? (
               <div className="flex items-center justify-center">
@@ -284,7 +284,7 @@ const OTPVerificationPage = () => {
             <button
               onClick={handleResendOTP}
               disabled={resendLoading || countdown > 0}
-              className="text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="text-black hover:opacity-80 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {resendLoading ? (
                 'Sending...'

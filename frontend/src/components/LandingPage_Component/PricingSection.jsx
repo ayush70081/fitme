@@ -1,93 +1,81 @@
 // PricingSection.jsx
 import React from 'react';
+import { Check, ChevronDown } from 'lucide-react';
 
-const PricingCard = ({ title, price, duration, features, isPopular }) => {
+const PlanCard = ({ title, price, subtitle, features, ctaText, popular, secondaryCTA }) => {
   return (
-    <div className={`relative bg-white rounded-2xl shadow-lg p-8 flex flex-col justify-between w-full max-w-sm transition-all duration-300 hover:shadow-xl ${isPopular ? 'border-2 border-indigo-600' : 'border border-gray-200'}`}>
-      {isPopular && (
-        <span className="absolute top-0 right-0 bg-indigo-600 text-white text-sm font-semibold px-4 py-1 rounded-bl-lg rounded-tr-lg">
-          Most Popular
-        </span>
+    <div className={`relative bg-white rounded-2xl border border-[#EADFD0] shadow-sm p-6 sm:p-7 flex flex-col transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 max-w-sm w-full mx-auto`}>
+      {popular && (
+        <span className="absolute -top-3 left-6 bg-black text-white text-[11px] px-2 py-1 rounded-full tracking-wide">POPULAR</span>
       )}
-      <div>
-        <h3 className="text-2xl font-bold text-gray-800">{title}</h3>
-        <div className="mt-4">
+
+      <div className="mb-6">
+        <h3 className="text-sm font-semibold text-gray-900 tracking-wide">{title}</h3>
+        <div className="mt-2 flex items-baseline gap-2">
           <span className="text-4xl font-extrabold text-gray-900">${price}</span>
-          <span className="text-gray-500"> /{duration}</span>
+          <span className="text-sm text-gray-500">{subtitle}</span>
         </div>
-        <ul className="mt-6 space-y-4">
-          {features.map((feature, index) => (
-            <li key={index} className="flex items-center">
-              <svg className="w-5 h-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span className="text-gray-600">{feature}</span>
-            </li>
-          ))}
-        </ul>
       </div>
-      <button className={`mt-8 w-full py-3 rounded-lg font-semibold text-white transition-colors duration-300 ${isPopular ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-gray-800 hover:bg-gray-900'}`}>
-        Get Started
-      </button>
+
+      <ul className="space-y-3 text-sm">
+        {features.map((feature, idx) => (
+          <li key={idx} className="flex items-start gap-2">
+            <Check className="w-4 h-4 mt-0.5 text-gray-900" />
+            <span className="text-gray-700">{feature}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-6 grid grid-cols-1 gap-2">
+        <button className="w-full h-10 rounded-lg bg-black text-white text-sm font-medium hover:opacity-90 transition-colors">{ctaText}</button>
+        {secondaryCTA && (
+          <button className="w-full h-10 rounded-lg border border-[#EADFD0] bg-[#FFF8ED] text-gray-900 text-sm font-medium hover:bg-[#F5EFE6] transition-colors flex items-center justify-center gap-2">
+            {secondaryCTA} <ChevronDown className="w-4 h-4" />
+          </button>
+        )}
+      </div>
     </div>
   );
 };
 
 const PricingSection = () => {
-  const plans = [
-    {
-      title: "Free Plan",
-      price: "0",
-      duration: "1 month",
-      features: [
-        "Basic fitness tracking",
-        "Access to limited workouts",
-        "Community support",
-        "1 user account"
-      ],
-      isPopular: false
-    },
-    {
-      title: "Standard Plan",
-      price: "29",
-      duration: "3 months",
-      features: [
-        "All Free Plan features",
-        "Access to all workouts",
-        "Diet plan recommendations",
-        "Priority email support",
-        "5 user profiles"
-      ],
-      isPopular: true
-    },
-    {
-      title: "Premium Plan",
-      price: "49",
-      duration: "6 months",
-      features: [
-        "All Standard Plan features",
-        "24/7 chat support",
-        "Personalized fitness coaching",
-        "Meal tracking & analysis",
-        "Unlimited user profiles"
-      ],
-      isPopular: false
-    }
-  ];
-
   return (
-    <section id='plans' className="bg-white py-16">
+    <section id="plans" className="py-16" style={{ backgroundColor: '#FAF7F2' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Choose Your Plan</h2>
-          <p className="mt-4 text-lg text-gray-600">
-            Select the perfect plan to track your fitness journey.
-          </p>
+          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900">Plans and Pricing</h2>
+          <p className="mt-3 text-gray-600">Choose the perfect plan for your journey</p>
         </div>
-        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 justify-center">
-          {plans.map((plan, index) => (
-            <PricingCard key={index} {...plan} />
-          ))}
+
+        <div className="mt-10 grid gap-8 grid-cols-1 sm:grid-cols-2 justify-items-center max-w-4xl mx-auto">
+          <PlanCard
+            title="FREE"
+            price="0"
+            subtitle="per user / month"
+            features={[
+              'Basic workout tracking',
+              'AI Coach intro prompts',
+              'Community access',
+              '1 saved plan',
+            ]}
+            ctaText="Get started"
+          />
+
+          <PlanCard
+            title="PRO"
+            price="15"
+            subtitle="per user / month"
+            features={[
+              'All Free features',
+              'Advanced AI Coach',
+              'Daily meal plan generator',
+              'Unlimited saved plans',
+            ]}
+            ctaText="Select plan"
+            popular
+          />
+
+          
         </div>
       </div>
     </section>

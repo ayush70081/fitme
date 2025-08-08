@@ -75,8 +75,8 @@ const Settings = () => {
       </div>
       <button
         onClick={() => onToggle(!enabled)}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 ${
-          enabled ? 'bg-pink-500' : 'bg-gray-200'
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 ${
+          enabled ? 'bg-black' : 'bg-gray-200'
         }`}
       >
         <span
@@ -113,10 +113,10 @@ const Settings = () => {
     const baseClasses = "inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
     
     const variantClasses = {
-      primary: "bg-pink-500 text-white hover:bg-pink-600 focus:ring-pink-500",
-      secondary: "bg-blue-50 text-blue-600 hover:bg-blue-100 focus:ring-blue-500",
+      primary: "bg-black text-white hover:bg-black focus:ring-black",
+      secondary: "bg-[#FFF8ED] text-gray-900 hover:bg-[#F5EFE6] focus:ring-black border border-[#EADFD0]",
       danger: "bg-red-50 text-red-600 hover:bg-red-100 focus:ring-red-500",
-      outline: "border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500"
+      outline: "border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-black"
     };
 
     return (
@@ -131,7 +131,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#FAF7F2' }}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <motion.div
@@ -140,9 +140,7 @@ const Settings = () => {
           className="mb-8"
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center">
-              <SettingsIcon className="w-4 h-4 text-pink-600" />
-            </div>
+            <SettingsIcon className="w-6 h-6 text-gray-900" />
             <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
           </div>
           <p className="text-gray-600">Manage your account security and preferences.</p>
@@ -157,16 +155,8 @@ const Settings = () => {
             description="Protect your account with additional security measures"
           >
             <div className="space-y-6">
-              {/* Two-Factor Authentication */}
-              <ToggleSwitch
-                enabled={settings.twoFactorAuth}
-                onToggle={(value) => handleSettingChange('twoFactorAuth', value)}
-                label="Two-Factor Authentication"
-                description="Add an extra layer of security to your account with SMS or app-based verification"
-              />
-              
-              <hr className="border-gray-200" />
-              
+              {/* Security Options */}
+              <p className="text-sm text-gray-600">Manage your security settings below.</p>
               {/* Change Password */}
               <div className="flex items-center justify-between">
                 <div className="flex-1">
@@ -174,7 +164,7 @@ const Settings = () => {
                   <p className="text-sm text-gray-500 mt-1">Update your account password regularly for security</p>
                 </div>
                 <ActionButton 
-                  variant="outline" 
+                  variant="secondary" 
                   icon={Key}
                   onClick={() => setIsPasswordModalOpen(true)}
                 >
@@ -233,7 +223,7 @@ const Settings = () => {
           className="mt-12 text-center"
         >
           <p className="text-sm text-gray-500">
-            Need help with your account? <a href="#" className="text-pink-600 hover:text-pink-700 font-medium">Contact Support</a>
+            Need help with your account? <a href="#" className="text-black hover:opacity-80 font-medium">Contact Support</a>
           </p>
         </motion.div>
       </div>

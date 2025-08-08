@@ -5,6 +5,7 @@ import RecipeModal from '../components/NutritionPage_Component/RecipeModal';
 import AddMealModal from '../components/NutritionPage_Component/AddMealModal';
 import DailyMealPlanGenerator from '../components/DailyMealPlanGenerator';
 import { useToast } from '../hooks/useToast';
+import mealPlanPersistence from '../services/mealPlanPersistence';
 
 const Nutrition = () => {
     const [selectedRecipe, setSelectedRecipe] = useState(null);
@@ -15,6 +16,8 @@ const Nutrition = () => {
     const [routineModalMealType, setRoutineModalMealType] = useState(null);
     const [routineSelectedTime, setRoutineSelectedTime] = useState("07:00");
     const { showToast } = useToast();
+    
+
 
     const handleMealClick = (day, mealType, meal) => {
         if (!meal?.name) return;
@@ -26,13 +29,34 @@ const Nutrition = () => {
     };
 
     const handleSaveMeal = (meal, mealType) => {
-        setCurrentPlan(prev => ({
-            ...prev,
-            [mealType]: meal
-        }));
+        // Build updated plan deterministically, then persist immediately
+        setCurrentPlan(prev => {
+            const baseType = mealType.toLowerCase();
+            let updatedPlan;
+
+            if (!prev[baseType] || !prev[baseType]?.name) {
+                updatedPlan = { ...prev, [baseType]: meal };
+            } else {
+                let index = 2;
+                let newKey = `${baseType}_${index}`;
+                while (prev[newKey]?.name) {
+                    index += 1;
+                    newKey = `${baseType}_${index}`;
+                }
+                updatedPlan = { ...prev, [newKey]: meal };
+            }
+
+            // Persist immediately so refresh keeps manual meals without explicit save
+            try { mealPlanPersistence.savePlan(updatedPlan, null, true); } catch {}
+            return updatedPlan;
+        });
+        showToast('success', 'Meal added successfully!');
     };
 
     const handleDailyPlanGenerated = (dayPlan) => {
+
+        // When AI generates a plan, it replaces the current plan
+        // But we should preserve manually added meals if they exist
         setCurrentPlan(dayPlan);
     };
 
@@ -72,7 +96,7 @@ const Nutrition = () => {
         carbs: Math.round(routineModalMeal.nutrition?.carbs || 0),
         fat: Math.round(routineModalMeal.nutrition?.fat || 0),
         completed: false,
-        color: "bg-blue-100",
+        color: "bg-gray-100",
         addedTime: new Date(),
       };
       // Get current date and tasks from localStorage in {date, tasks} format
@@ -115,49 +139,41 @@ const Nutrition = () => {
 
     const { totalCalories } = getDailyStats();
 
+    // Aggregate macros for sidebar summary (display-only)
+    const getMacroTotals = () => {
+        let p = 0, c = 0, f = 0;
+        Object.values(currentPlan).forEach(meal => {
+            if (meal?.nutrition) {
+                p += Number(meal.nutrition.protein || 0);
+                c += Number(meal.nutrition.carbs || 0);
+                f += Number(meal.nutrition.fat || 0);
+            }
+        });
+        return { p: Math.round(p), c: Math.round(c), f: Math.round(f) };
+    };
+    const { p: totalProtein, c: totalCarbs, f: totalFat } = getMacroTotals();
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Modern Header */}
-                <header className="mb-8">
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-                        <div className="mb-6 lg:mb-0">
-                            <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                                🍽️ Smart Meal Planner
-                            </h1>
-                            <p className="text-lg text-gray-600">
-                                AI-powered daily meal planning made simple and affordable
-                            </p>
-                        </div>
-                        
-                        {/* Stats Cards */}
-                        <div className="flex gap-4">
-                            {/* Removed Total Meals card */}
-                            {totalCalories > 0 && (
-                                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                                    <div className="flex items-center gap-2">
-                                        <FiTrendingUp className="w-5 h-5 text-orange-500" />
-                                        <div>
-                                            <p className="text-sm text-gray-600">Daily Cal</p>
-                                            <p className="text-lg font-semibold text-gray-900">{Math.round(totalCalories)}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+        <div className="min-h-screen" style={{ backgroundColor: '#FAF7F2' }}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                {/* Header */}
+                <header className="mb-4">
+                    <div className="flex flex-col gap-2">
+                        <h1 className="text-4xl font-bold text-gray-900">Smart Meal Planner</h1>
+                        <p className="text-sm text-gray-600">Plan a beautiful, simple day of eating with AI.
+                        </p>
                     </div>
                 </header>
 
-                {/* Quick Actions */}
-                {/* Removed Saved Meals button */}
-
-                {/* Daily AI Meal Plan Generator */}
+                {/* Content grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                    {/* Main column */}
+                    <div className="lg:col-span-2 space-y-8">
                 <DailyMealPlanGenerator 
                     onPlanGenerated={handleDailyPlanGenerated}
                     currentDayPlan={currentPlan}
                 />
                 
-                {/* Daily Plan */}
                 <DayPlan 
                     day="Today"
                     meals={currentPlan}
@@ -165,7 +181,53 @@ const Nutrition = () => {
                     onAddMealClick={handleAddMealClick}
                     onAddToRoutine={handleAddToRoutine}
                 />
-                
+                    </div>
+
+                    {/* Sidebar summary */}
+                    <aside className="lg:sticky lg:top-6 space-y-4">
+                        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-semibold text-gray-900">Today's Overview</h3>
+                                <FiTrendingUp className="w-5 h-5 text-gray-900" />
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs text-gray-600">Planned meals</span>
+                                    <span className="text-sm font-semibold text-gray-900">{Object.values(currentPlan).filter(m => m?.name).length}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs text-gray-600">Estimated calories</span>
+                                    <span className="text-sm font-semibold text-gray-900">{totalCalories > 0 ? Math.round(totalCalories) : '—'}</span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 pt-2">
+                                    <div className="rounded-md bg-gray-50 border border-gray-200 p-2 text-center">
+                                        <div className="text-xs text-gray-600">Protein</div>
+                                        <div className="text-sm font-semibold text-gray-900">{totalProtein}g</div>
+                                    </div>
+                                    <div className="rounded-md bg-gray-50 border border-gray-200 p-2 text-center">
+                                        <div className="text-xs text-gray-600">Carbs</div>
+                                        <div className="text-sm font-semibold text-gray-900">{totalCarbs}g</div>
+                                    </div>
+                                    <div className="rounded-md bg-gray-50 border border-gray-200 p-2 text-center">
+                                        <div className="text-xs text-gray-600">Fat</div>
+                                        <div className="text-sm font-semibold text-gray-900">{totalFat}g</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                            <h3 className="text-base font-semibold text-gray-900 mb-2">Tips</h3>
+                            <ul className="list-disc list-inside space-y-1 text-xs text-gray-700">
+                                <li>Keep meals simple and balanced.</li>
+                                <li>Prep ingredients once; reuse across meals.</li>
+                                <li>Protein with every main meal helps satiety.</li>
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+
+                {/* Modals */}
                 {selectedRecipe && (
                     <RecipeModal 
                         mealType={selectedRecipe.mealType}
@@ -180,33 +242,30 @@ const Nutrition = () => {
                     onSave={handleSaveMeal}
                 />
 
-                {/* Routine Modal */}
                 {showRoutineModal && (
-                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-[6px]">
-                    <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md animate-fade-in border-2" style={{ borderColor: '#db2777' }}>
-                      <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#db2777' }}><FiClock style={{ color: '#ec4899' }} />Add to Daily Routine</h3>
-                      <p className="mb-2 text-gray-600">Select a time for <span className="font-semibold" style={{ color: '#db2777' }}>{routineModalMeal?.name}</span> ({routineModalMealType})</p>
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                    <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md border border-gray-200">
+                      <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-900"><FiClock className="text-gray-900" />Add to Daily Routine</h3>
+                      <p className="mb-2 text-gray-700">Select a time for <span className="font-semibold text-gray-900">{routineModalMeal?.name}</span> ({routineModalMealType})</p>
                       <div className="mb-4 flex flex-col items-center">
                         <input
                           type="time"
                           value={routineSelectedTime}
                           onChange={e => setRoutineSelectedTime(e.target.value)}
-                          className="w-40 p-2 border-2 rounded-lg focus:outline-none focus:ring-2 text-lg text-center"
-                          style={{ borderColor: '#db2777', boxShadow: '0 0 0 2px #fbcfe8' }}
+                          className="w-40 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#000] text-lg text-center border-gray-300"
                         />
-                        <span className="mt-2 text-gray-500 text-sm">Selected: <span className="font-semibold">{formatTime(routineSelectedTime)}</span></span>
+                        <span className="mt-2 text-gray-500 text-sm">Selected: <span className="font-semibold text-gray-900">{formatTime(routineSelectedTime)}</span></span>
                       </div>
                       <div className="flex gap-3 mt-6">
                         <button
                           onClick={handleRoutineModalConfirm}
-                          className="flex-1 text-white py-2 rounded-lg font-semibold shadow transition-all"
-                          style={{ backgroundColor: '#ec4899' }}
+                          className="flex-1 bg-black text-white py-2 rounded-lg font-semibold shadow transition-all hover:bg-black"
                         >
                           Add to Routine
                         </button>
                         <button
                           onClick={() => setShowRoutineModal(false)}
-                          className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-all"
+                          className="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-all"
                         >
                           Cancel
                         </button>
@@ -220,3 +279,4 @@ const Nutrition = () => {
 };
 
 export default Nutrition;
+

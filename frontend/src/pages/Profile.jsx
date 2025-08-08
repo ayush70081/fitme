@@ -487,7 +487,7 @@ const Profile = () => {
           <select
             value={fieldValue}
             onChange={(e) => handleInputChange(config.field, e.target.value)}
-            className="mt-2 w-full px-2 py-1 text-center border border-gray-300 rounded focus:ring-pink-500 focus:border-pink-500"
+            className="mt-2 w-full px-2 py-1 text-center border border-gray-300 rounded focus:ring-[#EADFD0] focus:border-[#EADFD0]"
           >
             <option value="">{config.placeholder}</option>
             {config.options.map(option => (
@@ -502,7 +502,7 @@ const Profile = () => {
           type={config.type}
           value={fieldValue}
           onChange={(e) => handleInputChange(config.field, e.target.value)}
-          className="mt-2 w-full px-2 py-1 text-center border border-gray-300 rounded focus:ring-pink-500 focus:border-pink-500"
+          className="mt-2 w-full px-2 py-1 text-center border border-gray-300 rounded focus:ring-[#EADFD0] focus:border-[#EADFD0]"
           placeholder={config.placeholder}
         />
       );
@@ -510,7 +510,7 @@ const Profile = () => {
 
     return (
       <div className="text-center p-4 bg-gray-50 rounded-lg">
-        <div className="text-2xl font-bold text-pink-600">{formatGoalWeight(fieldValue) || '--'}</div>
+        <div className="text-2xl font-bold text-gray-900">{formatGoalWeight(fieldValue) || '--'}</div>
         <div className="text-sm text-gray-600">{config.label}</div>
         {isEditing && renderFieldInput()}
       </div>
@@ -628,7 +628,7 @@ const Profile = () => {
       {/* About Me Section - Moved to top for better visibility */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <User className="w-5 h-5 text-pink-600" />
+          <User className="w-5 h-5 text-gray-900" />
           About Me
         </h3>
         {isEditing ? (
@@ -637,7 +637,7 @@ const Profile = () => {
             onChange={(e) => handleInputChange('bio', e.target.value)}
             rows={4}
             placeholder="Tell us about yourself, your fitness journey, goals..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
           />
         ) : (
           <p className="text-gray-700 text-base leading-relaxed">
@@ -658,7 +658,7 @@ const Profile = () => {
                   type="text"
                   value={profileData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
                 />
               ) : (
                 <p className="mt-1 text-gray-900">{profileData.name || 'Not specified'}</p>
@@ -678,7 +678,7 @@ const Profile = () => {
                   type="date"
                   value={profileData.dateOfBirth}
                   onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
                 />
               ) : (
                 <p className="mt-1 text-gray-900">
@@ -693,7 +693,7 @@ const Profile = () => {
                 <select
                   value={profileData.gender}
                   onChange={(e) => handleInputChange('gender', e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
                 >
                   <option value="">Select gender</option>
                   <option value="male">Male</option>
@@ -712,7 +712,7 @@ const Profile = () => {
                   type="text"
                   value={profileData.location}
                   onChange={(e) => handleInputChange('location', e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
                 />
               ) : (
                 <p className="mt-1 text-gray-900">{profileData.location || 'Not specified'}</p>
@@ -731,27 +731,27 @@ const Profile = () => {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Body Measurements</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <div className="text-2xl font-bold text-pink-600">{formatHeight(profileData.height)}</div>
+            <div className="text-2xl font-bold text-gray-900">{formatHeight(profileData.height)}</div>
             <div className="text-sm text-gray-600">Height</div>
             {isEditing && (
               <input
                 type="number"
                 value={profileData.height}
                 onChange={(e) => handleInputChange('height', e.target.value)}
-                className="mt-2 w-full px-2 py-1 text-center border border-gray-300 rounded focus:ring-pink-500 focus:border-pink-500"
+                className="mt-2 w-full px-2 py-1 text-center border border-gray-300 rounded focus:ring-[#EADFD0] focus:border-[#EADFD0]"
                 placeholder="Height in cm"
               />
             )}
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <div className="text-2xl font-bold text-pink-600">{formatWeight(profileData.weight)}</div>
+            <div className="text-2xl font-bold text-gray-900">{formatWeight(profileData.weight)}</div>
             <div className="text-sm text-gray-600">Current Weight</div>
             {isEditing && (
               <input
                 type="number"
                 value={profileData.weight}
                 onChange={(e) => handleInputChange('weight', e.target.value)}
-                className="mt-2 w-full px-2 py-1 text-center border border-gray-300 rounded focus:ring-pink-500 focus:border-pink-500"
+                className="mt-2 w-full px-2 py-1 text-center border border-gray-300 rounded focus:ring-[#EADFD0] focus:border-[#EADFD0]"
                 placeholder="Weight in kg"
               />
             )}
@@ -789,7 +789,7 @@ const Profile = () => {
               <select
                 value={profileData.fitnessGoal}
                 onChange={(e) => handleInputChange('fitnessGoal', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
               >
                 <option value="">Select goal</option>
                 <option value="weight-loss">Lose Weight</option>
@@ -808,7 +808,7 @@ const Profile = () => {
               <select
                 value={profileData.activityLevel}
                 onChange={(e) => handleInputChange('activityLevel', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
               >
                 <option value="">Select activity level</option>
                 <option value="sedentary">Sedentary</option>
@@ -829,7 +829,7 @@ const Profile = () => {
             <select
               value={profileData.fitnessExperience}
               onChange={(e) => handleInputChange('fitnessExperience', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
             >
               <option value="">Select experience level</option>
               <option value="beginner">Beginner</option>
@@ -857,7 +857,7 @@ const Profile = () => {
               <select
                 value={profileData.dietaryPreference}
                 onChange={(e) => handleInputChange('dietaryPreference', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
               >
                 <option value="">Select dietary preference</option>
                 <option value="No Restrictions">No Restrictions</option>
@@ -894,7 +894,7 @@ const Profile = () => {
               <select
                 value={profileData.workoutFrequency}
                 onChange={(e) => handleInputChange('workoutFrequency', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
               >
                 <option value="">Select frequency</option>
                 <option value="2-3">2-3 times per week</option>
@@ -913,7 +913,7 @@ const Profile = () => {
               <select
                 value={profileData.workoutDuration}
                 onChange={(e) => handleInputChange('workoutDuration', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
               >
                 <option value="">Select duration</option>
                 <option value="15-30">15-30 minutes</option>
@@ -948,22 +948,22 @@ const Profile = () => {
                 control: (base) => ({
                   ...base,
                   minHeight: '48px',
-                  borderColor: '#f472b6', // Tailwind pink-400
+                  borderColor: '#EADFD0',
                 }),
                 multiValue: (base) => ({
                   ...base,
-                  backgroundColor: '#fce7f3', // Tailwind pink-100
+                  backgroundColor: '#FFF8ED',
                 }),
                 multiValueLabel: (base) => ({
                   ...base,
-                  color: '#be185d', // Tailwind pink-800
+                  color: '#374151',
                 }),
                 multiValueRemove: (base) => ({
                   ...base,
-                  color: '#be185d',
+                  color: '#374151',
                   ':hover': {
-                    backgroundColor: '#f472b6',
-                    color: 'white',
+                    backgroundColor: '#EADFD0',
+                    color: '#111827',
                   },
                 }),
               }}
@@ -972,7 +972,7 @@ const Profile = () => {
             <div className="flex flex-wrap gap-2">
               {(profileData.preferredWorkouts || []).length > 0 ? (
                 profileData.preferredWorkouts.map((workout, index) => (
-                  <span key={index} className="px-3 py-1 bg-pink-100 text-pink-800 text-sm rounded-full">
+                  <span key={index} className="px-3 py-1 bg-[#FFF8ED] text-gray-800 text-sm rounded-full">
                     {workout}
                   </span>
                 ))
@@ -997,9 +997,9 @@ const Profile = () => {
       <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Fitness Statistics</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="text-center p-4 bg-pink-50 rounded-lg">
-            <Dumbbell className="w-8 h-8 text-pink-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-pink-600">{fitnessStats.totalWorkouts}</div>
+          <div className="text-center p-4 bg-[#FFF8ED] rounded-lg">
+            <Dumbbell className="w-8 h-8 text-gray-900 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-gray-900">{fitnessStats.totalWorkouts}</div>
             <div className="text-sm text-gray-600">Total Workouts</div>
           </div>
           <div className="text-center p-4 bg-orange-50 rounded-lg">
@@ -1061,8 +1061,8 @@ const Profile = () => {
             {fitnessStats.recentWorkouts.map((workout, index) => (
               <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
-                    <Dumbbell className="w-5 h-5 text-pink-600" />
+                  <div className="w-10 h-10 bg-[#F5EFE6] rounded-full flex items-center justify-center">
+                    <Dumbbell className="w-5 h-5 text-gray-900" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">{workout.workoutName || 'Workout'}</p>
@@ -1101,7 +1101,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+    <div className="min-h-screen p-4 sm:p-6" style={{ backgroundColor: '#FAF7F2' }}>
       <div className="max-w-6xl mx-auto">
         {/* Header with Profile Picture and Basic Info */}
         <motion.div
@@ -1112,10 +1112,10 @@ const Profile = () => {
           <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
             {/* Profile Picture */}
             <div className="relative">
-              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-pink-200 shadow-lg relative">
+              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[#EADFD0] shadow-lg relative">
                 {imageUploading ? (
                   <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 text-pink-500 animate-spin" />
+                    <Loader2 className="w-8 h-8 text-gray-900 animate-spin" />
                   </div>
                 ) : profileImage ? (
                   <img 
@@ -1124,7 +1124,7 @@ const Profile = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white text-2xl font-bold">
+                  <div className="w-full h-full bg-black flex items-center justify-center text-white text-2xl font-bold">
                     {getInitials(profileData.name)}
                   </div>
                 )}
@@ -1138,7 +1138,7 @@ const Profile = () => {
                   whileTap={{ scale: 0.95 }}
                   onClick={triggerImageUpload}
                   disabled={imageUploading}
-                  className="bg-pink-500 rounded-full p-2 shadow-lg border-2 border-white hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-black text-white rounded-full p-2 shadow-lg border-2 border-white hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   title={profileImage ? "Change photo" : "Upload photo"}
                 >
                   <Camera className="w-4 h-4 text-white" />
@@ -1217,7 +1217,7 @@ const Profile = () => {
                       <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-4 py-2 bg-pink-500 text-white rounded-lg font-medium hover:bg-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                        className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                       >
                         <Save className="w-4 h-4" />
                         {saving ? 'Saving...' : 'Save Changes'}
@@ -1226,7 +1226,7 @@ const Profile = () => {
                   ) : (
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-pink-500 text-white rounded-lg font-medium hover:bg-pink-600 transition-all duration-200"
+                      className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-black transition-all duration-200"
                     >
                       <Edit3 className="w-4 h-4" />
                       Edit Profile
@@ -1249,7 +1249,7 @@ const Profile = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'border-pink-500 text-pink-600 bg-pink-50'
+                      ? 'border-[#EADFD0] text-gray-900 bg-[#FFF8ED]'
                       : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                   }`}
                 >

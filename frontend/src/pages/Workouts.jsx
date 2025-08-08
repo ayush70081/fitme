@@ -94,8 +94,8 @@ const ExerciseCard = React.memo(({ exercise, onComplete, isCompleted, exerciseIn
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     className={`bg-white rounded-xl p-6 shadow-md border transition-all duration-300 ${
-      isCompleted ? 'border-green-300 bg-green-50' : 'border-gray-100'
-    } ${isResting ? 'ring-2 ring-orange-300' : ''}`}
+      isCompleted ? 'border-[#EADFD0] bg-[#FFF8ED]' : 'border-gray-100'
+    } ${isResting ? 'ring-2 ring-[#EADFD0]' : ''}`}
   >
     <div className="flex justify-between items-start mb-4">
       <div className="flex items-center gap-3">
@@ -104,7 +104,7 @@ const ExerciseCard = React.memo(({ exercise, onComplete, isCompleted, exerciseIn
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center"
+            className="w-6 h-6 bg-black rounded-full flex items-center justify-center"
           >
             <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -113,11 +113,11 @@ const ExerciseCard = React.memo(({ exercise, onComplete, isCompleted, exerciseIn
         )}
       </div>
       <div className="flex items-center gap-2">
-        <span className="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm font-medium">
+        <span className="bg-[#FFF8ED] text-gray-900 px-3 py-1 rounded-full text-sm font-medium">
           {exercise.type}
         </span>
         {exercise.sets && (
-          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+          <span className="bg-[#F5EFE6] text-gray-900 px-2 py-1 rounded-full text-xs font-medium">
             Set {currentSet}/{exercise.sets}
           </span>
         )}
@@ -129,30 +129,30 @@ const ExerciseCard = React.memo(({ exercise, onComplete, isCompleted, exerciseIn
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
       {exercise.sets && (
         <div className="text-center">
-          <p className="text-2xl font-bold text-pink-600">{exercise.sets}</p>
+          <p className="text-2xl font-bold text-gray-900">{exercise.sets}</p>
           <p className="text-xs text-gray-500">Sets</p>
         </div>
       )}
       {exercise.reps && (
         <div className="text-center">
-          <p className="text-2xl font-bold text-pink-600">{exercise.reps}</p>
+          <p className="text-2xl font-bold text-gray-900">{exercise.reps}</p>
           <p className="text-xs text-gray-500">Reps</p>
         </div>
       )}
       {exercise.duration_minutes && exercise.duration_minutes > 0 && (
         <div className="text-center">
-          <p className="text-2xl font-bold text-pink-600">{exercise.duration_minutes}</p>
+          <p className="text-2xl font-bold text-gray-900">{exercise.duration_minutes}</p>
           <p className="text-xs text-gray-500">Minutes</p>
         </div>
       )}
       {exercise.duration_seconds && exercise.duration_seconds > 0 && (
         <div className="text-center">
-          <p className="text-2xl font-bold text-pink-600">{exercise.duration_seconds}</p>
+          <p className="text-2xl font-bold text-gray-900">{exercise.duration_seconds}</p>
           <p className="text-xs text-gray-500">Seconds</p>
         </div>
       )}
       <div className="text-center">
-        <p className="text-2xl font-bold text-orange-600">{exercise.calories_burned}</p>
+        <p className="text-2xl font-bold text-gray-900">{exercise.calories_burned}</p>
         <p className="text-xs text-gray-500">Calories</p>
       </div>
     </div>
@@ -178,7 +178,7 @@ const ExerciseCard = React.memo(({ exercise, onComplete, isCompleted, exerciseIn
               <button
                 onClick={isRunning ? pause : start}
                 className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                  isRunning ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'
+                  isRunning ? 'bg-red-50 text-red-700 hover:bg-red-100' : 'bg-[#FFF8ED] text-gray-900 hover:bg-[#F5EFE6]'
                 }`}
               >
                 {isRunning ? 'Pause' : 'Start'}
@@ -204,15 +204,15 @@ const ExerciseCard = React.memo(({ exercise, onComplete, isCompleted, exerciseIn
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center"
+          className="bg-[#FFF8ED] border border-[#EADFD0] rounded-lg p-4 text-center"
         >
-          <div className="text-2xl font-bold text-orange-600 mb-2">
+          <div className="text-2xl font-bold text-gray-900 mb-2">
             Rest Time: {Math.floor(restTimer / 60)}:{(restTimer % 60).toString().padStart(2, '0')}
           </div>
           <div className="flex justify-center gap-2">
             <button
               onClick={skipRest}
-              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm"
+              className="px-4 py-2 bg-black text-white rounded-lg hover:opacity-90 transition-colors text-sm"
             >
               Skip Rest
             </button>
@@ -238,7 +238,7 @@ const ExerciseCard = React.memo(({ exercise, onComplete, isCompleted, exerciseIn
                 className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
                   isResting 
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                    : 'bg-black text-white hover:opacity-90'
                 }`}
               >
                 {currentSet >= exercise.sets ? 'Complete Exercise' : `Complete Set ${currentSet}`}
@@ -246,7 +246,7 @@ const ExerciseCard = React.memo(({ exercise, onComplete, isCompleted, exerciseIn
             ) : (
               <button
                 onClick={() => onComplete(exerciseIndex)}
-                className="flex-1 py-2 px-4 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition-colors"
+                className="flex-1 py-2 px-4 bg-black text-white rounded-lg font-medium hover:opacity-90 transition-colors"
               >
                 Mark Complete
               </button>
@@ -302,8 +302,8 @@ const CustomWorkoutModal = React.memo(({
           className="bg-gray-50/95 backdrop-blur-sm rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 shadow-xl"
         >
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-8 h-8 bg-[#F5EFE6] rounded-lg flex items-center justify-center">
+            <svg className="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
             </div>
@@ -324,7 +324,7 @@ const CustomWorkoutModal = React.memo(({
               type="text"
               value={customWorkout.name}
               onChange={(e) => setCustomWorkout(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#EADFD0] focus:border-transparent"
               placeholder="Enter workout name (e.g., Upper Body Strength)"
               maxLength={50}
             />
@@ -336,7 +336,7 @@ const CustomWorkoutModal = React.memo(({
               <button
                 type="button"
                 onClick={addCustomExercise}
-                className="bg-pink-500 text-white px-3 py-1.5 rounded-lg hover:bg-pink-600 transition-colors text-sm font-medium"
+                className="bg-black text-white px-3 py-1.5 rounded-lg hover:bg-black transition-colors text-sm font-medium"
               >
                 Add Exercise
               </button>
@@ -365,7 +365,7 @@ const CustomWorkoutModal = React.memo(({
                       placeholder="e.g., Push-ups"
                       value={exercise.name}
                       onChange={(e) => updateCustomExercise(index, 'name', e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
+                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#EADFD0]"
                     />
                   </div>
                   <div>
@@ -373,7 +373,7 @@ const CustomWorkoutModal = React.memo(({
                     <select
                       value={exercise.type || 'Custom'}
                       onChange={(e) => updateCustomExercise(index, 'type', e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
+                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#EADFD0]"
                     >
                       <option value="Custom">Custom</option>
                       <option value="Cardio">Cardio</option>
@@ -393,7 +393,7 @@ const CustomWorkoutModal = React.memo(({
                       max="10"
                       value={exercise.sets}
                       onChange={(e) => updateCustomExercise(index, 'sets', e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
+                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#EADFD0]"
                     />
                   </div>
                 </div>
@@ -408,7 +408,7 @@ const CustomWorkoutModal = React.memo(({
                       max="100"
                       value={exercise.reps}
                       onChange={(e) => updateCustomExercise(index, 'reps', e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
+                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#EADFD0]"
                     />
                   </div>
                   <div>
@@ -420,7 +420,7 @@ const CustomWorkoutModal = React.memo(({
                       max="60"
                       value={exercise.duration}
                       onChange={(e) => updateCustomExercise(index, 'duration', e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
+                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#EADFD0]"
                     />
                   </div>
                   <div>
@@ -432,7 +432,7 @@ const CustomWorkoutModal = React.memo(({
                       max="300"
                       value={exercise.rest || 60}
                       onChange={(e) => updateCustomExercise(index, 'rest', e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
+                      className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#EADFD0]"
                     />
                   </div>
                 </div>
@@ -443,7 +443,7 @@ const CustomWorkoutModal = React.memo(({
                     placeholder="Describe how to perform this exercise..."
                     value={exercise.description || ''}
                     onChange={(e) => updateCustomExercise(index, 'description', e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#EADFD0]"
                     rows="2"
                     maxLength={200}
                   />
@@ -466,7 +466,7 @@ const CustomWorkoutModal = React.memo(({
               type="button"
               onClick={saveCustomWorkout}
               disabled={saveLoading}
-              className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+              className="px-4 py-2 bg-black text-white rounded-lg hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
             >
               {saveLoading ? 'Creating...' : 'Create Workout'}
             </button>
@@ -502,8 +502,8 @@ const SavePlanModal = React.memo(({
           className="bg-gray-50/95 backdrop-blur-sm rounded-2xl p-6 max-w-md w-full border border-gray-200 shadow-xl"
         >
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-8 h-8 bg-[#F5EFE6] rounded-lg flex items-center justify-center">
+              <svg className="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
               </svg>
             </div>
@@ -518,7 +518,7 @@ const SavePlanModal = React.memo(({
               type="text"
               value={planName}
               onChange={(e) => setPlanName(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#EADFD0] focus:border-transparent"
               placeholder="Enter a name for your workout plan"
               maxLength={50}
             />
@@ -538,7 +538,7 @@ const SavePlanModal = React.memo(({
             <button
               onClick={saveCurrentPlan}
               disabled={saveLoading || !planName.trim()}
-              className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+              className="px-4 py-2 bg-black text-white rounded-lg hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
             >
               {saveLoading ? 'Saving...' : 'Save Plan'}
             </button>
@@ -574,8 +574,8 @@ const SavedPlansModal = React.memo(({
         >
           <div className="flex justify-between items-center mb-5">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center">
-                <svg className="w-4 h-4 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-8 h-8 bg-[#F5EFE6] rounded-lg flex items-center justify-center">
+                <svg className="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
               </div>
@@ -593,7 +593,7 @@ const SavedPlansModal = React.memo(({
 
           {savedPlansLoading ? (
             <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
             </div>
           ) : savedPlans.length === 0 ? (
             <div className="text-center py-8">
@@ -607,24 +607,24 @@ const SavedPlansModal = React.memo(({
                   key={plan._id} 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-pink-200 transition-all duration-200"
+                  className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-[#EADFD0] transition-all duration-200"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-1">
                         <h4 className="text-base font-semibold text-gray-900">{plan.name}</h4>
                         {plan.isAIGenerated && (
-                          <span className="bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full text-xs font-medium">
+                        <span className="bg-[#F5EFE6] text-gray-900 px-2 py-0.5 rounded-full text-xs font-medium">
                             AI Generated
                           </span>
                         )}
                         {plan.isCustom && (
-                          <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-xs font-medium">
+                        <span className="bg-[#F5EFE6] text-gray-900 px-2 py-0.5 rounded-full text-xs font-medium">
                             Custom
                           </span>
                         )}
                         {plan.isActive && (
-                          <span className="bg-green-50 text-green-600 px-2 py-0.5 rounded-full text-xs font-medium">
+                        <span className="bg-[#F5EFE6] text-gray-900 px-2 py-0.5 rounded-full text-xs font-medium">
                             Active
                           </span>
                         )}
@@ -632,19 +632,19 @@ const SavedPlansModal = React.memo(({
                       <p className="text-sm text-gray-600 mb-2">Goal: {plan.goal}</p>
                       <div className="flex items-center flex-wrap gap-3 text-xs text-gray-500">
                         <div className="flex items-center gap-1">
-                          <svg className="w-3.5 h-3.5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3.5 h-3.5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                           <span>{plan.days?.length || 0} days</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <svg className="w-3.5 h-3.5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3.5 h-3.5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           <span>{plan.duration_per_day_minutes} min/day</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <svg className="w-3.5 h-3.5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3.5 h-3.5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z" />
                           </svg>
                           <span>{plan.totalCaloriesBurned} calories</span>
@@ -658,7 +658,7 @@ const SavedPlansModal = React.memo(({
                     <div className="flex items-center gap-2 ml-4">
                       <button
                         onClick={() => loadSavedPlan(plan._id)}
-                        className="px-3 py-1.5 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors text-xs font-medium"
+                        className="px-3 py-1.5 bg-black text-white rounded-lg hover:bg-black transition-colors text-xs font-medium"
                       >
                         Load
                       </button>
@@ -720,8 +720,8 @@ const WorkoutCompletionModal = React.memo(({
           className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
         >
           <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-[#F5EFE6] rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
@@ -734,19 +734,19 @@ const WorkoutCompletionModal = React.memo(({
             <h4 className="font-semibold text-gray-900 mb-3">Session Summary</h4>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <p className="text-2xl font-bold text-blue-600">{formatWorkoutTime(totalWorkoutTime)}</p>
+                <p className="text-2xl font-bold text-gray-900">{formatWorkoutTime(totalWorkoutTime)}</p>
                 <p className="text-xs text-gray-500">Duration</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-orange-600">{completedCalories}</p>
+                <p className="text-2xl font-bold text-gray-900">{completedCalories}</p>
                 <p className="text-xs text-gray-500">Calories Burned</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-green-600">{completedExercises.size}</p>
+                <p className="text-2xl font-bold text-gray-900">{completedExercises.size}</p>
                 <p className="text-xs text-gray-500">Exercises Done</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-purple-600">{Math.round(completionRate)}%</p>
+                <p className="text-2xl font-bold text-gray-900">{Math.round(completionRate)}%</p>
                 <p className="text-xs text-gray-500">Completion</p>
               </div>
             </div>
@@ -762,7 +762,7 @@ const WorkoutCompletionModal = React.memo(({
                   return (
                     <div key={exerciseIndex} className="flex items-center justify-between py-1 text-sm">
                       <span className="text-gray-700">{exercise?.name}</span>
-                      <span className="text-orange-600 font-medium">{exercise?.calories_burned || 0} cal</span>
+                      <span className="text-gray-900 font-medium">{exercise?.calories_burned || 0} cal</span>
                     </div>
                   );
                 })}
@@ -781,7 +781,7 @@ const WorkoutCompletionModal = React.memo(({
             <button
               onClick={completeWorkout}
               disabled={completionLoading}
-              className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 px-4 py-2 bg-black text-white rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {completionLoading ? 'Saving...' : 'Save Workout'}
             </button>
@@ -1274,7 +1274,7 @@ const Workouts = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen p-4" style={{ backgroundColor: '#FAF7F2' }}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -1289,7 +1289,7 @@ const Workouts = () => {
           <div className="flex flex-wrap gap-4 mb-8">
             <button
               onClick={() => setShowSavedPlans(true)}
-              className="flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="flex items-center px-6 py-3 bg-black text-white rounded-xl font-medium hover:bg-black transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -1299,7 +1299,7 @@ const Workouts = () => {
 
             <button
               onClick={() => setShowCustomWorkout(true)}
-              className="flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl font-medium hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="flex items-center px-6 py-3 bg-white border border-[#EADFD0] text-gray-900 rounded-xl font-medium hover:bg-[#FFF8ED] transition-all duration-200 shadow-sm"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -1324,7 +1324,7 @@ const Workouts = () => {
           <div className="flex flex-wrap gap-4 mb-8">
             <button
               onClick={() => setWorkoutPlan(null)}
-              className="flex items-center px-6 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-xl font-medium hover:from-pink-600 hover:to-pink-700 transition-all duration-200"
+              className="flex items-center px-6 py-3 bg-black text-white rounded-xl font-medium hover:bg-black transition-all duration-200"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -1334,7 +1334,7 @@ const Workouts = () => {
 
             <button
               onClick={() => setShowSaveModal(true)}
-              className="flex items-center px-6 py-3 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-colors duration-200"
+              className="flex items-center px-6 py-3 bg-black text-white rounded-xl font-medium hover:opacity-90 transition-colors duration-200"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
@@ -1344,7 +1344,7 @@ const Workouts = () => {
             
             <button
               onClick={() => setShowSavedPlans(true)}
-              className="flex items-center px-6 py-3 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-colors duration-200"
+              className="flex items-center px-6 py-3 bg-black text-white rounded-xl font-medium hover:opacity-90 transition-colors duration-200"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -1354,7 +1354,7 @@ const Workouts = () => {
             
             <button
               onClick={() => setShowCustomWorkout(true)}
-              className="flex items-center px-6 py-3 bg-white border-2 border-pink-500 text-pink-600 rounded-xl font-medium hover:bg-pink-50 transition-colors duration-200"
+              className="flex items-center px-6 py-3 bg-white border border-[#EADFD0] text-gray-900 rounded-xl font-medium hover:bg-[#FFF8ED] transition-colors duration-200"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -1383,19 +1383,19 @@ const Workouts = () => {
             className="space-y-6"
           >
             {/* Plan Overview */}
-            <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl p-6 text-white">
+            <div className="rounded-2xl p-6 text-gray-900 border border-[#EADFD0] bg-[#FFF8ED]">
               <h2 className="text-2xl font-bold mb-4">Your Personalized Plan</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <p className="text-pink-100">Goal</p>
+                  <p className="text-gray-600">Goal</p>
                   <p className="text-xl font-semibold">{workoutPlan.goal}</p>
                 </div>
                 <div>
-                  <p className="text-pink-100">Duration per Day</p>
+                  <p className="text-gray-600">Duration per Day</p>
                   <p className="text-xl font-semibold">{workoutPlan.duration_per_day_minutes} minutes</p>
                 </div>
                 <div>
-                  <p className="text-pink-100">Preferences</p>
+                  <p className="text-gray-600">Preferences</p>
                   <p className="text-xl font-semibold">{workoutPlan.preference?.join(', ') || 'Various'}</p>
                 </div>
               </div>
@@ -1409,8 +1409,8 @@ const Workouts = () => {
                   onClick={() => setSelectedDay(index)}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     selectedDay === index
-                      ? 'bg-pink-500 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                      ? 'bg-black text-white'
+                      : 'bg-white text-gray-700 hover:bg-[#FFF8ED] border border-[#EADFD0]'
                   }`}
                 >
                   {day.day}
@@ -1423,7 +1423,7 @@ const Workouts = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 text-white"
+                className="bg-[#FFF8ED] border border-[#EADFD0] rounded-xl p-4 text-gray-900"
               >
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="font-semibold">Session Progress</h3>
@@ -1457,19 +1457,19 @@ const Workouts = () => {
                         {workoutPlan.days[selectedDay].workout_type}
                       </p>
                       {isWorkoutActive && (
-                        <p className="text-sm text-green-600 font-medium mt-1">
+                          <p className="text-sm text-gray-600 font-medium mt-1">
                           Workout in progress • {formatWorkoutTime(totalWorkoutTime)}
                         </p>
                       )}
                     </div>
                     <div className="text-right">
-                      <p className="text-3xl font-bold text-orange-600">
+                      <p className="text-3xl font-bold text-gray-900">
                         {workoutPlan.days[selectedDay].estimated_calories_burned}
                       </p>
                       <p className="text-sm text-gray-500">Estimated Calories</p>
                       {isWorkoutActive && (
                         <div className="mt-2 text-sm">
-                          <p className="text-green-600 font-medium">
+                          <p className="text-gray-600 font-medium">
                             {completedExercises.size}/{workoutSession?.totalExercises || 0} completed
                           </p>
                         </div>
@@ -1482,7 +1482,7 @@ const Workouts = () => {
                     {!isWorkoutActive ? (
                       <button
                         onClick={startWorkoutSession}
-                        className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium"
+                        className="flex items-center px-4 py-2 bg-black text-white rounded-lg hover:opacity-90 transition-colors font-medium"
                       >
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m-6-8h1m4 0h1M9 22h6a2 2 0 002-2V4a2 2 0 00-2-2H9a2 2 0 00-2 2v16a2 2 0 002 2z" />
@@ -1501,7 +1501,7 @@ const Workouts = () => {
                           </svg>
                           End Workout
                         </button>
-                        <div className="flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
+                        <div className="flex items-center px-4 py-2 bg-[#F5EFE6] text-gray-900 rounded-lg border border-[#EADFD0]">
                           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>

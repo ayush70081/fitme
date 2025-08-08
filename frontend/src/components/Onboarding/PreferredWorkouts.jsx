@@ -48,8 +48,8 @@ const PreferredWorkouts = ({ nextStep, prevStep, handleChange, values }) => {
             onClick={() => handleWorkoutSelection(workout)}
             className={`p-3 text-sm font-medium rounded-lg border-2 transition-all duration-200 ${
               (values.preferredWorkouts || []).includes(workout)
-                ? 'bg-pink-50 border-pink-500 text-pink-700'
-                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                ? 'bg-gray-50 border-black text-black'
+                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-black'
             }`}
           >
             {workout}
@@ -60,14 +60,14 @@ const PreferredWorkouts = ({ nextStep, prevStep, handleChange, values }) => {
       <div className="mt-8 flex justify-between items-center">
         <button
           onClick={prevStep}
-          className="text-sm font-medium text-gray-700 hover:text-pink-600 transition-colors duration-200"
+          className="text-sm font-medium text-gray-700 hover:text-black transition-colors duration-200"
         >
           Back
         </button>
         <button
           onClick={nextStep}
           disabled={!values.preferredWorkouts || values.preferredWorkouts.length === 0}
-          className="w-1/2 bg-gradient-to-r from-pink-500 to-pink-600 text-white py-3 px-4 rounded-lg font-medium hover:from-pink-600 hover:to-pink-700 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          className="w-1/2 bg-black text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
           Continue
         </button>

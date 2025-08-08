@@ -67,8 +67,8 @@ const Goal = ({ nextStep, handleChange, values }) => {
             onClick={() => handleGoalSelect(goal.id)}
             className={`p-3 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
               values.goal === goal.id
-                ? 'border-pink-500 bg-pink-50 ring-2 ring-pink-200 shadow-md'
-                : 'border-gray-200 hover:border-pink-300 hover:bg-gray-50'
+                ? 'border-black bg-gray-50 ring-2 ring-black/10 shadow-md'
+                : 'border-gray-200 hover:border-black hover:bg-gray-50'
             }`}
           >
             <div className="text-center">
@@ -83,7 +83,7 @@ const Goal = ({ nextStep, handleChange, values }) => {
         <button
           onClick={nextStep}
           disabled={!values.goal}
-          className="w-full bg-gradient-to-r from-pink-500 to-pink-600 text-white py-2.5 px-6 rounded-lg font-medium hover:from-pink-600 hover:to-pink-700 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          className="w-full bg-black text-white py-2.5 px-6 rounded-lg font-medium hover:opacity-90 focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
           Continue
         </button>

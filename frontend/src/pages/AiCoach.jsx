@@ -259,7 +259,7 @@ const AiCoach = () => {
       </div>
 
       <div className="flex gap-3 mb-3 text-sm">
-        <span className="text-pink-600 font-medium">{recipe.calories} cal</span>
+        <span className="text-gray-900 font-medium">{recipe.calories} cal</span>
         <span className="text-gray-600">P: {recipe.protein}</span>
         <span className="text-gray-600">C: {recipe.carbs}</span>
         <span className="text-gray-600">F: {recipe.fat}</span>
@@ -288,7 +288,7 @@ const AiCoach = () => {
       {recipe.tags && (
         <div className="flex gap-2 mt-3">
           {recipe.tags.map((tag, idx) => (
-            <span key={idx} className="px-2 py-1 bg-pink-50 text-pink-600 text-xs rounded-full">
+            <span key={idx} className="px-2 py-1 bg-[#FFF8ED] text-gray-900 text-xs rounded-full">
               {tag}
             </span>
           ))}
@@ -298,7 +298,7 @@ const AiCoach = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+    <div className="min-h-screen p-4 sm:p-6" style={{ backgroundColor: '#FAF7F2' }}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
@@ -308,9 +308,7 @@ const AiCoach = () => {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl">
-                <Bot className="w-8 h-8 text-white" />
-              </div>
+              <Bot className="w-8 h-8 text-gray-900" />
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">AI Fitness Coach</h1>
                 <p className="text-gray-600 mt-1">Your personal AI assistant for fitness and wellness</p>
@@ -338,7 +336,7 @@ const AiCoach = () => {
           >
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 h-[600px] flex flex-col">
               <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="w-5 h-5 text-pink-500" />
+                <Sparkles className="w-5 h-5 text-gray-900" />
                 <h3 className="font-semibold text-gray-900">Suggested Questions</h3>
               </div>
               <div className="space-y-2 flex-1 overflow-y-auto">
@@ -348,7 +346,7 @@ const AiCoach = () => {
                     onClick={() => handleSuggestedQuestion(question)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full text-left p-3 text-sm text-gray-600 hover:text-pink-600 hover:bg-pink-50 rounded-lg transition-colors border border-gray-100 hover:border-pink-200"
+                    className="w-full text-left p-3 text-sm text-gray-600 hover:text-gray-900 hover:bg-[#FFF8ED] rounded-lg transition-colors border border-gray-100 hover:border-[#EADFD0]"
                   >
                     {question}
                   </motion.button>
@@ -368,9 +366,7 @@ const AiCoach = () => {
               {/* Chat Header */}
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-pink-600 rounded-full flex items-center justify-center">
-                    <Bot className="w-6 h-6 text-white" />
-                  </div>
+                  <Bot className="w-6 h-6 text-gray-900" />
                   <div>
                     <h3 className="font-semibold text-gray-900">AI Fitness Coach</h3>
                     <div className="flex items-center gap-2">
@@ -393,15 +389,15 @@ const AiCoach = () => {
                       className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : ''}`}
                     >
                       {message.type === 'bot' && (
-                        <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Bot className="w-5 h-5 text-white" />
+                        <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                          <Bot className="w-5 h-5 text-gray-900" />
                         </div>
                       )}
                       
                       <div className={`max-w-[80%] ${message.type === 'user' ? 'order-first' : ''}`}>
                         <div className={`rounded-2xl px-4 py-3 ${
                           message.type === 'user' 
-                            ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white' 
+                            ? 'bg-gray-900 text-white' 
                             : message.isError 
                               ? 'bg-red-50 text-red-900 border border-red-200'
                               : 'bg-gray-100 text-gray-900'
@@ -440,7 +436,7 @@ const AiCoach = () => {
                     className="mt-4"
                   >
                     <div className="flex items-center gap-2 mb-3">
-                      <ChefHat className="w-5 h-5 text-pink-500" />
+                      <ChefHat className="w-5 h-5 text-gray-900" />
                       <h3 className="font-semibold text-gray-900">Suggested Recipes</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -458,8 +454,8 @@ const AiCoach = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="flex gap-3"
                   >
-                    <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-pink-600 rounded-full flex items-center justify-center">
-                      <Bot className="w-5 h-5 text-white" />
+                    <div className="w-8 h-8 flex items-center justify-center">
+                      <Bot className="w-5 h-5 text-gray-900" />
                     </div>
                     <div className="bg-gray-100 rounded-2xl px-4 py-3">
                       <div className="flex gap-1">
@@ -476,7 +472,7 @@ const AiCoach = () => {
 
               {/* Input Area */}
               <div className="p-6 border-t border-gray-200">
-                <div className="flex gap-3">
+                <div className="relative">
                   <input
                     ref={inputRef}
                     type="text"
@@ -484,7 +480,7 @@ const AiCoach = () => {
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder="Ask about workouts, nutrition, recipes, or fitness tips..."
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200"
+                    className="w-full pr-12 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EADFD0] focus:border-transparent transition-all duration-200"
                     disabled={isTyping}
                   />
                   <motion.button
@@ -492,7 +488,8 @@ const AiCoach = () => {
                     disabled={!inputMessage.trim() || isTyping}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-6 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-xl hover:from-pink-600 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md"
+                    aria-label="Send message"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Send className="w-5 h-5" />
                   </motion.button>

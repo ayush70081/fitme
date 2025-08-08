@@ -43,7 +43,7 @@ export default function Sidebar({ isExpanded = false, isMobile = false, onClose 
   return (
     <div
       className={`
-        fixed top-0 left-0 h-full z-50 bg-prime-blue shadow-md
+        fixed top-0 left-0 h-full z-50 bg-[#FFF8ED] border-r border-[#EADFD0] shadow-md
         transition-all duration-300 ease-in-out
         ${isExpanded ? 'w-56' : 'w-16'}
         ${isMobile ? 'w-56' : ''}
@@ -54,11 +54,11 @@ export default function Sidebar({ isExpanded = false, isMobile = false, onClose 
         {/* Logo Section */}
         <div className="pt-6 pb-8 flex items-center justify-between px-2">
           {(isExpanded || isMobile) ? (
-            <div className="flex-1 pl-2 text-2xl font-bold text-white">
-              FitMe<span className="text-pink-400">+</span>
+            <div className="flex-1 pl-2 text-2xl font-bold text-gray-900">
+              FitMe+
             </div>
           ) : (
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-pink-400 font-bold mx-auto">
+            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-gray-900 font-bold mx-auto">
               F
             </div>
           )}
@@ -67,7 +67,7 @@ export default function Sidebar({ isExpanded = false, isMobile = false, onClose 
           {isMobile && (
             <button
               onClick={onClose}
-              className="p-2 text-white hover:bg-slate-700 rounded-lg"
+              className="p-2 text-gray-700 hover:bg-[#F5EFE6] rounded-lg"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -89,7 +89,7 @@ export default function Sidebar({ isExpanded = false, isMobile = false, onClose 
                 className={`
                   flex items-center relative z-10
                   transition-colors duration-200
-                  ${isActive ? 'text-prime-blue font-semibold' : 'text-white hover:bg-slate-700'}
+                  ${isActive ? 'text-gray-900 font-semibold' : 'text-gray-700 hover:bg-[#F5EFE6]'}
                   ${(isExpanded || isMobile) ? 'px-4 py-3 rounded-xl gap-3' : 'px-3 py-3 justify-center'}
                 `}
               >
@@ -99,11 +99,11 @@ export default function Sidebar({ isExpanded = false, isMobile = false, onClose 
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.2, ease: 'easeInOut' }}
-                    className="absolute inset-0 bg-pink-300 rounded-xl z-0"
+                    className="absolute inset-0 bg-[#F5EFE6] rounded-xl z-0"
                   />
                 )}
                 <div className="flex items-center justify-center w-6 h-6 flex-shrink-0 relative z-10">
-                  <Icon size={20} className={`${isActive ? 'text-prime-blue' : 'text-white'}`} />
+                  <Icon size={20} className={`${isActive ? 'text-gray-900' : 'text-gray-700'}`} />
                 </div>
                 {(isExpanded || isMobile) && (
                   <motion.span
@@ -128,12 +128,12 @@ export default function Sidebar({ isExpanded = false, isMobile = false, onClose 
             className={`
               flex items-center relative z-10
               transition-colors duration-200
-              text-white hover:bg-red-600
+              text-red-700 hover:bg-red-50
               ${(isExpanded || isMobile) ? 'px-4 py-3 rounded-xl gap-3' : 'px-3 py-3 justify-center'}
             `}
           >
             <div className="flex items-center justify-center w-6 h-6 flex-shrink-0 relative z-10">
-              <LogOut size={20} className="text-white" />
+              <LogOut size={20} className="text-red-700" />
             </div>
             {(isExpanded || isMobile) && (
               <motion.span

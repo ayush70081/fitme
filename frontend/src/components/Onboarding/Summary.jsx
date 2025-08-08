@@ -31,33 +31,7 @@ const Summary = ({ prevStep, values }) => {
 
   const age = calculateAge(birthday);
 
-  // Mifflin-St Jeor Equation for BMR
-  const calculateBMR = () => {
-    if (!currentWeight || !height || !age) return 0;
-    if (gender === 'male') {
-      return 10 * currentWeight + 6.25 * height - 5 * age + 5;
-    }
-    return 10 * currentWeight + 6.25 * height - 5 * age - 161;
-  };
-
-  const calculateTDEE = () => calculateBMR();
-  
-  const calculateNutrients = () => {
-    let calories = calculateTDEE();
-    if (goal === 'lose') {
-        calories -= 500; // 1lb per week deficit
-    } else if (goal === 'gain') {
-        calories += 500; // 1lb per week surplus
-    }
-
-    const protein = Math.round((calories * 0.3) / 4);
-    const carbs = Math.round((calories * 0.4) / 4);
-    const fat = Math.round((calories * 0.3) / 9);
-    
-    return { calories: Math.round(calories), protein, carbs, fat };
-  };
-
-  const nutrients = calculateNutrients();
+  // Daily goals section removed; nutrient calculations no longer needed
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -245,39 +219,19 @@ const Summary = ({ prevStep, values }) => {
         {detailItem("Location", values.location)}
       </div>
 
-      <div className="bg-pink-50 rounded-lg p-6">
-        <h3 className="text-lg font-bold text-center mb-4 text-pink-800">Your Daily Goals</h3>
-        <div className="flex justify-around text-center">
-            <div>
-                <p className="text-2xl font-bold text-pink-600">{nutrients.calories}</p>
-                <p className="text-sm text-gray-600">Calories</p>
-            </div>
-            <div>
-                <p className="text-2xl font-bold text-pink-600">{nutrients.protein}g</p>
-                <p className="text-sm text-gray-600">Protein</p>
-            </div>
-            <div>
-                <p className="text-2xl font-bold text-pink-600">{nutrients.carbs}g</p>
-                <p className="text-sm text-gray-600">Carbs</p>
-            </div>
-            <div>
-                <p className="text-2xl font-bold text-pink-600">{nutrients.fat}g</p>
-                <p className="text-sm text-gray-600">Fat</p>
-            </div>
-        </div>
-      </div>
+      {/* Daily goals section removed per design request */}
 
       <div className="mt-8 flex justify-between items-center">
         <button
           onClick={prevStep}
-          className="text-sm font-medium text-gray-700 hover:text-pink-600 transition-colors duration-200"
+          className="text-sm font-medium text-gray-700 hover:text-black transition-colors duration-200"
         >
           Back
         </button>
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-1/2 bg-gradient-to-r from-pink-500 to-pink-600 text-white py-3 px-4 rounded-lg font-medium hover:from-pink-600 hover:to-pink-700 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          className="w-1/2 bg-black text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
           {loading ? 'Saving...' : 'Finish & Go to Dashboard'}
         </button>

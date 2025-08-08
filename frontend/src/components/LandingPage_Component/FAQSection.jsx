@@ -4,34 +4,34 @@ import { ChevronDown } from "lucide-react";
 
 const faqs = [
   {
-    question: "How is my personal information protected?",
+    question: "What can the AI Coach help with?",
     answer:
-      "We use industry-standard encryption and secure data practices to ensure your personal and fitness information is protected at all times.",
+      "The AI Coach can answer fitness questions, generate workout routines, suggest recipes, and help you plan meals based on your goals and preferences.",
   },
   {
-    question: "What services does FitTrack offer?",
+    question: "How are meal plans generated?",
     answer:
-      "FitTrack offers personalized workout plans, nutrition guidance, fitness tracking, progress analytics, and access to certified trainers.",
+      "Meal plans are created using your calorie target, macro preferences, and dietary restrictions. You can customize meals and save daily plans for later.",
   },
   {
-    question: "Is my health information kept confidential?",
+    question: "Can I save and load my workout or meal plans?",
     answer:
-      "Yes, your health data is fully confidential and handled in accordance with GDPR and HIPAA standards.",
+      "Yes. Use the Save options in Workouts or Nutrition to store plans locally. You can quickly load, rename, or delete saved plans anytime.",
   },
   {
-    question: "How do I schedule a consultation with a trainer?",
+    question: "Is my data secure?",
     answer:
-      "Easily schedule a 1:1 trainer session through your dashboard under the 'Consultations' tab.",
+      "We use secure authentication and follow best practices to protect your account data. Only you can access your saved content on your device.",
   },
   {
-    question: "Can I share my fitness journey?",
+    question: "Is there a free plan?",
     answer:
-      "Absolutely! Share your transformation stories with our supportive community and inspire others.",
+      "Yes. You can get started for free and upgrade to Pro for advanced AI features, unlimited saved plans, and priority support.",
   },
   {
-    question: "What is your content usage policy?",
+    question: "How do I change my password or account details?",
     answer:
-      "All content is for personal use. Redistribution or commercial use requires prior written consent.",
+      "Go to Settings → Security to change your password. Account info like name and avatar can be updated from Profile.",
   },
 ];
 
@@ -43,8 +43,8 @@ const FAQSection = () => {
   };
 
   return (
-    <section id="FAQs" className="bg-[white] py-16 px-4">
-      <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl p-8 sm:p-10 border border-gray-200">
+    <section id="FAQs" className="py-16 px-4" style={{ backgroundColor: '#FAF7F2' }}>
+      <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl p-8 sm:p-10 border border-[#EADFD0]">
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Frequently Asked Questions</h2>
           <p className="text-gray-600 text-sm sm:text-base">
@@ -56,7 +56,7 @@ const FAQSection = () => {
           {faqs.map((item, index) => (
             <div
               key={index}
-              className="border-b last:border-none border-black-200 pb-4"
+              className="border-b last:border-none border-[#EADFD0] pb-4"
             >
               <button
                 className="w-full flex items-center justify-between text-left"
@@ -97,7 +97,7 @@ const FAQSection = () => {
 
       {/* Footer */}
       {/* bg-gradient-to-r from-pink-100 to-pink-200 rounded-3xl px-6 py-10 my-10 max-w-5xl mx-4 md:mx-auto */}
-      <div className="mt-10 max-w-2xl mx-auto bg-gradient-to-r from-pink-100 to-pink-200 rounded-2xl shadow-lg px-6 py-8 text-center border border-gray-200">
+      <div className="mt-10 max-w-2xl mx-auto bg-[#F5EFE6] rounded-2xl shadow-lg px-6 py-8 text-center border border-[#EADFD0]">
         <div className="flex justify-center mb-3 -space-x-3">
           <img
             src="https://randomuser.me/api/portraits/men/42.jpg"

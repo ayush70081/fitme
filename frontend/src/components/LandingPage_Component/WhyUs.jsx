@@ -1,38 +1,38 @@
 // WhyUsSection.jsx
 import React from "react";
-import { FaCalendarAlt, FaExchangeAlt, FaFileMedical, FaWallet, FaHeartbeat } from "react-icons/fa";
+import { FaCalendarAlt, FaWallet, FaDumbbell, FaUtensils, FaChartLine } from "react-icons/fa";
 import { BiBot } from "react-icons/bi";
 
 const features = [
   {
-    icon: <BiBot className="text-2xl text-pink-400" />,
-    title: "Easy-to-Use",
-    description: "Intuitive interface, streamlined appointment scheduling, secure messaging, and user-friendly health ...",
+    icon: <BiBot className="text-2xl text-gray-900" />,
+    title: "AI Coach Guidance",
+    description: "Chat with an AI coach for workouts, recipes, and habit tips tailored to you.",
   },
   {
-    icon: <FaCalendarAlt className="text-2xl text-pink-400" />,
-    title: "Book appointments",
-    description: "Book face-to-face or remote online appointments with your GP, nurse or clinician at a time that suits you ...",
+    icon: <FaDumbbell className="text-2xl text-gray-900" />,
+    title: "Personalized Workouts",
+    description: "Generate smart routines by goal, experience level, and equipment.",
   },
   {
-    icon: <FaExchangeAlt className="text-2xl text-pink-400" />,
-    title: "Order repeat prescriptions",
-    description: "Order your repeat prescriptions online, with convenient delivery of your prescription to your local pharmacy ...",
+    icon: <FaUtensils className="text-2xl text-gray-900" />,
+    title: "Daily Meal Plans",
+    description: "Balanced plans with macros that match your targets and preferences.",
   },
   {
-    icon: <FaFileMedical className="text-2xl text-pink-400" />,
-    title: "Share your medical record",
-    description: "Securely share your information with healthcare professionals of your choosing, without the need to ...",
+    icon: <FaChartLine className="text-2xl text-gray-900" />,
+    title: "Progress Tracking",
+    description: "Track workouts, weight, and nutrition with clean, actionable insights.",
   },
   {
-    icon: <FaWallet className="text-2xl text-pink-400" />,
-    title: "Save Time. Save Money",
-    description: "Efficient appointment booking, cost-effective telemedicine options, and streamlined billing processes to ...",
+    icon: <FaCalendarAlt className="text-2xl text-gray-900" />,
+    title: "Routine Scheduling",
+    description: "Plan sessions and meals; gentle reminders help you stay consistent.",
   },
   {
-    icon: <FaHeartbeat className="text-2xl text-pink-400" />,
-    title: "Grow Health",
-    description: "Personalized wellness plans, health tracking, and access to educational resources for continuous health ...",
+    icon: <FaWallet className="text-2xl text-gray-900" />,
+    title: "Simple & Affordable",
+    description: "Start free. Upgrade when you need more—no clutter, no ads.",
   },
 ];
 
@@ -40,19 +40,18 @@ const WhyUs = () => {
   return (
     <section id="why us" className="bg-white text-black py-16 px-4 sm:px-6 md:px-12 rounded-t-[40px]">
       <div className="max-w-7xl mx-auto text-center">
-        <span className="inline-block bg-pink-100 text-pink-600 text-xs font-semibold px-4 py-1 rounded-full mb-4 uppercase">
-          Why Should Us?
+        <span className="inline-block bg-[#F5EFE6] text-gray-900 text-xs font-semibold px-4 py-1 rounded-full mb-4 uppercase border border-[#EADFD0]">
+          Why Choose FitMe+
         </span>
         <h2 className="text-3xl sm:text-4xl font-semibold leading-snug">
-          For your physical & mental health. For clinicians & hospitals. <br />
-          For all of it in one place. For life.
+          Workouts, nutrition, and AI coaching — all in one clean, focused app.
         </h2>
 
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <div key={index} className="text-left space-y-3 bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300">
 
-              <div className="w-10 h-10 flex items-center justify-center bg-pink-100 rounded-md">
+              <div className="w-10 h-10 flex items-center justify-center bg-[#F5EFE6] rounded-md border border-[#EADFD0]">
                 {feature.icon}
               </div>
               <h3 className="font-semibold text-lg">{feature.title}</h3>

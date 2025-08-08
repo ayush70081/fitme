@@ -57,8 +57,8 @@ const Testimonials = () => {
 
   return (
     <section className="bg-prime-blue py-10 relative text-center sm:px-6 md:px-10 rounded-[30px] mx-4 sm:mx-2 md:mx-6">
-      <p className="text-sm text-white mb-2">3940+ Happy Imwell Users</p>
-      <h2 className="text-3xl text-pink-300 font-semibold mb-10">Don’t just take our words</h2>
+      <p className="text-sm text-white mb-2">3940+ Happy FitMe Users</p>
+      <h2 className="text-3xl text-white font-semibold mb-10">Don’t just take our words</h2>
 
       <div className="relative">
         <div

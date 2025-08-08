@@ -91,8 +91,8 @@ const Navbar = () => {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
-            <div className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-pink-600 bg-clip-text text-transparent">
-              FitMe<span className="text-pink-500">+</span>
+            <div className="text-2xl font-bold text-gray-900">
+              FitMe+
       </div>
           </motion.div>
 
@@ -101,7 +101,7 @@ const Navbar = () => {
             <div className="relative flex gap-8 text-sm font-medium">
         {/* Animated Underline */}
         <motion.div
-                className="absolute bottom-0 h-[3px] bg-gradient-to-r from-pink-400 to-pink-600 rounded-full"
+                className="absolute bottom-0 h-[3px] bg-[#EADFD0] rounded-full"
           animate={underlineProps}
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
           style={{ position: 'absolute' }}
@@ -122,8 +122,8 @@ const Navbar = () => {
                     onSetActive={() => setActiveTab(item)}
                     className={`cursor-pointer capitalize transition-all duration-300 ${
                       activeTab === item 
-                        ? 'text-pink-600 font-semibold' 
-                        : 'text-gray-600 hover:text-pink-500'
+                        ? 'text-gray-900 font-semibold' 
+                        : 'text-gray-600 hover:text-gray-900'
                     }`}
             >
               {item}
@@ -139,7 +139,7 @@ const Navbar = () => {
               <div className="flex items-center gap-4">
             <RouterLink 
               to="/dashboard" 
-                  className="flex items-center gap-2 text-gray-700 hover:text-pink-600 font-medium transition-colors duration-200"
+                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200"
             >
                   <User className="w-4 h-4" />
               Dashboard
@@ -151,7 +151,7 @@ const Navbar = () => {
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-4 py-2 rounded-lg font-medium hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-md"
+                    className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-all duration-200 shadow-md"
                   >
                     <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-xs font-bold">
                       {getUserInitials(user?.name)}
@@ -173,7 +173,7 @@ const Navbar = () => {
                         {/* User Info */}
                         <div className="px-4 py-3 border-b border-gray-100">
             <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold">
+                            <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white font-bold">
                               {getUserInitials(user?.name)}
                             </div>
                             <div>
@@ -188,7 +188,7 @@ const Navbar = () => {
                           <RouterLink 
                             to="/dashboard/profile" 
                             onClick={() => setIsProfileDropdownOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200"
+                            className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-[#F5EFE6] hover:text-gray-900 transition-colors duration-200"
                           >
                             <User className="w-4 h-4" />
                             <span>Profile</span>
@@ -197,7 +197,7 @@ const Navbar = () => {
                           <RouterLink 
                             to="/dashboard/settings" 
                             onClick={() => setIsProfileDropdownOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200"
+                            className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-[#F5EFE6] hover:text-gray-900 transition-colors duration-200"
                           >
                             <Settings className="w-4 h-4" />
                             <span>Settings</span>
@@ -225,7 +225,7 @@ const Navbar = () => {
               <div className="flex items-center gap-3">
                 <RouterLink 
                   to="/login" 
-                  className="text-gray-700 hover:text-pink-600 font-medium transition-colors duration-200"
+                  className="text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200"
                 >
                   Login
                 </RouterLink>
@@ -235,7 +235,7 @@ const Navbar = () => {
                 >
                   <RouterLink 
                     to="/register" 
-                    className="bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-2 rounded-lg font-medium hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-md"
+                    className="bg-black text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-all duration-200 shadow-md"
                   >
                     Register
                   </RouterLink>
@@ -249,7 +249,7 @@ const Navbar = () => {
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-gray-600 hover:text-pink-600 transition-colors duration-200"
+              className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </motion.button>
@@ -281,9 +281,9 @@ const Navbar = () => {
                     setIsMobileMenuOpen(false);
                   }}
                   className={`block px-4 py-2 rounded-lg capitalize transition-all duration-200 ${
-                    activeTab === item 
-                      ? 'bg-pink-50 text-pink-600 font-semibold' 
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-pink-500'
+                     activeTab === item 
+                       ? 'bg-[#F5EFE6] text-gray-900 font-semibold' 
+                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
                   {item}
@@ -298,7 +298,7 @@ const Navbar = () => {
                   {/* User Info */}
                   <div className="px-4 py-2">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold">
+                      <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white font-bold">
                         {getUserInitials(user?.name)}
                       </div>
                       <div>
@@ -310,7 +310,7 @@ const Navbar = () => {
 
                   <RouterLink 
                     to="/dashboard" 
-                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-pink-600 font-medium transition-colors duration-200"
+                     className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <User className="w-4 h-4" />
@@ -319,7 +319,7 @@ const Navbar = () => {
 
                   <RouterLink 
                     to="/dashboard/profile" 
-                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-pink-600 font-medium transition-colors duration-200"
+                     className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <User className="w-4 h-4" />
@@ -328,7 +328,7 @@ const Navbar = () => {
 
                   <RouterLink 
                     to="/dashboard/settings" 
-                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-pink-600 font-medium transition-colors duration-200"
+                     className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <Settings className="w-4 h-4" />
@@ -350,14 +350,14 @@ const Navbar = () => {
                 <div className="space-y-2">
             <RouterLink 
               to="/login" 
-                    className="block px-4 py-2 text-gray-700 hover:text-pink-600 font-medium transition-colors duration-200"
+              className="block px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
             >
               Login
             </RouterLink>
             <RouterLink 
               to="/register" 
-                    className="block w-full px-4 py-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg font-medium hover:from-pink-600 hover:to-pink-700 transition-all duration-200 text-center"
+              className="block w-full px-4 py-2 bg-black text-white rounded-lg font-medium hover:opacity-90 transition-all duration-200 text-center"
                     onClick={() => setIsMobileMenuOpen(false)}
             >
               Register

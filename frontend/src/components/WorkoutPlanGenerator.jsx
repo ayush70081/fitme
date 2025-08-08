@@ -127,7 +127,7 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
     <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl flex items-center justify-center">
+        <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center">
           <Sparkles className="w-6 h-6 text-white" />
         </div>
         <div>
@@ -187,7 +187,7 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-700">Profile Completeness</span>
-          <span className="text-sm font-bold text-pink-600">{profileCompleteness}%</span>
+          <span className="text-sm font-bold text-gray-900">{profileCompleteness}%</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
@@ -208,7 +208,7 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
       {user && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="text-center p-3 bg-gray-50 rounded-lg">
-            <Target className="w-5 h-5 text-pink-600 mx-auto mb-1" />
+            <Target className="w-5 h-5 text-gray-900 mx-auto mb-1" />
             <div className="text-xs text-gray-600">Goal</div>
             <div className="text-sm font-semibold text-gray-900">
               {user.fitnessGoals?.[0] ? 
@@ -218,20 +218,20 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
             </div>
           </div>
           <div className="text-center p-3 bg-gray-50 rounded-lg">
-            <Dumbbell className="w-5 h-5 text-pink-600 mx-auto mb-1" />
+            <Dumbbell className="w-5 h-5 text-gray-900 mx-auto mb-1" />
             <div className="text-xs text-gray-600">Experience</div>
             <div className="text-sm font-semibold text-gray-900 capitalize">
               {user.fitnessExperience || 'Not Set'}
             </div>
           </div>
           <div className="text-center p-3 bg-gray-50 rounded-lg">
-            <Calendar className="w-5 h-5 text-pink-600 mx-auto mb-1" />
+            <Calendar className="w-5 h-5 text-gray-900 mx-auto mb-1" />
             <div className="text-xs text-gray-600">Frequency</div>
             <div className="text-sm font-semibold text-gray-900">
               {user.workoutFrequency ? `${user.workoutFrequency}/week` : 'Not Set'}
             </div>
             {user.workoutFrequency && (
-              <div className="text-xs text-pink-600 mt-1">
+              <div className="text-xs text-gray-600 mt-1">
                 {(() => {
                   const freq = user.workoutFrequency;
                   if (freq === '2-3') return '3 days';
@@ -245,7 +245,7 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
             )}
           </div>
           <div className="text-center p-3 bg-gray-50 rounded-lg">
-            <Clock className="w-5 h-5 text-pink-600 mx-auto mb-1" />
+            <Clock className="w-5 h-5 text-gray-900 mx-auto mb-1" />
             <div className="text-xs text-gray-600">Duration</div>
             <div className="text-sm font-semibold text-gray-900">
               {user.workoutDuration || 'Not Set'} min
@@ -288,7 +288,7 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
                 <select
                   value={customOptions.focusArea}
                   onChange={(e) => handleCustomOptionChange('focusArea', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#EADFD0] focus:border-transparent"
                 >
                   <option value="">Default (Balanced)</option>
                   <option value="upper-body">Upper Body</option>
@@ -307,7 +307,7 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
                 <select
                   value={customOptions.intensity}
                   onChange={(e) => handleCustomOptionChange('intensity', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#EADFD0] focus:border-transparent"
                 >
                   <option value="">Default (Based on Experience)</option>
                   <option value="low">Low Intensity</option>
@@ -324,7 +324,7 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
                 <select
                   value={customOptions.equipment}
                   onChange={(e) => handleCustomOptionChange('equipment', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#EADFD0] focus:border-transparent"
                 >
                   <option value="">Bodyweight Only</option>
                   <option value="basic">Basic (Dumbbells, Resistance bands)</option>
@@ -340,7 +340,7 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
                 <select
                   value={customOptions.duration}
                   onChange={(e) => handleCustomOptionChange('duration', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#EADFD0] focus:border-transparent"
                 >
                   <option value="">Use Profile Setting</option>
                   <option value="15-30">Quick (15-30 min)</option>
@@ -358,7 +358,7 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
                   value={customOptions.specificGoals}
                   onChange={(e) => handleCustomOptionChange('specificGoals', e.target.value)}
                   placeholder="e.g., Focus on improving posture, prepare for a 5K run, target specific muscle groups..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#EADFD0] focus:border-transparent"
                   rows={3}
                   maxLength={200}
                 />
@@ -395,7 +395,7 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
         className={`w-full py-4 px-6 rounded-xl font-semibold text-white transition-all duration-200 ${
           generating
             ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 active:scale-98'
+            : 'bg-black hover:opacity-90 active:scale-98'
         }`}
       >
         {generating ? (

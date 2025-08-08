@@ -89,3 +89,6 @@ coverage/
 # frontend/package-lock.json
 # backend/package-lock.json
 # fastapi_backend/poetry.lock 
+
+# Ignore all files in the .yoyo folder
+.yoyo/

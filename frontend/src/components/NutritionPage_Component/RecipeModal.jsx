@@ -35,7 +35,7 @@ const RecipeModal = ({ day, mealType, meal, onClose }) => {
                             <h2 className="text-2xl font-bold text-gray-800">{meal.name || 'Unnamed Meal'}</h2>
                             <p className="text-gray-600">{day} • {mealType}</p>
                             {(meal.nutrition?.calories || meal.calories) && (
-                                <p className="text-sm text-blue-600 mt-1">
+                                <p className="text-sm text-gray-900 mt-1">
                                     {Math.round(meal.nutrition?.calories || meal.calories)} calories
                                 </p>
                             )}
@@ -52,23 +52,23 @@ const RecipeModal = ({ day, mealType, meal, onClose }) => {
 
                     {/* Nutrition Info */}
                     {meal.nutrition && (
-                        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                        <div className="mb-6 p-4 bg-[#F5EFE6] rounded-lg border border-gray-200">
                             <h3 className="text-lg font-semibold text-gray-800 mb-3">Nutrition Information</h3>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <div className="text-center">
-                                    <div className="text-2xl font-bold text-blue-600">{Math.round(meal.nutrition.calories || 0)}</div>
+                                    <div className="text-2xl font-bold text-gray-900">{Math.round(meal.nutrition.calories || 0)}</div>
                                     <div className="text-sm text-gray-600">Calories</div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="text-2xl font-bold text-green-600">{Math.round(meal.nutrition.protein || 0)}g</div>
+                                    <div className="text-2xl font-bold text-gray-900">{Math.round(meal.nutrition.protein || 0)}g</div>
                                     <div className="text-sm text-gray-600">Protein</div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="text-2xl font-bold text-yellow-600">{Math.round(meal.nutrition.carbs || 0)}g</div>
+                                    <div className="text-2xl font-bold text-gray-900">{Math.round(meal.nutrition.carbs || 0)}g</div>
                                     <div className="text-sm text-gray-600">Carbs</div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="text-2xl font-bold text-red-600">{Math.round(meal.nutrition.fat || 0)}g</div>
+                                    <div className="text-2xl font-bold text-gray-900">{Math.round(meal.nutrition.fat || 0)}g</div>
                                     <div className="text-sm text-gray-600">Fat</div>
                                 </div>
                             </div>
@@ -108,7 +108,7 @@ const RecipeModal = ({ day, mealType, meal, onClose }) => {
                             {recipeSteps.map((step, index) => (
                                 step.trim() && (
                                     <div key={index} className="flex gap-3">
-                                        <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                                        <span className="flex-shrink-0 w-6 h-6 bg-gray-100 text-gray-900 rounded-full flex items-center justify-center text-sm font-medium">
                                             {index + 1}
                                         </span>
                                         <p className="text-gray-700 flex-1">{step.trim()}</p>
@@ -122,7 +122,7 @@ const RecipeModal = ({ day, mealType, meal, onClose }) => {
                     <div className="pt-6 border-t border-gray-200">
                         <button
                             onClick={onClose}
-                            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200"
+                            className="w-full py-3 px-4 bg-black hover:bg-black text-white font-medium rounded-lg transition-colors duration-200"
                         >
                             Close
                         </button>

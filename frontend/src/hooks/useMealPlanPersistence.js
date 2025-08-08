@@ -35,6 +35,15 @@ export const useMealPlanPersistence = (currentPlan, setPlan, options = {}) => {
         const result = mealPlanPersistence.restorePlan();
         
         if (result.success && result.data) {
+          // If there is already a non-empty plan in memory, don't clobber it
+          try {
+            const existingPlan = getCurrentPlan();
+            const hasExistingMeals = !!existingPlan && Object.values(existingPlan).some(m => m && m.name);
+            if (hasExistingMeals) {
+              return; // skip restore to avoid overwriting user changes
+            }
+          } catch {}
+
           setPlan(result.data);
           
           if (showToastMessages && result.metadata?.isRestored) {

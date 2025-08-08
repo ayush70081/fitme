@@ -13,26 +13,29 @@ const MealCard = ({ meal, mealType, onMealClick, onAddToRoutine, showDeleteButto
 
   return (
     <div
-      className={`relative bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 ${
-        isHovered ? "transform -translate-y-1 shadow-lg" : ""
+      className={`relative bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden transition-all duration-200 ${
+        isHovered ? "-translate-y-0.5 shadow-md" : ""
       } ${!meal?.name ? "border-2 border-dashed border-gray-200" : ""}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => meal?.name && onMealClick(meal, mealType)}
     >
-      <div className="p-6">
+      <div className="p-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-800">{mealType}</h3>
+          <h3 className="text-sm font-medium text-gray-600 capitalize">
+            {mealType.split('_')[0]}
+            {mealType.includes('_') && ` ${mealType.split('_')[1]}`}
+          </h3>
           <div className="flex items-center gap-2">
             {(meal?.calories || meal?.nutrition?.calories) && (
-              <span className="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+              <span className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-900">
                 {Math.round(meal?.nutrition?.calories || meal?.calories || 0)} kcal
               </span>
             )}
             {meal?.name && onAddToRoutine && (
               <button
                 onClick={(e) => { e.stopPropagation(); onAddToRoutine(meal, mealType); }}
-                className="p-1 px-3 text-xs font-semibold rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-white shadow hover:from-blue-500 hover:to-green-400 transition-colors duration-200"
+                className="p-1 px-3 text-[11px] font-semibold rounded-full bg-black text-white shadow hover:bg-black transition-colors duration-200"
                 title="Add this meal to your Daily Routine"
               >
                 + Add to Routine
@@ -49,7 +52,7 @@ const MealCard = ({ meal, mealType, onMealClick, onAddToRoutine, showDeleteButto
             )}
           </div>
         </div>
-        <div className="mt-4">
+        <div className="mt-1.5">
           <h4
             className={`text-xl font-bold ${
               meal?.name ? "text-gray-900" : "text-gray-400 italic"
@@ -59,7 +62,7 @@ const MealCard = ({ meal, mealType, onMealClick, onAddToRoutine, showDeleteButto
           </h4>
           {meal?.ingredients ? (
             <div>
-              <p className="mt-2 text-gray-600 line-clamp-2">
+              <p className="mt-2 text-gray-700 line-clamp-2">
                 {meal.ingredients.slice(0, 3).join(", ")}
                 {meal.ingredients.length > 3 ? "..." : ""}
               </p>
@@ -72,13 +75,13 @@ const MealCard = ({ meal, mealType, onMealClick, onAddToRoutine, showDeleteButto
               )}
               {meal?.nutrition && (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
+              <span className="px-2 py-1 text-xs bg-gray-100 text-gray-900 rounded">
                     P: {Math.round(meal.nutrition.protein)}g
                   </span>
-                  <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded">
+              <span className="px-2 py-1 text-xs bg-gray-100 text-gray-900 rounded">
                     C: {Math.round(meal.nutrition.carbs)}g
                   </span>
-                  <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">
+              <span className="px-2 py-1 text-xs bg-gray-100 text-gray-900 rounded">
                     F: {Math.round(meal.nutrition.fat)}g
                   </span>
                 </div>
@@ -96,7 +99,7 @@ const MealCard = ({ meal, mealType, onMealClick, onAddToRoutine, showDeleteButto
         </div>
       </div>
       {meal?.name && (
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-purple-500"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-black"></div>
       )}
     </div>
   );

@@ -10,7 +10,7 @@ const HeroSection = () => {
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-snug">
             Harmonize your <br />
-            <span className="text-pink-300">well-being with zero excuses.</span>
+            <span className="text-gray-300">well-being with zero excuses.</span>
           </h1>
 
           <p className="mt-4 text-gray-300 text-sm sm:text-base md:text-lg">

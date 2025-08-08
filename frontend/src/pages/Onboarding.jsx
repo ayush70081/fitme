@@ -88,7 +88,7 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-pink-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#FAF7F2' }}>
       <div className="w-full max-w-md mx-auto">
         {/* Progress indicator */}
         <div className="mb-6">
@@ -98,7 +98,7 @@ const Onboarding = () => {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
-              className="bg-gradient-to-r from-pink-500 to-pink-600 h-2 rounded-full transition-all duration-300"
+              className="bg-black h-2 rounded-full transition-all duration-300"
               style={{ width: `${(step / 10) * 100}%` }}
             ></div>
           </div>

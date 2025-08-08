@@ -329,7 +329,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-pink-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#FAF7F2' }}>
       <div className="w-full max-w-md">
         {/* Back to home button */}
         <motion.div
@@ -361,7 +361,7 @@ const Login = () => {
               transition={{ delay: 0.2 }}
               className="text-3xl font-bold text-gray-900 mb-2"
             >
-              FitMe<span className="text-pink-400">+</span>
+              FitMe+
             </motion.div>
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">Welcome Back</h1>
             <p className="text-gray-600">Sign in to continue your fitness journey</p>
@@ -403,7 +403,7 @@ const Login = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 ${
                     errors.email 
                       ? 'border-red-300 bg-red-50 focus:ring-red-500' 
                       : 'border-gray-300 hover:border-gray-400'
@@ -430,7 +430,7 @@ const Login = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 ${
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 ${
                     errors.password 
                       ? 'border-red-300 bg-red-50 focus:ring-red-500' 
                       : 'border-gray-300 hover:border-gray-400'
@@ -459,7 +459,7 @@ const Login = () => {
               type="submit"
               disabled={loading}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-gradient-to-r from-pink-500 to-pink-600 text-white py-3 px-4 rounded-lg font-medium hover:from-pink-600 hover:to-pink-700 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 relative"
+              className="w-full bg-black text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 relative"
             >
               {loading ? (
                 <div className="flex items-center justify-center">
@@ -480,7 +480,7 @@ const Login = () => {
           <div className="text-center mt-6">
             <Link
               to="/forgot-password"
-              className="text-sm text-pink-600 hover:text-pink-700 transition-colors duration-200 inline-flex items-center"
+              className="text-sm text-gray-900 hover:opacity-80 transition-colors duration-200 inline-flex items-center"
             >
               <HelpCircle className="w-4 h-4 mr-1" />
               Forgot your password?
@@ -493,7 +493,7 @@ const Login = () => {
               Don't have an account?{' '}
               <Link
                 to="/register"
-                className="text-pink-600 hover:text-pink-700 font-medium transition-colors duration-200"
+                className="text-gray-900 hover:opacity-80 font-medium transition-colors duration-200"
               >
                 Create Account
               </Link>
@@ -510,35 +510,17 @@ const Login = () => {
         >
           <p className="text-xs text-gray-500">
             Having trouble? Check our{' '}
-            <Link to="/help" className="text-pink-600 hover:text-pink-700">
+            <Link to="/help" className="text-gray-900 hover:opacity-80">
               help center
             </Link>{' '}
             or{' '}
-            <Link to="/contact" className="text-pink-600 hover:text-pink-700">
+            <Link to="/contact" className="text-gray-900 hover:opacity-80">
               contact support
             </Link>
           </p>
         </motion.div>
 
-        {/* Demo Credentials - Remove in production */}
-        {process.env.NODE_ENV === 'development' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4"
-          >
-            <div className="flex items-start">
-              <Info className="w-5 h-5 text-blue-500 mr-2 mt-0.5" />
-              <div>
-                <p className="text-sm text-blue-800 font-medium">Development Mode</p>
-                <p className="text-sm text-blue-700">
-                  Use any email and password to test the login system
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        )}
+        {/* Removed development mode notice */}
       </div>
     </div>
   );

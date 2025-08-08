@@ -126,7 +126,7 @@ const Register = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-pink-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#FAF7F2' }}>
       <div className="w-full max-w-md">
         {/* Back to home button */}
         <motion.div
@@ -152,9 +152,7 @@ const Register = () => {
         >
           {/* Logo and Title */}
           <div className="text-center mb-8">
-            <div className="text-3xl font-bold text-gray-900 mb-2">
-              FitMe<span className="text-pink-400">+</span>
-            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-2">FitMe+</div>
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">Create Account</h1>
             <p className="text-gray-600">Join us and start your fitness journey today</p>
           </div>
@@ -176,7 +174,7 @@ const Register = () => {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors duration-200 ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-colors duration-200 ${
                     errors.firstName ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                   placeholder="Enter your first name"
@@ -202,7 +200,7 @@ const Register = () => {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors duration-200 ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-colors duration-200 ${
                     errors.lastName ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                   placeholder="Enter your last name"
@@ -228,7 +226,7 @@ const Register = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors duration-200 ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-colors duration-200 ${
                     errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                   placeholder="Enter your email"
@@ -254,7 +252,7 @@ const Register = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors duration-200 ${
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-colors duration-200 ${
                     errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                   placeholder="Create a password (min. 6 characters)"
@@ -291,7 +289,7 @@ const Register = () => {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors duration-200 ${
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-colors duration-200 ${
                     errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                   placeholder="Confirm your password"
@@ -323,11 +321,11 @@ const Register = () => {
             {/* Terms and Conditions */}
             <div className="text-sm text-gray-600">
               By creating an account, you agree to our{' '}
-              <Link to="/terms" className="text-pink-600 hover:text-pink-700 underline">
+              <Link to="/terms" className="text-gray-900 hover:opacity-80 underline">
                 Terms of Service
               </Link>{' '}
               and{' '}
-              <Link to="/privacy" className="text-pink-600 hover:text-pink-700 underline">
+              <Link to="/privacy" className="text-gray-900 hover:opacity-80 underline">
                 Privacy Policy
               </Link>
             </div>
@@ -336,7 +334,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-pink-500 to-pink-600 text-white py-3 px-4 rounded-lg font-medium hover:from-pink-600 hover:to-pink-700 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              className="w-full bg-black text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               {loading ? (
                 <div className="flex items-center justify-center">
@@ -355,7 +353,7 @@ const Register = () => {
               Already have an account?{' '}
               <Link
                 to="/login"
-                className="text-pink-600 hover:text-pink-700 font-medium transition-colors duration-200"
+                className="text-gray-900 hover:opacity-80 font-medium transition-colors duration-200"
               >
                 Sign In
               </Link>
@@ -363,17 +361,7 @@ const Register = () => {
           </div>
         </motion.div>
 
-        {/* Demo Information */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4"
-        >
-          <p className="text-sm text-blue-800 text-center">
-            <strong>Demo:</strong> Create account with any valid email and password
-          </p>
-        </motion.div>
+        {/* Removed demo information */}
       </div>
     </div>
   );

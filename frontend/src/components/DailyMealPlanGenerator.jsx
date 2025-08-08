@@ -9,6 +9,8 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
   const [isGenerating, setIsGenerating] = useState(false);
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const [showSaveLoadModal, setShowSaveLoadModal] = useState(false);
+  const [quickSaveName, setQuickSaveName] = useState('');
+  const [isQuickSaveOpen, setIsQuickSaveOpen] = useState(false);
   const [preferences, setPreferences] = useState({
     cuisine: '',
     maxPrepTime: 30,
@@ -84,7 +86,10 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
 
   // Quick save handler
   const handleQuickSave = async () => {
-    await savePlan();
+    const nameToUse = quickSaveName.trim() || null;
+    await savePlan(nameToUse);
+    setQuickSaveName('');
+    setIsQuickSaveOpen(false);
   };
 
   // Handle plan loaded from save/load modal
@@ -100,12 +105,12 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
   const persistenceStatus = getPersistenceStatus();
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <h2 className="text-xl font-semibold text-gray-800">Daily AI Meal Planner</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Daily AI Meal Planner</h2>
           {persistenceStatus.hasAutoSave && (
-            <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+            <span className="text-xs bg-gray-100 text-gray-900 px-2 py-1 rounded-full">
               Auto-saved
             </span>
           )}
@@ -114,13 +119,13 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
           {/* Save & Load Manager Button */}
           <button
             onClick={() => setShowSaveLoadModal(true)}
-            className="flex items-center px-3 py-2 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-lg hover:from-blue-700 hover:to-green-700 transition-all shadow-sm"
+            className="flex items-center px-3 py-2 bg-black text-white rounded-lg hover:bg-black transition-all shadow-sm"
             title="Manage saved plans"
           >
             <FiFolder className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">Meal Plans</span>
             {persistenceStatus.savedPlansCount > 0 && (
-              <span className="ml-2 bg-white text-blue-600 text-xs px-2 py-1 rounded-full font-medium">
+              <span className="ml-2 bg-white text-gray-900 text-xs px-2 py-1 rounded-full font-medium">
                 {persistenceStatus.savedPlansCount}
               </span>
             )}
@@ -128,18 +133,38 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
 
           {/* Quick Save Button */}
           {hasCurrentDayPlan && (
-            <button
-              onClick={handleQuickSave}
-              className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-              title="Quick save current plan"
-            >
-              <FiSave className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              {isQuickSaveOpen && (
+                <>
+                  <input
+                    type="text"
+                    value={quickSaveName}
+                    onChange={(e) => setQuickSaveName(e.target.value)}
+                    placeholder={`Daily Plan - ${new Date().toLocaleDateString()}`}
+                    className="w-44 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#000] focus:border-transparent text-sm"
+                  />
+                  <button
+                    onClick={() => { setIsQuickSaveOpen(false); setQuickSaveName(''); }}
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                </>
+              )}
+              <button
+                onClick={() => (isQuickSaveOpen ? handleQuickSave() : setIsQuickSaveOpen(true))}
+                className="flex items-center px-3 py-2 bg-black text-white rounded-lg hover:bg-black transition-all shadow-sm"
+                title="Save current plan"
+              >
+                <FiSave className="w-4 h-4" />
+                <span className="ml-2">{isQuickSaveOpen ? 'Save' : 'Save Plan'}</span>
+              </button>
+            </div>
           )}
           
           <button
             onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
-            className="text-sm text-blue-600 hover:text-blue-800 px-3 py-1 rounded-lg hover:bg-blue-50"
+            className="text-sm text-gray-900 hover:text-black px-3 py-1 rounded-lg hover:bg-gray-100"
           >
             {showAdvancedOptions ? 'Hide Options' : 'Options'}
           </button>
@@ -147,9 +172,9 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
       </div>
 
       {showAdvancedOptions && (
-        <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">Meal Plan Preferences</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="mt-2 p-4 bg-[#F5EFE6] rounded-lg border border-gray-200">
+          <h3 className="text-sm font-medium text-gray-800 mb-3">Meal Plan Preferences</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
                 Meal Focus
@@ -157,7 +182,7 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
               <select
                 value={preferences.mealFocus}
                 onChange={(e) => setPreferences(prev => ({ ...prev, mealFocus: e.target.value }))}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#000] focus:border-transparent"
               >
                 <option value="balanced">Balanced</option>
                 <option value="protein-heavy">High Protein</option>
@@ -174,7 +199,7 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
               <select
                 value={preferences.cuisine}
                 onChange={(e) => setPreferences(prev => ({ ...prev, cuisine: e.target.value }))}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#000] focus:border-transparent"
               >
                 <option value="">Any Cuisine</option>
                 <option value="italian">Italian</option>
@@ -193,7 +218,7 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
               <select
                 value={preferences.maxPrepTime}
                 onChange={(e) => setPreferences(prev => ({ ...prev, maxPrepTime: parseInt(e.target.value) }))}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#000] focus:border-transparent"
               >
                 <option value="15">15 minutes</option>
                 <option value="30">30 minutes</option>
@@ -205,11 +230,11 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="mt-3 flex flex-col sm:flex-row gap-2">
         <button
           onClick={handleGenerateDailyPlan}
           disabled={isGenerating}
-          className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
+          className="flex-1 bg-black text-white py-3 px-6 rounded-lg font-medium hover:bg-black disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
         >
           {isGenerating ? (
             <span className="flex items-center justify-center">
@@ -227,7 +252,7 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
           <button
             onClick={handleGenerateDailyPlan}
             disabled={isGenerating}
-            className="bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-400 transition-colors duration-200"
+            className="bg-black text-white py-3 px-4 rounded-lg font-medium hover:bg-black disabled:bg-gray-400 transition-colors duration-200"
           >
             <FiRefreshCw className={`w-5 h-5 ${isGenerating ? 'animate-spin' : ''}`} />
           </button>

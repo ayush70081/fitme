@@ -48,8 +48,8 @@ class MealPlanPersistence {
         await this.addToSavedPlans(savedPlan);
       }
 
-      // Always update current plan
-      localStorage.setItem(STORAGE_KEYS.CURRENT_PLAN, JSON.stringify(savedPlan));
+      // Always update current plan (store only meals for consistency)
+      localStorage.setItem(STORAGE_KEYS.CURRENT_PLAN, JSON.stringify(savedPlan.meals));
 
       // Attempt backend sync (non-blocking)
       this.syncToBackend(savedPlan).catch(error => {
@@ -107,15 +107,17 @@ class MealPlanPersistence {
         }
       }
       if (plan) {
+        // Determine meals shape (plan may already be just meals)
+        const mealsOnly = plan?.meals ? plan.meals : plan;
         // Update current plan
-        localStorage.setItem('current_meal_plan', JSON.stringify(plan.meals));
+        localStorage.setItem('current_meal_plan', JSON.stringify(mealsOnly));
         return {
           success: true,
           message: 'Plan loaded successfully',
-          data: plan.meals,
+          data: mealsOnly,
           metadata: {
-            name: plan.name,
-            savedAt: plan.savedAt,
+            name: plan.name || 'Current Plan',
+            savedAt: plan.savedAt || new Date().toISOString(),
             summary: plan.summary
           }
         };
@@ -214,13 +216,22 @@ class MealPlanPersistence {
     let plan = null;
     const currentPlanMeals = localStorage.getItem('current_meal_plan');
     if (currentPlanMeals) {
-      plan = {
-        id: 'current',
-        name: 'Latest Generated Plan',
-        meals: JSON.parse(currentPlanMeals),
-        savedAt: new Date().toISOString(),
-        isRestored: true
-      };
+      try {
+        const parsed = JSON.parse(currentPlanMeals);
+        const mealsOnly = parsed && typeof parsed === 'object' && parsed.meals && typeof parsed.meals === 'object'
+          ? parsed.meals
+          : parsed;
+        plan = {
+          id: 'current',
+          name: 'Latest Generated Plan',
+          meals: mealsOnly,
+          savedAt: new Date().toISOString(),
+          isRestored: true
+        };
+      } catch {
+        // If parsing fails, clear the invalid entry
+        localStorage.removeItem('current_meal_plan');
+      }
     }
     // Fallback to previous logic if not found
     if (!plan) {
@@ -341,7 +352,10 @@ class MealPlanPersistence {
       };
 
       // Try to save to backend
-      const response = await fetch(`${import.meta.env.VITE_FASTAPI_URL || 'http://localhost:8000'}/api/mealplan/save`, {
+      const baseUrlRaw = import.meta.env.VITE_FASTAPI_URL || 'http://localhost:8000';
+      const baseUrl = (baseUrlRaw || '').replace(/\/$/, '');
+      const apiUrl = baseUrl.includes('/api') ? `${baseUrl}/mealplan/save` : `${baseUrl}/api/mealplan/save`;
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
