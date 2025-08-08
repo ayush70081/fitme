@@ -509,9 +509,25 @@ const Profile = () => {
       );
     };
 
+    // Determine display value based on the field type
+    let displayValue = '--';
+    switch (config.field) {
+      case 'goalWeight':
+        displayValue = formatGoalWeight(fieldValue);
+        break;
+      case 'targetMuscleGain':
+        displayValue = formatMuscleGain(fieldValue);
+        break;
+      case 'weight':
+        displayValue = formatWeight(fieldValue);
+        break;
+      default:
+        displayValue = fieldValue || '--';
+    }
+
     return (
       <div className="text-center p-4 bg-gray-50 rounded-lg">
-        <div className="text-2xl font-bold text-gray-900">{formatGoalWeight(fieldValue) || '--'}</div>
+        <div className="text-2xl font-bold text-gray-900">{displayValue}</div>
         <div className="text-sm text-gray-600">{config.label}</div>
         {isEditing && renderFieldInput()}
       </div>
@@ -521,14 +537,17 @@ const Profile = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Split the name into firstName and lastName
-      const nameParts = profileData.name.split(' ');
+      // Split the name into firstName and lastName with safe fallback
+      const trimmedName = (profileData.name || '').trim();
+      const nameParts = trimmedName.split(/\s+/).filter(Boolean);
       const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
+      const lastNameCandidate = nameParts.length > 1 ? nameParts.slice(1).join(' ') : null;
 
       const payload = {
         firstName,
-        lastName,
+        // Only send lastName if provided; otherwise keep existing last name to avoid validation errors
+        ...(lastNameCandidate ? { lastName: lastNameCandidate } : {}),
+        gender: profileData.gender,
         location: profileData.location,
         dateOfBirth: profileData.dateOfBirth,
         height: profileData.height ? parseFloat(profileData.height) : undefined,
@@ -607,22 +626,7 @@ const Profile = () => {
     return age;
   };
 
-  const calculateBMI = () => {
-    if (!profileData.height || !profileData.weight) return 'N/A';
-    const heightInM = parseFloat(profileData.height) / 100;
-    const weightInKg = parseFloat(profileData.weight);
-    const bmi = weightInKg / (heightInM * heightInM);
-    return bmi.toFixed(1);
-  };
-
-  const getBMIStatus = (bmi) => {
-    if (bmi === 'N/A') return { status: 'Unknown', color: 'gray' };
-    const bmiValue = parseFloat(bmi);
-    if (bmiValue < 18.5) return { status: 'Underweight', color: 'blue' };
-    if (bmiValue < 25) return { status: 'Normal', color: 'green' };
-    if (bmiValue < 30) return { status: 'Overweight', color: 'yellow' };
-    return { status: 'Obese', color: 'red' };
-  };
+  // BMI helpers removed as BMI display is no longer used on the Profile page
 
   const renderOverviewTab = () => (
     <div className="space-y-6">
@@ -699,8 +703,6 @@ const Profile = () => {
                   <option value="">Select gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
-                  <option value="other">Other</option>
-                  <option value="prefer-not-to-say">Prefer not to say</option>
                 </select>
               ) : (
                 <p className="mt-1 text-gray-900 capitalize">{profileData.gender || 'Not specified'}</p>
@@ -761,23 +763,7 @@ const Profile = () => {
           {renderDynamicGoalField()}
         </div>
         
-        {/* BMI Information */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="font-medium text-gray-900">Body Mass Index (BMI)</h4>
-              <p className="text-sm text-gray-600">Based on your height and weight</p>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-blue-600">{calculateBMI()}</div>
-              {calculateBMI() !== 'N/A' && (
-                <div className={`text-sm font-medium text-${getBMIStatus(calculateBMI()).color}-600`}>
-                  {getBMIStatus(calculateBMI()).status}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        {/* BMI Information removed */}
       </div>
 
       {/* Fitness Goals & Activity */}
