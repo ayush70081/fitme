@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import userStorage from "../../utils/userScopedStorage";
 
 // Helper to get today's date in YYYY-MM-DD format
 const getTodayDate = () => {
@@ -7,9 +8,9 @@ const getTodayDate = () => {
 };
 
 const DailyRoutine = () => {
-  // Load tasks from localStorage, but only if date matches today
+  // Load tasks from storage, but only if date matches today
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem("dailyTasks");
+    const saved = userStorage.getItem("dailyTasks");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -66,7 +67,7 @@ const DailyRoutine = () => {
 
   // When tasks change, save with today's date
   useEffect(() => {
-    localStorage.setItem(
+    userStorage.setItem(
       "dailyTasks",
       JSON.stringify({ date: getTodayDate(), tasks })
     );
@@ -79,10 +80,10 @@ const DailyRoutine = () => {
     const checkTemporaryTasks = () => {
       const now = new Date();
       // If date changed, clear tasks
-      if (getTodayDate() !== (JSON.parse(localStorage.getItem("dailyTasks") || '{}').date)) {
+        if (getTodayDate() !== (JSON.parse(userStorage.getItem("dailyTasks") || '{}').date)) {
         setTasks([]);
-        localStorage.setItem(
-          "dailyTasks",
+          userStorage.setItem(
+            "dailyTasks",
           JSON.stringify({ date: getTodayDate(), tasks: [] })
         );
         return;
@@ -108,7 +109,7 @@ const DailyRoutine = () => {
     const nutritionKey = 'cumulativeNutrition';
     
     try {
-      let nutritionData = JSON.parse(localStorage.getItem(nutritionKey) || '{}');
+      let nutritionData = JSON.parse(userStorage.getItem(nutritionKey) || '{}');
       
       // Initialize today's data if it doesn't exist
       if (!nutritionData[today]) {
@@ -144,7 +145,7 @@ const DailyRoutine = () => {
       console.log('Total nutrition now:', nutritionData[today]);
       
       // Save back to localStorage
-      localStorage.setItem(nutritionKey, JSON.stringify(nutritionData));
+      userStorage.setItem(nutritionKey, JSON.stringify(nutritionData));
       
       // Dispatch event to notify Profile component
       window.dispatchEvent(new Event('nutritionDataUpdated'));

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { workoutAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useAppDispatch } from '../hooks/redux';
+import { getCurrentUser } from '../store/authSlice';
 import WorkoutPlanGenerator from '../components/WorkoutPlanGenerator';
 import ExerciseDetailModal from '../components/ExerciseDetailModal';
 
@@ -817,6 +819,7 @@ const Workouts = () => {
     }]
   });
   const { user } = useAuth();
+  const dispatch = useAppDispatch();
   
   // Workout session management
   const [workoutSession, setWorkoutSession] = useState(null);
@@ -1231,6 +1234,18 @@ const Workouts = () => {
       // Show success message
       setError(`✅ Workout completed! ${completedCalories} calories burned in ${durationMinutes} minutes.`);
       setTimeout(() => setError(null), 5000);
+
+      // Refresh user profile to get updated workout history/stats
+      try {
+        await dispatch(getCurrentUser()).unwrap();
+      } catch (e) {
+        console.warn('Failed to refresh user after workout completion:', e);
+      }
+
+      // Notify other pages (Progress) to refresh charts
+      try {
+        window.dispatchEvent(new Event('workoutStatsUpdated'));
+      } catch {}
 
       // Reset session
       setWorkoutSession(null);

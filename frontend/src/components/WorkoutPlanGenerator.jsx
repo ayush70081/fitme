@@ -2,28 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { workoutAPI } from '../services/api';
-import { testGeminiConnection } from '../services/geminiAPI';
-import GeminiDiagnostics from './GeminiDiagnostics';
 import { 
   Dumbbell, 
   Target, 
   Clock, 
   Calendar,
   Zap,
-  CheckCircle,
-  AlertCircle,
   Settings,
   Info,
   Sparkles,
-  Wrench
+  
 } from 'lucide-react';
 
 const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
   const { user } = useAuth();
   const [generating, setGenerating] = useState(false);
-  const [geminiStatus, setGeminiStatus] = useState(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [showDiagnostics, setShowDiagnostics] = useState(false);
   
   // Custom generation options
   const [customOptions, setCustomOptions] = useState({
@@ -34,19 +28,7 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
     specificGoals: ''
   });
 
-  // Check Gemini API status on component mount
-  useEffect(() => {
-    checkGeminiStatus();
-  }, []);
-
-  const checkGeminiStatus = async () => {
-    try {
-      const result = await testGeminiConnection();
-      setGeminiStatus(result);
-    } catch (error) {
-      setGeminiStatus({ success: false, error: 'Connection failed' });
-    }
-  };
+  // Removed Gemini API status check
 
   const generateWorkoutPlan = async () => {
     if (!user) {
@@ -127,61 +109,13 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
     <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center">
-          <Sparkles className="w-6 h-6 text-white" />
-        </div>
+        <Sparkles className="w-6 h-6 text-gray-900" />
         <div>
           <h2 className="text-2xl font-bold text-gray-900">AI Workout Plan Generator</h2>
-          <p className="text-gray-600">Powered by Gemini 2.0 Flash</p>
         </div>
       </div>
 
-      {/* API Status */}
-      {geminiStatus && (
-        <div className={`flex items-center justify-between p-3 rounded-lg mb-4 ${
-          geminiStatus.success 
-            ? 'bg-green-50 border border-green-200 text-green-700'
-            : 'bg-yellow-50 border border-yellow-200 text-yellow-700'
-        }`}>
-          <div className="flex items-center gap-2">
-            {geminiStatus.success ? (
-              <CheckCircle className="w-4 h-4" />
-            ) : (
-              <AlertCircle className="w-4 h-4" />
-            )}
-            <span className="text-sm font-medium">
-              {geminiStatus.success 
-                ? 'Gemini AI is ready to create your personalized workout plan'
-                : 'Gemini AI unavailable - will use demo mode'
-              }
-            </span>
-          </div>
-          {!geminiStatus.success && (
-            <button
-              onClick={() => setShowDiagnostics(!showDiagnostics)}
-              className="flex items-center gap-1 text-sm text-yellow-700 hover:text-yellow-900 font-medium"
-            >
-              <Wrench className="w-4 h-4" />
-              Troubleshoot
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Diagnostics Panel */}
-      <AnimatePresence>
-        {showDiagnostics && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="mb-6"
-          >
-            <GeminiDiagnostics />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Removed Gemini status and diagnostics */}
 
       {/* Profile Completeness */}
       <div className="mb-6">

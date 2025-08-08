@@ -17,6 +17,59 @@ class MealPlanPersistence {
     this.syncInProgress = false;
     this.maxLocalPlans = 5; // Limit local storage
     this.autoSaveInterval = null;
+    // Migrate any legacy, non-namespaced keys to the current user's namespace
+    try {
+      this.migrateLegacyKeys();
+    } catch {
+      // best-effort only
+    }
+  }
+
+  // Namespace helpers
+  getCurrentUserId() {
+    try {
+      const raw = localStorage.getItem('fitme_user');
+      if (!raw) return 'guest';
+      const user = JSON.parse(raw);
+      return user?.id || user?._id || 'guest';
+    } catch {
+      return 'guest';
+    }
+  }
+
+  getKey(baseKey) {
+    const userId = this.getCurrentUserId();
+    return `fitme:${userId}:${baseKey}`;
+  }
+
+  migrateLegacyKeys() {
+    const userScopedCurrent = this.getKey(STORAGE_KEYS.CURRENT_PLAN);
+    const userScopedSaved = this.getKey(STORAGE_KEYS.SAVED_PLANS);
+    const userScopedAuto = this.getKey(STORAGE_KEYS.AUTO_SAVE);
+    const userScopedSync = this.getKey(STORAGE_KEYS.SYNC_STATUS);
+
+    // If the user-scoped keys are empty but legacy keys exist, move them
+    const legacyCurrent = localStorage.getItem(STORAGE_KEYS.CURRENT_PLAN);
+    const legacySaved = localStorage.getItem(STORAGE_KEYS.SAVED_PLANS);
+    const legacyAuto = localStorage.getItem(STORAGE_KEYS.AUTO_SAVE);
+    const legacySync = localStorage.getItem(STORAGE_KEYS.SYNC_STATUS);
+
+    if (legacyCurrent && !localStorage.getItem(userScopedCurrent)) {
+      localStorage.setItem(userScopedCurrent, legacyCurrent);
+      localStorage.removeItem(STORAGE_KEYS.CURRENT_PLAN);
+    }
+    if (legacySaved && !localStorage.getItem(userScopedSaved)) {
+      localStorage.setItem(userScopedSaved, legacySaved);
+      localStorage.removeItem(STORAGE_KEYS.SAVED_PLANS);
+    }
+    if (legacyAuto && !localStorage.getItem(userScopedAuto)) {
+      localStorage.setItem(userScopedAuto, legacyAuto);
+      localStorage.removeItem(STORAGE_KEYS.AUTO_SAVE);
+    }
+    if (legacySync && !localStorage.getItem(userScopedSync)) {
+      localStorage.setItem(userScopedSync, legacySync);
+      localStorage.removeItem(STORAGE_KEYS.SYNC_STATUS);
+    }
   }
 
   /**
@@ -42,14 +95,14 @@ class MealPlanPersistence {
 
       if (autoSave) {
         // Auto-save to special slot
-        localStorage.setItem(STORAGE_KEYS.AUTO_SAVE, JSON.stringify(savedPlan));
+        localStorage.setItem(this.getKey(STORAGE_KEYS.AUTO_SAVE), JSON.stringify(savedPlan));
       } else {
         // Save to regular saved plans
         await this.addToSavedPlans(savedPlan);
       }
 
       // Always update current plan (store only meals for consistency)
-      localStorage.setItem(STORAGE_KEYS.CURRENT_PLAN, JSON.stringify(savedPlan.meals));
+      localStorage.setItem(this.getKey(STORAGE_KEYS.CURRENT_PLAN), JSON.stringify(savedPlan.meals));
 
       // Attempt backend sync (non-blocking)
       this.syncToBackend(savedPlan).catch(error => {
@@ -102,7 +155,7 @@ class MealPlanPersistence {
               isRestored: true
             };
             // Update localStorage for future loads
-            localStorage.setItem('current_meal_plan', JSON.stringify(plan.meals));
+            localStorage.setItem(this.getKey(STORAGE_KEYS.CURRENT_PLAN), JSON.stringify(plan.meals));
           }
         }
       }
@@ -110,7 +163,7 @@ class MealPlanPersistence {
         // Determine meals shape (plan may already be just meals)
         const mealsOnly = plan?.meals ? plan.meals : plan;
         // Update current plan
-        localStorage.setItem('current_meal_plan', JSON.stringify(mealsOnly));
+        localStorage.setItem(this.getKey(STORAGE_KEYS.CURRENT_PLAN), JSON.stringify(mealsOnly));
         return {
           success: true,
           message: 'Plan loaded successfully',
@@ -140,7 +193,7 @@ class MealPlanPersistence {
    */
   getSavedPlans() {
     try {
-      const localPlans = JSON.parse(localStorage.getItem(STORAGE_KEYS.SAVED_PLANS) || '[]');
+      const localPlans = JSON.parse(localStorage.getItem(this.getKey(STORAGE_KEYS.SAVED_PLANS)) || '[]');
       
       // Sort by saved date (newest first)
       return localPlans.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
@@ -158,7 +211,7 @@ class MealPlanPersistence {
       const savedPlans = this.getSavedPlans();
       const updatedPlans = savedPlans.filter(plan => plan.id !== planId);
       
-      localStorage.setItem(STORAGE_KEYS.SAVED_PLANS, JSON.stringify(updatedPlans));
+      localStorage.setItem(this.getKey(STORAGE_KEYS.SAVED_PLANS), JSON.stringify(updatedPlans));
       
       // TODO: Also delete from backend
       
@@ -214,7 +267,7 @@ class MealPlanPersistence {
   restorePlan() {
     // Always try to restore the latest generated plan from localStorage first
     let plan = null;
-    const currentPlanMeals = localStorage.getItem('current_meal_plan');
+    const currentPlanMeals = localStorage.getItem(this.getKey(STORAGE_KEYS.CURRENT_PLAN));
     if (currentPlanMeals) {
       try {
         const parsed = JSON.parse(currentPlanMeals);
@@ -230,7 +283,7 @@ class MealPlanPersistence {
         };
       } catch {
         // If parsing fails, clear the invalid entry
-        localStorage.removeItem('current_meal_plan');
+        localStorage.removeItem(this.getKey(STORAGE_KEYS.CURRENT_PLAN));
       }
     }
     // Fallback to previous logic if not found
@@ -268,7 +321,7 @@ class MealPlanPersistence {
    */
   clearAllData() {
     Object.values(STORAGE_KEYS).forEach(key => {
-      localStorage.removeItem(key);
+      localStorage.removeItem(this.getKey(key));
     });
     this.stopAutoSave();
   }
@@ -277,7 +330,7 @@ class MealPlanPersistence {
 
   getCurrentPlan() {
     try {
-      const plan = localStorage.getItem(STORAGE_KEYS.CURRENT_PLAN);
+      const plan = localStorage.getItem(this.getKey(STORAGE_KEYS.CURRENT_PLAN));
       return plan ? JSON.parse(plan) : null;
     } catch (error) {
       return null;
@@ -286,7 +339,7 @@ class MealPlanPersistence {
 
   getAutoSavedPlan() {
     try {
-      const plan = localStorage.getItem(STORAGE_KEYS.AUTO_SAVE);
+      const plan = localStorage.getItem(this.getKey(STORAGE_KEYS.AUTO_SAVE));
       return plan ? JSON.parse(plan) : null;
     } catch (error) {
       return null;
@@ -310,7 +363,7 @@ class MealPlanPersistence {
     // Limit to max plans
     const limitedPlans = filteredPlans.slice(0, this.maxLocalPlans);
     
-    localStorage.setItem(STORAGE_KEYS.SAVED_PLANS, JSON.stringify(limitedPlans));
+    localStorage.setItem(this.getKey(STORAGE_KEYS.SAVED_PLANS), JSON.stringify(limitedPlans));
   }
 
   generatePlanSummary(plan) {
@@ -397,9 +450,20 @@ class MealPlanPersistence {
       const updatedPlans = savedPlans.map(plan => 
         plan.id === planId ? { ...plan, synced } : plan
       );
-      localStorage.setItem(STORAGE_KEYS.SAVED_PLANS, JSON.stringify(updatedPlans));
+      localStorage.setItem(this.getKey(STORAGE_KEYS.SAVED_PLANS), JSON.stringify(updatedPlans));
     } catch (error) {
       console.error('Error updating sync status:', error);
+    }
+  }
+
+  /**
+   * Set the current plan meals without saving to saved plans
+   */
+  setCurrentPlanMeals(meals) {
+    try {
+      localStorage.setItem(this.getKey(STORAGE_KEYS.CURRENT_PLAN), JSON.stringify(meals));
+    } catch {
+      // ignore
     }
   }
 }

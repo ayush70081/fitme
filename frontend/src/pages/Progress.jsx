@@ -1,6 +1,6 @@
 // src/pages/Progress.jsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -15,6 +15,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { workoutAPI } from '../services/api';
+import userStorage from '../utils/userScopedStorage';
 
 const Progress = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('week');
@@ -37,8 +38,8 @@ const Progress = () => {
     return () => { isMounted = false; };
   }, []);
 
-  // Build dynamic weekly data from user history
-  useEffect(() => {
+  // Build dynamic weekly data from user history (workouts) and user-scoped nutrition (eaten)
+  const rebuildWeeklyData = useCallback(() => {
     const history = Array.isArray(user?.workoutHistory) ? user.workoutHistory : [];
     const days = Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
@@ -48,10 +49,11 @@ const Progress = () => {
     });
 
     const formatDay = (d) => d.toLocaleDateString(undefined, { weekday: 'short' });
-    const dateKey = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    const ymdKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-    const dailyMap = days.reduce((acc, d) => {
-      acc[dateKey(d)] = { calories: 0, workouts: 0 };
+    // Workouts map (burned)
+    const workoutMap = days.reduce((acc, d) => {
+      acc[ymdKey(d)] = { burned: 0, workouts: 0 };
       return acc;
     }, {});
 
@@ -59,12 +61,20 @@ const Progress = () => {
       if (!w.completedAt) return;
       const d = new Date(w.completedAt);
       d.setHours(0, 0, 0, 0);
-      const key = dateKey(d);
-      if (dailyMap[key]) {
-        dailyMap[key].workouts += 1;
-        dailyMap[key].calories += parseInt(w.caloriesBurned || 0, 10);
+      const key = ymdKey(d);
+      if (workoutMap[key]) {
+        workoutMap[key].workouts += 1;
+        workoutMap[key].burned += parseInt(w.caloriesBurned || 0, 10);
       }
     });
+
+    // Nutrition map (eaten) from user-scoped cumulativeNutrition
+    let nutrition = {};
+    try {
+      nutrition = JSON.parse(userStorage.getItem('cumulativeNutrition') || '{}');
+    } catch {
+      nutrition = {};
+    }
 
     const weightArray = days.map((d) => ({
       day: formatDay(d),
@@ -72,18 +82,37 @@ const Progress = () => {
       target: user?.goalWeight ?? null,
     }));
 
+    // Use eaten calories for the chart (aligns with nutrition progress)
     const caloriesArray = days.map((d) => {
-      const key = dateKey(d);
-      return { day: formatDay(d), value: dailyMap[key]?.calories || 0 };
+      const key = ymdKey(d);
+      const eaten = nutrition[key]?.calories || 0;
+      return { day: formatDay(d), value: eaten };
     });
 
     const workoutsArray = days.map((d) => {
-      const key = dateKey(d);
-      return { day: formatDay(d), value: dailyMap[key]?.workouts || 0 };
+      const key = ymdKey(d);
+      return { day: formatDay(d), value: workoutMap[key]?.workouts || 0 };
     });
 
     setWeeklyData({ weight: weightArray, calories: caloriesArray, workouts: workoutsArray });
   }, [user]);
+
+  useEffect(() => {
+    rebuildWeeklyData();
+  }, [rebuildWeeklyData]);
+
+  // Refresh when nutrition data updates (add to routine, etc.)
+  useEffect(() => {
+    const handler = () => rebuildWeeklyData();
+    window.addEventListener('nutritionDataUpdated', handler);
+    window.addEventListener('dailyTasksUpdated', handler);
+    window.addEventListener('workoutStatsUpdated', handler);
+    return () => {
+      window.removeEventListener('nutritionDataUpdated', handler);
+      window.removeEventListener('dailyTasksUpdated', handler);
+      window.removeEventListener('workoutStatsUpdated', handler);
+    };
+  }, [rebuildWeeklyData]);
 
   // weeklyData is built dynamically above from user history
 
@@ -329,12 +358,12 @@ const Progress = () => {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">
                   {selectedMetric === 'weight' && 'Weight Progress'}
-                  {selectedMetric === 'calories' && 'Calories Progress'}
+                  {selectedMetric === 'calories' && 'Calories (Eaten) Progress'}
                   {selectedMetric === 'workouts' && 'Workouts Progress'}
                 </h3>
                 <p className="text-sm text-gray-600">
                   {selectedMetric === 'weight' && 'Your weight journey over time'}
-                  {selectedMetric === 'calories' && 'Calories burned per day'}
+                  {selectedMetric === 'calories' && 'Calories eaten per day'}
                   {selectedMetric === 'workouts' && 'Workouts completed per day'}
                 </p>
               </div>

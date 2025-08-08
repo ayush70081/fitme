@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import userStorage from '../utils/userScopedStorage';
 import { useAppDispatch } from '../hooks/redux';
 import { updateUserProfile, updateProfilePhoto, deleteProfilePhoto } from '../store/authSlice';
 import { useAuth } from '../contexts/AuthContext';
@@ -217,7 +218,7 @@ const Profile = () => {
   // Function to get total cumulative nutrition data across ALL days
   const getTotalCumulativeNutrition = () => {
     try {
-      const nutritionData = JSON.parse(localStorage.getItem('cumulativeNutrition') || '{}');
+      const nutritionData = JSON.parse(userStorage.getItem('cumulativeNutrition') || '{}');
       
       // Sum up all days
       let totalNutrition = { calories: 0, protein: 0, carbs: 0, fat: 0 };

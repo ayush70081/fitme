@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import userStorage from '../../utils/userScopedStorage';
 import { Flame } from 'lucide-react';
 
 const ProgressBar = ({ label, value, max, suffix }) => {
@@ -22,7 +23,7 @@ const CalorieOverview = ({ caloriesBurned = 0 }) => {
   // Get today's nutrition progress from cumulative data
   const getTodaysNutrition = () => {
     try {
-      const nutritionData = JSON.parse(localStorage.getItem('cumulativeNutrition') || '{}');
+      const nutritionData = JSON.parse(userStorage.getItem('cumulativeNutrition') || '{}');
       const today = new Date().toISOString().slice(0, 10);
       
       if (nutritionData[today]) {

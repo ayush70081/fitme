@@ -5,6 +5,7 @@ import RecipeModal from '../components/NutritionPage_Component/RecipeModal';
 import AddMealModal from '../components/NutritionPage_Component/AddMealModal';
 import DailyMealPlanGenerator from '../components/DailyMealPlanGenerator';
 import { useToast } from '../hooks/useToast';
+import userStorage from '../utils/userScopedStorage';
 import mealPlanPersistence from '../services/mealPlanPersistence';
 
 const Nutrition = () => {
@@ -103,7 +104,7 @@ const Nutrition = () => {
       const today = new Date().toISOString().slice(0, 10);
       let parsed = { date: today, tasks: [] };
       try {
-        const saved = localStorage.getItem("dailyTasks");
+        const saved = userStorage.getItem("dailyTasks");
         if (saved) {
           parsed = JSON.parse(saved);
           if (parsed.date !== today) {
@@ -117,13 +118,13 @@ const Nutrition = () => {
       parsed.tasks = parsed.tasks.filter(t => t.time !== task.time);
       // Add new task
       parsed.tasks.push(task);
-      localStorage.setItem("dailyTasks", JSON.stringify(parsed));
+      userStorage.setItem("dailyTasks", JSON.stringify(parsed));
       setShowRoutineModal(false);
       setRoutineModalMeal(null);
       setRoutineModalMealType(null);
       setRoutineSelectedTime("07:00");
       showToast('success', 'Meal added to Daily Routine!');
-      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new Event('dailyTasksUpdated'));
     };
 
     // Calculate daily stats

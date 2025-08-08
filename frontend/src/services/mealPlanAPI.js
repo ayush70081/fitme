@@ -1,4 +1,5 @@
 import api from './api.js';
+import mealPlanPersistence from './mealPlanPersistence';
 
 // FastAPI Base URL for meal planning
 const FASTAPI_BASE_URL = import.meta.env.VITE_FASTAPI_URL || 'http://localhost:8000/api';
@@ -45,9 +46,9 @@ export const mealPlanAPI = {
     try {
       // Use test endpoint for now to bypass authentication issues
       const response = await fastapi.post('/mealplan/generate-test');
-      // Save as current plan in localStorage
+      // Save as current plan (scoped per user)
       if (response.data && response.data.data) {
-        localStorage.setItem('current_meal_plan', JSON.stringify(response.data.data.meals));
+        mealPlanPersistence.setCurrentPlanMeals(response.data.data.meals);
       }
       return response.data;
     } catch (error) {
@@ -64,7 +65,7 @@ export const mealPlanAPI = {
           regenerate: false
         });
         if (authResponse.data && authResponse.data.data) {
-          localStorage.setItem('current_meal_plan', JSON.stringify(authResponse.data.data.meals));
+          mealPlanPersistence.setCurrentPlanMeals(authResponse.data.data.meals);
         }
         return authResponse.data;
       } catch (authError) {
@@ -147,7 +148,7 @@ export const mealPlanAPI = {
       });
       
       if (response.data && response.data.data) {
-        localStorage.setItem('current_meal_plan', JSON.stringify(response.data.data.meals));
+        mealPlanPersistence.setCurrentPlanMeals(response.data.data.meals);
       }
       console.log('Daily meal plan response:', response.data);
       return response.data;
@@ -169,7 +170,7 @@ export const mealPlanAPI = {
           regenerate: false
         });
         if (authResponse.data && authResponse.data.data) {
-          localStorage.setItem('current_meal_plan', JSON.stringify(authResponse.data.data.meals));
+          mealPlanPersistence.setCurrentPlanMeals(authResponse.data.data.meals);
         }
         return authResponse.data;
       } catch (authError) {
