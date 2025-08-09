@@ -115,7 +115,6 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
         </div>
       </div>
 
-      {/* Removed Gemini status and diagnostics */}
 
       {/* Profile Completeness */}
       <div className="mb-6">

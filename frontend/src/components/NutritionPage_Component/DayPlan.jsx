@@ -1,7 +1,7 @@
 import MealCard from './MealCard';
 import { FiPlus } from 'react-icons/fi';
 
-const DayPlan = ({ day, meals, onMealClick, onAddMealClick, onAddToRoutine }) => {
+const DayPlan = ({ day, meals, onMealClick, onAddMealClick, onAddToRoutine, onDeleteMeal }) => {
 
     
     // Filter out non-meal properties (like dailyTotals) and only show meals that actually have data (name exists)
@@ -81,6 +81,7 @@ const DayPlan = ({ day, meals, onMealClick, onAddMealClick, onAddToRoutine }) =>
                                         meal={meal} 
                                         onMealClick={(meal, type) => onMealClick(day, type, meal)}
                                         onAddToRoutine={onAddToRoutine ? (meal, type) => onAddToRoutine(meal, type) : undefined}
+                                        onDeleteMeal={onDeleteMeal ? (type) => onDeleteMeal(type) : undefined}
                                     />
                                 </div>
                             ))}

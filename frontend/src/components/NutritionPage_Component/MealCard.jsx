@@ -1,25 +1,26 @@
 import { useState } from "react";
 import { FiBookmark, FiTrash2 } from 'react-icons/fi';
 
-const MealCard = ({ meal, mealType, onMealClick, onAddToRoutine, showDeleteButton = false }) => {
+const MealCard = ({ meal, mealType, onMealClick, onAddToRoutine, onDeleteMeal, showDeleteButton = false }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleDeleteMeal = (e) => {
     e.stopPropagation();
-    if (onDeleteMeal && meal?.id) {
-      onDeleteMeal(meal.id);
+    if (onDeleteMeal && mealType) {
+      onDeleteMeal(mealType);
     }
   };
 
   return (
     <div
-      className={`relative bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden transition-all duration-200 ${
+      className={`group relative bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden transition-all duration-200 ${
         isHovered ? "-translate-y-0.5 shadow-md" : ""
       } ${!meal?.name ? "border-2 border-dashed border-gray-200" : ""}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => meal?.name && onMealClick(meal, mealType)}
     >
+      {/* No overlay button now; delete is inline in header for better layout */}
       <div className="p-4 h-[260px] flex flex-col">
         {/* Header row */}
         <div className="flex items-center justify-between">
@@ -28,11 +29,6 @@ const MealCard = ({ meal, mealType, onMealClick, onAddToRoutine, showDeleteButto
             {mealType.includes('_') && ` ${mealType.split('_')[1]}`}
           </h3>
           <div className="flex items-center gap-2">
-            {(meal?.calories || meal?.nutrition?.calories) && (
-              <span className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-900 whitespace-nowrap">
-                {Math.round(meal?.nutrition?.calories || meal?.calories || 0)} kcal
-              </span>
-            )}
             {meal?.name && onAddToRoutine && (
               <button
                 onClick={(e) => { e.stopPropagation(); onAddToRoutine(meal, mealType); }}
@@ -42,11 +38,12 @@ const MealCard = ({ meal, mealType, onMealClick, onAddToRoutine, showDeleteButto
                 + Add to Routine
               </button>
             )}
-            {showDeleteButton && meal?.id && (
+            {meal?.name && onDeleteMeal && (
               <button
                 onClick={handleDeleteMeal}
-                className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                title="Delete saved meal"
+                className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity text-gray-400 hover:text-red-600 p-1"
+                title="Remove this meal"
+                aria-label="Delete meal"
               >
                 <FiTrash2 className="w-4 h-4" />
               </button>
@@ -76,7 +73,10 @@ const MealCard = ({ meal, mealType, onMealClick, onAddToRoutine, showDeleteButto
           {/* Footer section pinned to bottom for consistency */}
           <div className="mt-auto pt-3">
             {meal?.nutrition && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap items-center gap-1.5">
+                {(meal?.calories || meal?.nutrition?.calories) && (
+                  <span className="px-2 py-1 text-xs bg-gray-100 text-gray-900 rounded">{Math.round(meal?.nutrition?.calories || meal?.calories || 0)} kcal</span>
+                )}
                 <span className="px-2 py-1 text-xs bg-gray-100 text-gray-900 rounded">P: {Math.round(meal.nutrition.protein)}g</span>
                 <span className="px-2 py-1 text-xs bg-gray-100 text-gray-900 rounded">C: {Math.round(meal.nutrition.carbs)}g</span>
                 <span className="px-2 py-1 text-xs bg-gray-100 text-gray-900 rounded">F: {Math.round(meal.nutrition.fat)}g</span>

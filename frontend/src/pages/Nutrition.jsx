@@ -61,6 +61,21 @@ const Nutrition = () => {
         setCurrentPlan(dayPlan);
     };
 
+    const handleDeleteMeal = (mealType) => {
+        if (!mealType) return;
+        setCurrentPlan(prev => {
+            const updated = { ...prev };
+            // Remove base type or suffixed type by key
+            if (updated[mealType]) {
+                delete updated[mealType];
+            }
+            // Persist immediately
+            try { mealPlanPersistence.savePlan(updated, null, true); } catch {}
+            return updated;
+        });
+        showToast('success', 'Meal removed.');
+    };
+
     const handleCloseModal = () => {
         setSelectedRecipe(null);
     };
@@ -181,6 +196,7 @@ const Nutrition = () => {
                     onMealClick={handleMealClick}
                     onAddMealClick={handleAddMealClick}
                     onAddToRoutine={handleAddToRoutine}
+                    onDeleteMeal={handleDeleteMeal}
                 />
                     </div>
 

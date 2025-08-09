@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiRefreshCw, FiSave, FiBook, FiFolder } from 'react-icons/fi';
+import { FiRefreshCw, FiSave, FiBook, FiFolder, FiSettings, FiZap, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { mealPlanAPI, mealPlanUtils } from '../services/mealPlanAPI';
 import { useToast } from '../hooks/useToast';
 import useMealPlanPersistence from '../hooks/useMealPlanPersistence';
@@ -105,176 +105,179 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
   const persistenceStatus = getPersistenceStatus();
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold text-gray-900">Daily AI Meal Planner</h2>
-          {persistenceStatus.hasAutoSave && (
-            <span className="text-xs bg-gray-100 text-gray-900 px-2 py-1 rounded-full">
-              Auto-saved
-            </span>
-          )}
+    <div className="bg-white rounded-xl border border-[#EADFD0] shadow-sm">
+      {/* Compact Header */}
+      <div className="bg-[#F5EFE6] px-4 py-3 border-b border-[#EADFD0] rounded-t-xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-black rounded-lg flex items-center justify-center">
+              <FiZap className="w-3 h-3 text-white" />
+            </div>
+            <h3 className="text-base font-semibold text-gray-900">AI Meal Planner</h3>
+            {persistenceStatus.hasAutoSave && (
+              <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
+                Auto-saved
+              </span>
+            )}
+          </div>
+          
+          <div className="flex items-center gap-1">
+            {persistenceStatus.savedPlansCount > 0 && (
+              <span className="text-xs text-gray-600">
+                {persistenceStatus.savedPlansCount}/{persistenceStatus.maxPlans} saved
+              </span>
+            )}
+          </div>
         </div>
+      </div>
+
+      {/* Compact Content */}
+      <div className="p-4 space-y-3">
+        {/* Main Action Row */}
         <div className="flex gap-2">
-          {/* Save & Load Manager Button */}
+          {/* Generate Button */}
+          <button
+            onClick={handleGenerateDailyPlan}
+            disabled={isGenerating}
+            className="flex-1 bg-black text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+          >
+            {isGenerating ? (
+              <>
+                <FiRefreshCw className="animate-spin w-4 h-4" />
+                <span>Generating...</span>
+              </>
+            ) : (
+              <>
+                <FiZap className="w-4 h-4" />
+                <span>Generate Daily Meals</span>
+              </>
+            )}
+          </button>
+
+          {/* Secondary Actions */}
           <button
             onClick={() => setShowSaveLoadModal(true)}
-            className="flex items-center px-3 py-2 bg-black text-white rounded-lg hover:bg-black transition-all shadow-sm"
-            title="Manage saved plans"
+            className="bg-[#F5EFE6] border border-[#EADFD0] text-gray-700 px-3 py-3 rounded-lg hover:bg-[#EADFD0] transition-all flex items-center gap-1"
+            title="Meal Plans"
           >
-            <FiFolder className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline">Meal Plans</span>
+            <FiFolder className="w-4 h-4" />
             {persistenceStatus.savedPlansCount > 0 && (
-              <span className="ml-2 bg-white text-gray-900 text-xs px-2 py-1 rounded-full font-medium">
+              <span className="bg-black text-white text-xs px-1.5 py-0.5 rounded-full font-medium min-w-[16px] text-center">
                 {persistenceStatus.savedPlansCount}
               </span>
             )}
           </button>
 
-          {/* Quick Save Button */}
           {hasCurrentDayPlan && (
-            <div className="flex items-center gap-2">
-              {isQuickSaveOpen && (
-                <>
-                  <input
-                    type="text"
-                    value={quickSaveName}
-                    onChange={(e) => setQuickSaveName(e.target.value)}
-                    placeholder={`Daily Plan - ${new Date().toLocaleDateString()}`}
-                    className="w-44 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#000] focus:border-transparent text-sm"
-                  />
-                  <button
-                    onClick={() => { setIsQuickSaveOpen(false); setQuickSaveName(''); }}
-                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                </>
-              )}
-              <button
-                onClick={() => (isQuickSaveOpen ? handleQuickSave() : setIsQuickSaveOpen(true))}
-                className="flex items-center px-3 py-2 bg-black text-white rounded-lg hover:bg-black transition-all shadow-sm"
-                title="Save current plan"
-              >
-                <FiSave className="w-4 h-4" />
-                <span className="ml-2">{isQuickSaveOpen ? 'Save' : 'Save Plan'}</span>
-              </button>
-            </div>
+            <button
+              onClick={() => setIsQuickSaveOpen(!isQuickSaveOpen)}
+              className="bg-[#F5EFE6] border border-[#EADFD0] text-gray-700 px-3 py-3 rounded-lg hover:bg-[#EADFD0] transition-all"
+              title="Save Plan"
+            >
+              <FiSave className="w-4 h-4" />
+            </button>
           )}
-          
+
           <button
             onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
-            className="text-sm text-gray-900 hover:text-black px-3 py-1 rounded-lg hover:bg-gray-100"
+            className="bg-[#F5EFE6] border border-[#EADFD0] text-gray-700 px-3 py-3 rounded-lg hover:bg-[#EADFD0] transition-all"
+            title="Options"
           >
-            {showAdvancedOptions ? 'Hide Options' : 'Options'}
+            <FiSettings className="w-4 h-4" />
           </button>
         </div>
-      </div>
 
-      {showAdvancedOptions && (
-        <div className="mt-2 p-4 bg-[#F5EFE6] rounded-lg border border-gray-200">
-          <h3 className="text-sm font-medium text-gray-800 mb-3">Meal Plan Preferences</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Meal Focus
-              </label>
-              <select
-                value={preferences.mealFocus}
-                onChange={(e) => setPreferences(prev => ({ ...prev, mealFocus: e.target.value }))}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#000] focus:border-transparent"
+        {/* Quick Save Input */}
+        {isQuickSaveOpen && (
+          <div className="bg-[#F5EFE6] border border-[#EADFD0] rounded-lg p-3">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={quickSaveName}
+                onChange={(e) => setQuickSaveName(e.target.value)}
+                placeholder={`Daily Plan - ${new Date().toLocaleDateString()}`}
+                className="flex-1 px-3 py-2 border border-[#EADFD0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EADFD0] focus:border-transparent bg-white text-sm"
+              />
+              <button
+                onClick={handleQuickSave}
+                className="bg-black text-white px-3 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors text-sm"
               >
-                <option value="balanced">Balanced</option>
-                <option value="protein-heavy">High Protein</option>
-                <option value="low-carb">Low Carb</option>
-                <option value="vegetarian">Vegetarian</option>
-                <option value="comfort-food">Comfort Food</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Cuisine Type
-              </label>
-              <select
-                value={preferences.cuisine}
-                onChange={(e) => setPreferences(prev => ({ ...prev, cuisine: e.target.value }))}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#000] focus:border-transparent"
+                Save
+              </button>
+              <button
+                onClick={() => { setIsQuickSaveOpen(false); setQuickSaveName(''); }}
+                className="px-3 py-2 text-gray-700 hover:bg-[#EADFD0] rounded-lg transition-colors text-sm"
               >
-                <option value="">Any Cuisine</option>
-                <option value="italian">Italian</option>
-                <option value="mexican">Mexican</option>
-                <option value="asian">Asian</option>
-                <option value="mediterranean">Mediterranean</option>
-                <option value="american">American</option>
-                <option value="indian">Indian</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Max Prep Time
-              </label>
-              <select
-                value={preferences.maxPrepTime}
-                onChange={(e) => setPreferences(prev => ({ ...prev, maxPrepTime: parseInt(e.target.value) }))}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#000] focus:border-transparent"
-              >
-                <option value="15">15 minutes</option>
-                <option value="30">30 minutes</option>
-                <option value="45">45 minutes</option>
-                <option value="60">60 minutes</option>
-              </select>
+                Cancel
+              </button>
             </div>
           </div>
-        </div>
-      )}
-
-      <div className="mt-3 flex flex-col sm:flex-row gap-2">
-        <button
-          onClick={handleGenerateDailyPlan}
-          disabled={isGenerating}
-          className="flex-1 bg-black text-white py-3 px-6 rounded-lg font-medium hover:bg-black disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
-        >
-          {isGenerating ? (
-            <span className="flex items-center justify-center">
-              <FiRefreshCw className="animate-spin mr-2 h-5 w-5" />
-              Generating Plan...
-            </span>
-          ) : (
-            <span className="flex items-center justify-center">
-              🤖 Generate Daily Meals
-            </span>
-          )}
-        </button>
-        
-        {hasCurrentDayPlan && (
-          <button
-            onClick={handleGenerateDailyPlan}
-            disabled={isGenerating}
-            className="bg-black text-white py-3 px-4 rounded-lg font-medium hover:bg-black disabled:bg-gray-400 transition-colors duration-200"
-          >
-            <FiRefreshCw className={`w-5 h-5 ${isGenerating ? 'animate-spin' : ''}`} />
-          </button>
         )}
-      </div>
 
-      <div className="mt-4 flex items-center justify-between">
-        <div className="text-sm text-gray-600">
-          <p>
-            💡 Generate personalized meals for today. Much more cost-effective than full weekly plans!
-            {hasCurrentDayPlan && ' Your plan is auto-saved every 30 seconds.'}
-          </p>
-        </div>
-        
-        {persistenceStatus.savedPlansCount > 0 && (
-          <div className="text-xs text-gray-500">
-            {persistenceStatus.savedPlansCount}/{persistenceStatus.maxPlans} saved plans
+        {/* Compact Options */}
+        {showAdvancedOptions && (
+          <div className="bg-[#F5EFE6] border border-[#EADFD0] rounded-lg p-3">
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Focus
+                </label>
+                <select
+                  value={preferences.mealFocus}
+                  onChange={(e) => setPreferences(prev => ({ ...prev, mealFocus: e.target.value }))}
+                  className="w-full p-2 border border-[#EADFD0] rounded-lg focus:ring-2 focus:ring-[#EADFD0] focus:border-transparent bg-white text-xs"
+                >
+                  <option value="balanced">Balanced</option>
+                  <option value="protein-heavy">High Protein</option>
+                  <option value="low-carb">Low Carb</option>
+                  <option value="vegetarian">Vegetarian</option>
+                  <option value="comfort-food">Comfort Food</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Cuisine
+                </label>
+                <select
+                  value={preferences.cuisine}
+                  onChange={(e) => setPreferences(prev => ({ ...prev, cuisine: e.target.value }))}
+                  className="w-full p-2 border border-[#EADFD0] rounded-lg focus:ring-2 focus:ring-[#EADFD0] focus:border-transparent bg-white text-xs"
+                >
+                  <option value="">Any Cuisine</option>
+                  <option value="italian">Italian</option>
+                  <option value="mexican">Mexican</option>
+                  <option value="asian">Asian</option>
+                  <option value="mediterranean">Mediterranean</option>
+                  <option value="american">American</option>
+                  <option value="indian">Indian</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Prep Time
+                </label>
+                <select
+                  value={preferences.maxPrepTime}
+                  onChange={(e) => setPreferences(prev => ({ ...prev, maxPrepTime: parseInt(e.target.value) }))}
+                  className="w-full p-2 border border-[#EADFD0] rounded-lg focus:ring-2 focus:ring-[#EADFD0] focus:border-transparent bg-white text-xs"
+                >
+                  <option value="15">15 min</option>
+                  <option value="30">30 min</option>
+                  <option value="45">45 min</option>
+                  <option value="60">60 min</option>
+                </select>
+              </div>
+            </div>
           </div>
         )}
+
+        {/* Compact Footer (no copy text) */}
+        <div className="pt-2 border-t border-[#EADFD0]"></div>
       </div>
 
-      {/* Enhanced Save/Load Modal */}
+      {/* Modal */}
       <MealPlanSaveLoad
         currentPlan={currentDayPlan}
         onPlanLoaded={handlePlanLoaded}
