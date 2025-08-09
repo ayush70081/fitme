@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 const Birthday = ({ nextStep, prevStep, handleChange, values }) => {
+  const error = useMemo(() => {
+    const v = values.birthday;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return 'Please enter a valid date (YYYY-MM-DD)';
+    const date = new Date(v);
+    const today = new Date();
+    const age = today.getFullYear() - date.getFullYear() - ((today.getMonth() < date.getMonth() || (today.getMonth() === date.getMonth() && today.getDate() < date.getDate())) ? 1 : 0);
+    if (age < 13 || age > 120) return 'Age must be between 13 and 120 years';
+    return '';
+  }, [values.birthday]);
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -26,9 +35,10 @@ const Birthday = ({ nextStep, prevStep, handleChange, values }) => {
             }}
             max={new Date().toISOString().split('T')[0]}
             min={new Date(new Date().setFullYear(new Date().getFullYear() - 120)).toISOString().split('T')[0]}
-            className="mt-1 block w-full px-4 py-3 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent sm:text-sm rounded-lg"
+            className={`mt-1 block w-full px-4 py-3 text-base border ${error ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent sm:text-sm rounded-lg`}
           />
           <p className="text-xs text-gray-500 mt-1">Format: YYYY-MM-DD or use the date picker</p>
+          {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
         </div>
       </div>
       <div className="mt-8 flex justify-between items-center">
@@ -40,7 +50,7 @@ const Birthday = ({ nextStep, prevStep, handleChange, values }) => {
         </button>
         <button
           onClick={nextStep}
-          disabled={!/^\d{4}-\d{2}-\d{2}$/.test(values.birthday)}
+          disabled={Boolean(error)}
           className="w-1/2 bg-black text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
           Continue

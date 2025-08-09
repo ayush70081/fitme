@@ -220,7 +220,32 @@ const validateProfileUpdate = [
   body('goalWeight')
     .optional()
     .isFloat({ min: 20, max: 500 })
-    .withMessage('Goal weight must be between 20 and 500 kg'),
+    .withMessage('Goal weight must be between 20 and 500 kg')
+    .custom((goalWeight, { req }) => {
+      // Enforce that goal weight differs from current weight when both are provided
+      const currentWeight = req.body?.weight;
+      const fitnessGoals = Array.isArray(req.body?.fitnessGoals)
+        ? req.body.fitnessGoals
+        : (req.body?.fitnessGoals ? [req.body.fitnessGoals] : []);
+      if (goalWeight != null && currentWeight != null) {
+        const gw = parseFloat(goalWeight);
+        const cw = parseFloat(currentWeight);
+        if (!Number.isNaN(gw) && !Number.isNaN(cw)) {
+          // Generic rule: goal weight should not equal current weight
+          if (gw === cw) {
+            throw new Error('Goal weight must be different from current weight');
+          }
+          // Goal-specific directional rules
+          if (fitnessGoals.includes('weight-gain') && gw <= cw) {
+            throw new Error('For weight gain, goal weight must be greater than current weight');
+          }
+          if (fitnessGoals.includes('weight-loss') && gw >= cw) {
+            throw new Error('For weight loss, goal weight must be less than current weight');
+          }
+        }
+      }
+      return true;
+    }),
     
   body('profilePhoto')
     .optional()

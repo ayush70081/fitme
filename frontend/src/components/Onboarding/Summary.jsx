@@ -14,6 +14,7 @@ const Summary = ({ prevStep, values }) => {
   const { 
     goal, gender, birthday, height, currentWeight, goalWeight, location,
     fitnessExperience, preferredWorkouts,
+    workoutFrequency, workoutDuration,
     dietaryPreference
   } = values;
 
@@ -81,7 +82,9 @@ const Summary = ({ prevStep, values }) => {
           // Extended questionnaire data
           fitnessExperience: fitnessExperience || '',
           preferredWorkouts: Array.isArray(preferredWorkouts) ? preferredWorkouts.join(',') : '',
-          dietaryPreference: dietaryPreference || ''
+          dietaryPreference: dietaryPreference || '',
+          workoutFrequency: workoutFrequency || '',
+          workoutDuration: workoutDuration || ''
         };
 
         // Ensure required fields have valid values
@@ -214,6 +217,8 @@ const Summary = ({ prevStep, values }) => {
         {detailItem("Gender", values.gender)}
         {detailItem("Age", age)}
         {detailItem("Fitness Experience", values.fitnessExperience)}
+        {detailItem("Preferred Frequency", values.workoutFrequency)}
+        {detailItem("Preferred Duration", values.workoutDuration)}
         {detailItem("Dietary Preference", values.dietaryPreference)}
         {detailItem("Preferred Workouts", (values.preferredWorkouts || []).join(', '))}
         {detailItem("Location", values.location)}

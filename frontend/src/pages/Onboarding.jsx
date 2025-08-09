@@ -7,6 +7,7 @@ import Height from "../components/Onboarding/Height";
 import Weight from "../components/Onboarding/Weight";
 import FitnessExperience from "../components/Onboarding/FitnessExperience";
 import PreferredWorkouts from "../components/Onboarding/PreferredWorkouts";
+import WorkoutFrequency from "../components/Onboarding/WorkoutFrequency";
 import DietaryPreferences from "../components/Onboarding/DietaryPreferences";
 import Summary from "../components/Onboarding/Summary";
 
@@ -25,6 +26,8 @@ const Onboarding = () => {
     // Extended questionnaire
     fitnessExperience: "",
     preferredWorkouts: [],
+    workoutFrequency: "",
+    workoutDuration: "",
     dietaryPreference: "",
     
     // Dynamic goal-specific fields
@@ -77,10 +80,12 @@ const Onboarding = () => {
       case 7:
         return <PreferredWorkouts nextStep={nextStep} prevStep={prevStep} handleChange={handleArrayChange} values={{...userData, updateData}} />;
       case 8:
-        return <DietaryPreferences nextStep={nextStep} prevStep={prevStep} handleChange={handleChange} values={{...userData, updateData}} />;
+        return <WorkoutFrequency nextStep={nextStep} prevStep={prevStep} handleChange={handleChange} values={userData} />;
       case 9:
-        return <Location nextStep={nextStep} prevStep={prevStep} handleChange={handleChange} values={userData} />;
+        return <DietaryPreferences nextStep={nextStep} prevStep={prevStep} handleChange={handleChange} values={{...userData, updateData}} />;
       case 10:
+        return <Location nextStep={nextStep} prevStep={prevStep} handleChange={handleChange} values={userData} />;
+      case 11:
         return <Summary prevStep={prevStep} values={userData} />;
       default:
         return <div>Step not found</div>;

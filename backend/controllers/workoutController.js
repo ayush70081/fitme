@@ -767,6 +767,108 @@ const getWorkoutStatistics = async (req, res) => {
   }
 };
 
+// GET /api/workouts/weekly-summary
+// Returns per-user weekly aggregates: thisWeek, lastWeek, delta, and daily breakdown for the current week
+const getWeeklySummary = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    const toStartOfDay = (d) => {
+      const nd = new Date(d);
+      nd.setHours(0, 0, 0, 0);
+      return nd;
+    };
+
+    // Monday as start of week
+    const startOfWeek = (d) => {
+      const nd = toStartOfDay(d);
+      const day = nd.getDay(); // 0=Sun, 1=Mon, ...
+      const diff = (day + 6) % 7; // days since Monday
+      nd.setDate(nd.getDate() - diff);
+      return nd;
+    };
+
+    const thisWeekStart = startOfWeek(new Date());
+    const nextWeekStart = new Date(thisWeekStart);
+    nextWeekStart.setDate(thisWeekStart.getDate() + 7);
+
+    const lastWeekStart = new Date(thisWeekStart);
+    lastWeekStart.setDate(thisWeekStart.getDate() - 7);
+    const lastWeekEnd = new Date(thisWeekStart); // exclusive upper bound
+
+    const inRange = (date, start, end) => {
+      const t = new Date(date).getTime();
+      return t >= start.getTime() && t < end.getTime();
+    };
+
+    const history = Array.isArray(user.workoutHistory) ? user.workoutHistory : [];
+
+    const aggregate = (entries) => {
+      const base = { workouts: 0, minutes: 0, calories: 0 };
+      for (const w of entries) {
+        base.workouts += 1;
+        base.minutes += parseInt(w.durationMinutes || 0);
+        base.calories += parseInt(w.caloriesBurned || 0);
+      }
+      return base;
+    };
+
+    // Collect entries
+    const thisWeekEntries = history.filter(w => inRange(w.completedAt, thisWeekStart, nextWeekStart));
+    const lastWeekEntries = history.filter(w => inRange(w.completedAt, lastWeekStart, lastWeekEnd));
+
+    const thisWeek = aggregate(thisWeekEntries);
+    const lastWeek = aggregate(lastWeekEntries);
+
+    const delta = {
+      workouts: thisWeek.workouts - lastWeek.workouts,
+      minutes: thisWeek.minutes - lastWeek.minutes,
+      calories: thisWeek.calories - lastWeek.calories
+    };
+
+    // Daily breakdown for the current week (Mon..Sun)
+    const dailyMap = new Map();
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(thisWeekStart);
+      d.setDate(thisWeekStart.getDate() + i);
+      const key = d.toISOString().slice(0, 10); // YYYY-MM-DD
+      dailyMap.set(key, { date: key, workouts: 0, minutes: 0, calories: 0 });
+    }
+    for (const w of thisWeekEntries) {
+      const dayKey = toStartOfDay(new Date(w.completedAt)).toISOString().slice(0, 10);
+      if (!dailyMap.has(dayKey)) continue;
+      const obj = dailyMap.get(dayKey);
+      obj.workouts += 1;
+      obj.minutes += parseInt(w.durationMinutes || 0);
+      obj.calories += parseInt(w.caloriesBurned || 0);
+    }
+    const daily = Array.from(dailyMap.values());
+
+    return res.json({
+      success: true,
+      thisWeek,
+      lastWeek,
+      delta,
+      daily
+    });
+  } catch (error) {
+    console.error('Error generating weekly summary:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to generate weekly summary',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+};
+
 module.exports = {
   generateWorkoutPlan,
   saveWorkoutPlan,
@@ -776,5 +878,6 @@ module.exports = {
   setActivePlan,
   createCustomWorkout,
   completeWorkout,
-  getWorkoutStatistics
+  getWorkoutStatistics,
+  getWeeklySummary
 };

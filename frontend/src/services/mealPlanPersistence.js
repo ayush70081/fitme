@@ -19,7 +19,11 @@ class MealPlanPersistence {
     this.autoSaveInterval = null;
     // Migrate any legacy, non-namespaced keys to the current user's namespace
     try {
-      this.migrateLegacyKeys();
+      // Only migrate when a real user is present to avoid assigning legacy data to 'guest'
+      const hasUser = !!localStorage.getItem('fitme_user');
+      if (hasUser) {
+        this.migrateLegacyKeys();
+      }
     } catch {
       // best-effort only
     }

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 const DietaryPreferences = ({ nextStep, prevStep, handleChange, values }) => {
+  const error = useMemo(() => (!values.dietaryPreference ? 'Please select a dietary preference' : ''), [values.dietaryPreference]);
   const dietTypes = [
     'No Restrictions',
     'Vegetarian',
@@ -51,6 +52,7 @@ const DietaryPreferences = ({ nextStep, prevStep, handleChange, values }) => {
               </button>
             ))}
           </div>
+          {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
         </div>
       </div>
       
@@ -63,7 +65,7 @@ const DietaryPreferences = ({ nextStep, prevStep, handleChange, values }) => {
         </button>
         <button
           onClick={nextStep}
-          disabled={!values.dietaryPreference}
+          disabled={Boolean(error)}
           className="w-1/2 bg-black text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
           Continue

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 const Weight = ({ nextStep, prevStep, handleChange, values }) => {
@@ -124,41 +124,88 @@ const Weight = ({ nextStep, prevStep, handleChange, values }) => {
 
   const config = getGoalConfig(values.goal);
   
-  // Check if all required fields are filled
-  const canContinue = config.fields
-    .filter(field => field.required)
-    .every(field => values[field.key]);
+  const getFieldError = (field) => {
+    const value = values[field.key];
+    if (field.required && (value === undefined || value === null || value === '')) {
+      return `${field.label} is required`;
+    }
+    if (field.type === 'number' && value !== '' && value !== undefined && value !== null) {
+      const num = parseFloat(value);
+      if (Number.isNaN(num)) return `${field.label} must be a number`;
+      if (field.min !== undefined && num < field.min) return `${field.label} must be at least ${field.min}`;
+      if (field.max !== undefined && num > field.max) return `${field.label} must be at most ${field.max}`;
+    }
+    return '';
+  };
+
+  const getCrossFieldError = () => {
+    const goal = values.goal;
+    const cw = values.currentWeight ? parseFloat(values.currentWeight) : null;
+    const gw = values.goalWeight ? parseFloat(values.goalWeight) : null;
+    if (cw !== null && gw !== null && !Number.isNaN(cw) && !Number.isNaN(gw)) {
+      if (gw === cw) return 'Goal weight must be different from current weight';
+      if (goal === 'gain' && gw <= cw) return 'For weight gain, goal weight must be greater than current weight';
+      if (goal === 'lose' && gw >= cw) return 'For weight loss, goal weight must be less than current weight';
+    }
+    if (goal === 'muscle') {
+      const tmg = values.targetMuscleGain ? parseFloat(values.targetMuscleGain) : null;
+      if (tmg !== null && !Number.isNaN(tmg) && tmg <= 0) return 'Target muscle gain must be greater than 0';
+    }
+    return '';
+  };
+
+  const canContinue = useMemo(() => {
+    for (const field of config.fields) {
+      const err = getFieldError(field);
+      if (err) return false;
+    }
+    const crossErr = getCrossFieldError();
+    if (crossErr) return false;
+    return true;
+  }, [config.fields, values]);
 
   const renderField = (field) => {
     const value = values[field.key] || '';
+    const fieldError = getFieldError(field);
     
     if (field.type === 'select') {
       return (
+        <>
           <select
           id={field.key}
           onChange={handleChange(field.key)}
           value={value}
-            className="mt-1 block w-full px-4 py-3 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent sm:text-sm rounded-lg"
+            className={`mt-1 block w-full px-4 py-3 text-base border ${fieldError ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent sm:text-sm rounded-lg`}
         >
           <option value="">{field.placeholder}</option>
           {field.options.map(option => (
             <option key={option} value={option}>{option}</option>
           ))}
         </select>
+        {fieldError && (
+          <p className="mt-1 text-xs text-red-600">{fieldError}</p>
+        )}
+        </>
       );
     }
     
     return (
+      <>
       <input
         type={field.type}
         id={field.key}
         onChange={handleChange(field.key)}
-        defaultValue={value}
+        value={value}
         min={field.min}
         max={field.max}
-        className="mt-1 block w-full px-4 py-3 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent sm:text-sm rounded-lg"
+        step="any"
+        className={`mt-1 block w-full px-4 py-3 text-base border ${fieldError ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent sm:text-sm rounded-lg`}
         placeholder={field.placeholder}
       />
+      {fieldError && (
+        <p className="mt-1 text-xs text-red-600">{fieldError}</p>
+      )}
+      </>
     );
   };
 
@@ -173,14 +220,21 @@ const Weight = ({ nextStep, prevStep, handleChange, values }) => {
         <p className="text-gray-600 mt-2">{config.subtitle}</p>
       </div>
       <div className="space-y-6">
-        {config.fields.map((field) => (
-          <div key={field.key}>
-            <label htmlFor={field.key} className="block text-sm font-medium text-gray-700">
-              {field.label} {field.required && <span className="text-red-500">*</span>}
-            </label>
-            {renderField(field)}
-          </div>
-        ))}
+        {config.fields.map((field) => {
+          const crossError = getCrossFieldError();
+          const showCrossErrorUnder = (field.key === 'goalWeight' && crossError) || (field.key === 'targetMuscleGain' && crossError);
+          return (
+            <div key={field.key}>
+              <label htmlFor={field.key} className="block text-sm font-medium text-gray-700">
+                {field.label} {field.required && <span className="text-red-500">*</span>}
+              </label>
+              {renderField(field)}
+              {showCrossErrorUnder && (
+                <p className="mt-1 text-xs text-red-600">{crossError}</p>
+              )}
+            </div>
+          );
+        })}
       </div>
       <div className="mt-8 flex justify-between items-center">
         <button

@@ -337,6 +337,11 @@ export const workoutAPI = {
   getWorkoutStatistics: async () => {
     const response = await api.get('/workouts/statistics');
     return response.data;
+  },
+
+  getWeeklySummary: async () => {
+    const response = await api.get('/workouts/weekly-summary');
+    return response.data;
   }
 };
 

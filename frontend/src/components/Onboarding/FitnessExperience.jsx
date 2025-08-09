@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 const FitnessExperience = ({ nextStep, prevStep, handleChange, values }) => {
+  const error = useMemo(() => (!values.fitnessExperience ? 'Please select your experience level' : ''), [values.fitnessExperience]);
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -19,7 +20,7 @@ const FitnessExperience = ({ nextStep, prevStep, handleChange, values }) => {
             id="fitnessExperience"
             onChange={handleChange('fitnessExperience')}
             defaultValue={values.fitnessExperience}
-            className="mt-1 block w-full pl-3 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent sm:text-sm rounded-lg"
+            className={`mt-1 block w-full pl-3 pr-10 py-3 text-base border ${error ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent sm:text-sm rounded-lg`}
           >
             <option value="">Select your experience level</option>
             <option value="beginner">Beginner (0-6 months)</option>
@@ -27,6 +28,7 @@ const FitnessExperience = ({ nextStep, prevStep, handleChange, values }) => {
             <option value="advanced">Advanced (2-5 years)</option>
             <option value="expert">Expert (5+ years)</option>
           </select>
+          {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
         </div>
       </div>
       <div className="mt-8 flex justify-between items-center">
@@ -38,7 +40,7 @@ const FitnessExperience = ({ nextStep, prevStep, handleChange, values }) => {
         </button>
         <button
           onClick={nextStep}
-          disabled={!values.fitnessExperience}
+          disabled={Boolean(error)}
           className="w-1/2 bg-black text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
           Continue

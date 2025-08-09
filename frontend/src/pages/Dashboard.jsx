@@ -3,14 +3,15 @@ import CalorieOverview from '../components/Dash_Components/CalorieOverview';
 import DailyRoutine from '../components/Dash_Components/DailyRoutine';
 import FitnessGrowthChart from '../components/Dash_Components/FitnessGrowthChart';
 import FoodOverview from '../components/Dash_Components/FoodOverview';
-import StepProgressCard from '../components/Dash_Components/StepProgressCard';
 import WorkoutOverviewCard from '../components/Dash_Components/WorkoutOverviewCard';
 import { useEffect, useState } from 'react';
+import WeeklySummaryCard from '../components/Dash_Components/WeeklySummaryCard';
 import { userAPI, workoutAPI } from '../services/api';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({});
   const [workoutStats, setWorkoutStats] = useState({});
+  const [weeklySummary, setWeeklySummary] = useState(null);
 
   useEffect(() => {
     async function fetchStats() {
@@ -32,8 +33,19 @@ const Dashboard = () => {
       }
     }
 
+    async function fetchWeekly() {
+      try {
+        const res = await workoutAPI.getWeeklySummary();
+        setWeeklySummary(res);
+      } catch (e) {
+        console.error('Failed to fetch weekly summary:', e);
+        setWeeklySummary(null);
+      }
+    }
+
     fetchStats();
     fetchWorkoutStats();
+    fetchWeekly();
   }, []);
 
   return (
@@ -56,13 +68,14 @@ const Dashboard = () => {
         </div>
         <div className="w-full rounded-2xl lg:w-[40%] bg-white shadow p-3 ">
           <div className="flex flex-row gap-4 mb-3">
-            <StepProgressCard currentStreak={stats.currentStreak ?? 0} longestStreak={stats.longestStreak ?? 0} />
             <WorkoutOverviewCard 
               totalWorkouts={workoutStats.totalWorkouts ?? stats.totalWorkouts ?? 0} 
               avgWorkout={workoutStats.averageWorkoutTimeMinutes ?? stats.avgWorkout ?? 0}
               totalCaloriesBurned={workoutStats.totalCaloriesBurned ?? 0}
             />
           </div>
+
+          <WeeklySummaryCard summary={weeklySummary} />
 
           <FitnessGrowthChart />
         </div>

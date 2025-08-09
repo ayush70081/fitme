@@ -127,7 +127,8 @@ export const updateUserProfile = createAsyncThunk(
       }
     } catch (error) {
       const errorData = apiUtils.handleError(error);
-      return rejectWithValue(errorData.message);
+      // Pass through full error details so UI can show meaningful messages
+      return rejectWithValue(errorData);
     }
   }
 );
@@ -357,7 +358,21 @@ const authSlice = createSlice({
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        const payload = action.payload;
+        // Suppress global toast for validation errors (handled inline in Profile page)
+        if (payload && Array.isArray(payload.errors) && payload.errors.length > 0) {
+          state.error = null;
+          return;
+        }
+        let friendlyMessage = 'Profile update failed';
+        if (payload) {
+          if (typeof payload === 'string') {
+            friendlyMessage = payload;
+          } else if (payload.message) {
+            friendlyMessage = payload.message;
+          }
+        }
+        state.error = friendlyMessage;
       })
       
       // Update profile photo cases

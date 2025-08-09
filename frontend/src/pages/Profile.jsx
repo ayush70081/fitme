@@ -33,21 +33,14 @@ import {
 } from 'lucide-react';
 import { userAPI, workoutAPI } from '../services/api';
 import Select from 'react-select';
+import {
+  WORKOUT_FREQUENCY_OPTIONS,
+  WORKOUT_DURATION_OPTIONS,
+  WORKOUT_TYPE_OPTIONS as CANONICAL_WORKOUT_TYPES,
+  FITNESS_EXPERIENCE_OPTIONS
+} from '../constants/preferences';
 
-const WORKOUT_TYPE_OPTIONS = [
-  'Strength Training',
-  'Cardio',
-  'Yoga',
-  'Pilates',
-  'HIIT',
-  'Running',
-  'Swimming',
-  'Cycling',
-  'Boxing',
-  'Dancing',
-  'Calisthenics',
-  'CrossFit'
-];
+const WORKOUT_TYPE_OPTIONS = CANONICAL_WORKOUT_TYPES;
 
 const Profile = () => {
   const { user } = useAuth();
@@ -60,6 +53,8 @@ const Profile = () => {
   const [imageUploading, setImageUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [imageError, setImageError] = useState(null);
+  const [formError, setFormError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
   
   // Add debug logs
   console.log('Raw user data:', user);
@@ -324,6 +319,59 @@ const Profile = () => {
       ...prev,
       [field]: value
     }));
+    // Clear inline error for this field on change
+    setFieldErrors(prev => {
+      if (prev[field]) {
+        const { [field]: _removed, ...rest } = prev;
+        return rest;
+      }
+      // Map backend field names to UI field for name
+      if ((field === 'name') && prev.name) {
+        const { name: _n, ...rest } = prev;
+        return rest;
+      }
+      return prev;
+    });
+    setFormError(null);
+  };
+
+  // Map backend validation errors to UI field names and show inline
+  const applyBackendFieldErrors = (err) => {
+    try {
+      const errorsArray = Array.isArray(err?.errors) ? err.errors : [];
+      if (errorsArray.length === 0) {
+        if (err?.message) setFormError(err.message);
+        return;
+      }
+      const fieldMap = {
+        firstName: 'name',
+        lastName: 'name',
+        fitnessGoals: 'fitnessGoal',
+        dateOfBirth: 'dateOfBirth',
+        gender: 'gender',
+        location: 'location',
+        height: 'height',
+        weight: 'weight',
+        goalWeight: 'goalWeight',
+        bio: 'bio',
+        fitnessExperience: 'fitnessExperience',
+        workoutFrequency: 'workoutFrequency',
+        workoutDuration: 'workoutDuration',
+        dietaryPreference: 'dietaryPreference',
+        preferredWorkouts: 'preferredWorkouts',
+        targetMuscleGain: 'targetMuscleGain',
+        currentStrengthLevel: 'currentStrengthLevel'
+      };
+      const nextErrors = {};
+      errorsArray.forEach(e => {
+        const key = fieldMap[e.field] || e.field;
+        if (!nextErrors[key]) nextErrors[key] = e.message;
+      });
+      setFieldErrors(nextErrors);
+    } catch (e) {
+      // Fallback to generic form error
+      if (err?.message) setFormError(err.message);
+    }
   };
 
   const handleImageUpload = async (event) => {
@@ -480,7 +528,7 @@ const Profile = () => {
     };
 
     const config = goalConfigs[currentGoal] || goalConfigs['weight-loss'];
-    const fieldValue = profileData[config.field] || '';
+    const fieldValue = profileData[config.field] ?? '';
 
     const renderFieldInput = () => {
       if (config.type === 'select') {
@@ -498,6 +546,18 @@ const Profile = () => {
         );
       }
       
+      const inputProps = {};
+      if (config.field === 'goalWeight' || config.field === 'weight') {
+        inputProps.min = 20;
+        inputProps.max = 500;
+        inputProps.step = 'any';
+      }
+      if (config.field === 'targetMuscleGain') {
+        inputProps.min = 0.1;
+        inputProps.max = 50;
+        inputProps.step = 'any';
+      }
+
       return (
         <input
           type={config.type}
@@ -505,6 +565,7 @@ const Profile = () => {
           onChange={(e) => handleInputChange(config.field, e.target.value)}
           className="mt-2 w-full px-2 py-1 text-center border border-gray-300 rounded focus:ring-[#EADFD0] focus:border-[#EADFD0]"
           placeholder={config.placeholder}
+          {...inputProps}
         />
       );
     };
@@ -513,13 +574,19 @@ const Profile = () => {
     let displayValue = '--';
     switch (config.field) {
       case 'goalWeight':
-        displayValue = formatGoalWeight(fieldValue);
+        displayValue = fieldValue !== '' && fieldValue !== null && fieldValue !== undefined
+          ? formatGoalWeight(fieldValue)
+          : '--';
         break;
       case 'targetMuscleGain':
-        displayValue = formatMuscleGain(fieldValue);
+        displayValue = fieldValue !== '' && fieldValue !== null && fieldValue !== undefined
+          ? formatMuscleGain(fieldValue)
+          : '--';
         break;
       case 'weight':
-        displayValue = formatWeight(fieldValue);
+        displayValue = fieldValue !== '' && fieldValue !== null && fieldValue !== undefined
+          ? formatWeight(fieldValue)
+          : '--';
         break;
       default:
         displayValue = fieldValue || '--';
@@ -529,19 +596,124 @@ const Profile = () => {
       <div className="text-center p-4 bg-gray-50 rounded-lg">
         <div className="text-2xl font-bold text-gray-900">{displayValue}</div>
         <div className="text-sm text-gray-600">{config.label}</div>
-        {isEditing && renderFieldInput()}
+        {isEditing && (
+          <>
+            {renderFieldInput()}
+            {fieldErrors[config.field] ? (
+              <p className="mt-1 text-xs text-red-600">{fieldErrors[config.field]}</p>
+            ) : null}
+          </>
+        )}
       </div>
     );
   };
 
   const handleSave = async () => {
     setSaving(true);
+    setFormError(null);
+    setFieldErrors({});
     try {
+      const nextErrors = {};
       // Split the name into firstName and lastName with safe fallback
       const trimmedName = (profileData.name || '').trim();
       const nameParts = trimmedName.split(/\s+/).filter(Boolean);
       const firstName = nameParts[0] || '';
       const lastNameCandidate = nameParts.length > 1 ? nameParts.slice(1).join(' ') : null;
+
+      // Frontend validations for basic fields
+      const nameRegex = /^[A-Za-z\s]+$/;
+      if (firstName && (!nameRegex.test(firstName) || firstName.length < 2 || firstName.length > 50)) {
+        nextErrors.name = 'First name must be 2-50 letters (A-Z only)';
+      }
+      if (lastNameCandidate && (!nameRegex.test(lastNameCandidate) || lastNameCandidate.length < 2 || lastNameCandidate.length > 50)) {
+        nextErrors.name = nextErrors.name || 'Last name must be 2-50 letters (A-Z only)';
+      }
+
+      if (profileData.location && profileData.location.length > 100) {
+        nextErrors.location = 'Location cannot exceed 100 characters';
+      }
+
+      if (profileData.bio && profileData.bio.length > 1000) {
+        nextErrors.bio = 'Bio cannot exceed 1000 characters';
+      }
+
+      if (profileData.dateOfBirth) {
+        const today = new Date();
+        const dob = new Date(profileData.dateOfBirth);
+        let age = today.getFullYear() - dob.getFullYear();
+        const m = today.getMonth() - dob.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+        if (age < 13 || age > 120) {
+          nextErrors.dateOfBirth = 'Age must be between 13 and 120 years';
+        }
+      }
+
+      if (profileData.height) {
+        const h = parseFloat(profileData.height);
+        if (Number.isNaN(h) || h < 50 || h > 300) {
+          nextErrors.height = 'Height must be between 50 and 300 cm';
+        }
+      }
+
+      if (profileData.weight) {
+        const w = parseFloat(profileData.weight);
+        if (Number.isNaN(w) || w < 20 || w > 500) {
+          nextErrors.weight = 'Weight must be between 20 and 500 kg';
+        }
+      }
+
+      // Validate goal weight range if provided
+      if (profileData.goalWeight !== undefined && profileData.goalWeight !== null && profileData.goalWeight !== '') {
+        const gwRange = parseFloat(profileData.goalWeight);
+        if (Number.isNaN(gwRange) || gwRange < 20 || gwRange > 500) {
+          nextErrors.goalWeight = 'Goal weight must be between 20 and 500 kg';
+        }
+      }
+
+      // Frontend validation: current weight vs goal weight
+      const currentWeight = profileData.weight ? parseFloat(profileData.weight) : null;
+      const targetGoalWeight = profileData.goalWeight ? parseFloat(profileData.goalWeight) : null;
+      const goal = Array.isArray(profileData.fitnessGoal)
+        ? (profileData.fitnessGoal[0] || '')
+        : (profileData.fitnessGoal || '');
+      if (
+        currentWeight !== null &&
+        targetGoalWeight !== null &&
+        !Number.isNaN(currentWeight) &&
+        !Number.isNaN(targetGoalWeight)
+      ) {
+        if (currentWeight === targetGoalWeight) {
+          nextErrors.goalWeight = nextErrors.goalWeight || 'Goal weight must be different from current weight';
+        }
+      }
+
+      if (
+        currentWeight !== null &&
+        targetGoalWeight !== null &&
+        !Number.isNaN(currentWeight) &&
+        !Number.isNaN(targetGoalWeight)
+      ) {
+        if (goal === 'weight-gain' && targetGoalWeight <= currentWeight) {
+          nextErrors.goalWeight = nextErrors.goalWeight || 'For weight gain, goal weight must be greater than current weight';
+        }
+        if (goal === 'weight-loss' && targetGoalWeight >= currentWeight) {
+          nextErrors.goalWeight = nextErrors.goalWeight || 'For weight loss, goal weight must be less than current weight';
+        }
+      }
+
+      // Additional sanity checks for goal-specific fields
+      if (goal === 'muscle-gain') {
+        const tmg = profileData.targetMuscleGain ? parseFloat(profileData.targetMuscleGain) : null;
+        if (tmg !== null && !Number.isNaN(tmg) && tmg <= 0) {
+          nextErrors.targetMuscleGain = 'Target muscle gain must be greater than 0';
+        }
+      }
+
+      if (Object.keys(nextErrors).length > 0) {
+        setFieldErrors(nextErrors);
+        setSaving(false);
+        return;
+      }
 
       const payload = {
         firstName,
@@ -575,6 +747,8 @@ const Profile = () => {
       setIsEditing(false);
     } catch (error) {
       console.error('Save profile error:', error);
+      // Map backend field errors to inline display
+      applyBackendFieldErrors(error);
     } finally {
       setSaving(false);
     }
@@ -582,6 +756,8 @@ const Profile = () => {
 
   const handleCancel = () => {
     setIsEditing(false);
+    setFormError(null);
+    setFieldErrors({});
     // Reset to original data from the user object
     const resetData = {
       name: getDisplayName(user),
@@ -637,13 +813,18 @@ const Profile = () => {
           About Me
         </h3>
         {isEditing ? (
-          <textarea
-            value={profileData.bio}
-            onChange={(e) => handleInputChange('bio', e.target.value)}
-            rows={4}
-            placeholder="Tell us about yourself, your fitness journey, goals..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
-          />
+          <>
+            <textarea
+              value={profileData.bio}
+              onChange={(e) => handleInputChange('bio', e.target.value)}
+              rows={4}
+              placeholder="Tell us about yourself, your fitness journey, goals..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
+            />
+            {fieldErrors.bio && (
+              <p className="mt-1 text-xs text-red-600">{fieldErrors.bio}</p>
+            )}
+          </>
         ) : (
           <p className="text-gray-700 text-base leading-relaxed">
             {profileData.bio || 'Welcome to your fitness journey! 🌟 This is where your story begins. Share your goals, what motivates you, and celebrate every step forward. Remember, every expert was once a beginner - you\'ve got this! 💪'}
@@ -659,12 +840,17 @@ const Profile = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700">Full Name</label>
               {isEditing ? (
-                <input
-                  type="text"
-                  value={profileData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
-                />
+                <>
+                  <input
+                    type="text"
+                    value={profileData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
+                  />
+                  {fieldErrors.name && (
+                    <p className="mt-1 text-xs text-red-600">{fieldErrors.name}</p>
+                  )}
+                </>
               ) : (
                 <p className="mt-1 text-gray-900">{profileData.name || 'Not specified'}</p>
               )}
@@ -679,12 +865,17 @@ const Profile = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
               {isEditing ? (
-                <input
-                  type="date"
-                  value={profileData.dateOfBirth}
-                  onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
-                />
+                <>
+                  <input
+                    type="date"
+                    value={profileData.dateOfBirth}
+                    onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
+                  />
+                  {fieldErrors.dateOfBirth && (
+                    <p className="mt-1 text-xs text-red-600">{fieldErrors.dateOfBirth}</p>
+                  )}
+                </>
               ) : (
                 <p className="mt-1 text-gray-900">
                   {profileData.dateOfBirth ? new Date(profileData.dateOfBirth).toLocaleDateString() : 'Not specified'}
@@ -695,15 +886,20 @@ const Profile = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700">Gender</label>
               {isEditing ? (
-                <select
-                  value={profileData.gender}
-                  onChange={(e) => handleInputChange('gender', e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
-                >
-                  <option value="">Select gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
+                <>
+                  <select
+                    value={profileData.gender}
+                    onChange={(e) => handleInputChange('gender', e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                  {fieldErrors.gender && (
+                    <p className="mt-1 text-xs text-red-600">{fieldErrors.gender}</p>
+                  )}
+                </>
               ) : (
                 <p className="mt-1 text-gray-900 capitalize">{profileData.gender || 'Not specified'}</p>
               )}
@@ -711,12 +907,17 @@ const Profile = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700">Location</label>
               {isEditing ? (
-                <input
-                  type="text"
-                  value={profileData.location}
-                  onChange={(e) => handleInputChange('location', e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
-                />
+                <>
+                  <input
+                    type="text"
+                    value={profileData.location}
+                    onChange={(e) => handleInputChange('location', e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
+                  />
+                  {fieldErrors.location && (
+                    <p className="mt-1 text-xs text-red-600">{fieldErrors.location}</p>
+                  )}
+                </>
               ) : (
                 <p className="mt-1 text-gray-900">{profileData.location || 'Not specified'}</p>
               )}
@@ -743,7 +944,13 @@ const Profile = () => {
                 onChange={(e) => handleInputChange('height', e.target.value)}
                 className="mt-2 w-full px-2 py-1 text-center border border-gray-300 rounded focus:ring-[#EADFD0] focus:border-[#EADFD0]"
                 placeholder="Height in cm"
+                min={50}
+                max={300}
+                step="any"
               />
+            )}
+            {isEditing && fieldErrors.height && (
+              <p className="mt-1 text-xs text-red-600">{fieldErrors.height}</p>
             )}
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
@@ -758,12 +965,14 @@ const Profile = () => {
                 placeholder="Weight in kg"
               />
             )}
+              {isEditing && fieldErrors.weight && (
+                <p className="mt-1 text-xs text-red-600">{fieldErrors.weight}</p>
+              )}
           </div>
           {/* Dynamic Goal Field */}
           {renderDynamicGoalField()}
         </div>
         
-        {/* BMI Information removed */}
       </div>
 
       {/* Fitness Goals & Activity */}
@@ -884,11 +1093,9 @@ const Profile = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
               >
                 <option value="">Select frequency</option>
-                <option value="2-3">2-3 times per week</option>
-                <option value="3-4">3-4 times per week</option>
-                <option value="4-5">4-5 times per week</option>
-                <option value="5-6">5-6 times per week</option>
-                <option value="daily">Daily</option>
+                {WORKOUT_FREQUENCY_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
               </select>
             ) : (
               <p className="text-gray-900">{formatFrequency(profileData.workoutFrequency)}</p>
@@ -903,11 +1110,9 @@ const Profile = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
               >
                 <option value="">Select duration</option>
-                <option value="15-30">15-30 minutes</option>
-                <option value="30-45">30-45 minutes</option>
-                <option value="45-60">45-60 minutes</option>
-                <option value="60-90">60-90 minutes</option>
-                <option value="90+">90+ minutes</option>
+                {WORKOUT_DURATION_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
               </select>
             ) : (
               <p className="text-gray-900">{formatDuration(profileData.workoutDuration)}</p>
@@ -920,7 +1125,7 @@ const Profile = () => {
           {isEditing ? (
             <Select
               isMulti
-              options={WORKOUT_TYPE_OPTIONS.map(option => ({ value: option, label: option }))}
+               options={WORKOUT_TYPE_OPTIONS.map(option => ({ value: option, label: option }))}
               value={
                 (Array.isArray(profileData.preferredWorkouts)
                   ? profileData.preferredWorkouts
@@ -1189,6 +1394,16 @@ const Profile = () => {
                       </p>
                     </div>
                   )}
+
+                  {/* Form Validation Error */}
+                  {formError && (
+                    <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md">
+                      <p className="text-sm text-red-600 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {formError}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-3">
@@ -1212,7 +1427,7 @@ const Profile = () => {
                     </>
                   ) : (
                     <button
-                      onClick={() => setIsEditing(true)}
+                      onClick={() => { setIsEditing(true); setFormError(null); }}
                       className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-black transition-all duration-200"
                     >
                       <Edit3 className="w-4 h-4" />
@@ -1236,7 +1451,7 @@ const Profile = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'border-[#EADFD0] text-gray-900 bg-[#FFF8ED]'
+                      ? 'border-black/70 text-gray-900 bg-[#FFF8ED]'
                       : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                   }`}
                 >

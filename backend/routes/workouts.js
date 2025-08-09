@@ -9,7 +9,8 @@ const {
   setActivePlan,
   createCustomWorkout,
   completeWorkout,
-  getWorkoutStatistics
+  getWorkoutStatistics,
+  getWeeklySummary
 } = require('../controllers/workoutController');
 const { authenticate } = require('../middleware/auth');
 
@@ -27,6 +28,9 @@ router.get('/saved', authenticate, getSavedWorkoutPlans);
 
 // GET /api/workouts/statistics - Get workout statistics (must come before /:planId)
 router.get('/statistics', authenticate, getWorkoutStatistics);
+
+// GET /api/workouts/weekly-summary - Per-user weekly aggregation
+router.get('/weekly-summary', authenticate, getWeeklySummary);
 
 // POST /api/workouts/complete - Complete a workout
 router.post('/complete', authenticate, completeWorkout);
