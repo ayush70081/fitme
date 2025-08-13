@@ -20,8 +20,8 @@ const ProtectedRoute = ({ children, requireCompleteProfile = true }) => {
   }
 
   if (!isAuthenticated) {
-    // Redirect to login if not authenticated
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Redirect to landing page if not authenticated
+    return <Navigate to="/" replace />;
   }
 
   // Only check profile completion if explicitly required

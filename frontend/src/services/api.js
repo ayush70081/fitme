@@ -2,8 +2,8 @@ import axios from 'axios';
 import { generateWorkoutPlanWithGemini } from './geminiAPI.js';
 
 // Base API configuration - Express backend for auth/user, FastAPI for AI Coach
-const EXPRESS_BASE_URL = 'http://localhost:5000/api';
-const FASTAPI_BASE_URL = 'http://localhost:8000/api';
+const EXPRESS_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const FASTAPI_BASE_URL = import.meta.env.VITE_FASTAPI_URL || 'http://localhost:8000/api';
 const BASE_URL = EXPRESS_BASE_URL; // Default to Express for auth/user APIs
 
 // Create axios instances

@@ -29,6 +29,7 @@ export default function Sidebar({ isExpanded = false, isMobile = false, onClose 
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -122,7 +123,7 @@ export default function Sidebar({ isExpanded = false, isMobile = false, onClose 
           {/* Logout Button */}
           <button
             onClick={() => {
-              handleLogout();
+              setShowLogoutConfirm(true);
               isMobile && onClose && onClose();
             }}
             className={`
@@ -153,6 +154,37 @@ export default function Sidebar({ isExpanded = false, isMobile = false, onClose 
           {(isExpanded || isMobile) && '© 2025 FitMe+'}
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm border border-gray-200">
+            <div className="p-4 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">Confirm Logout</h3>
+            </div>
+            <div className="p-4 text-sm text-gray-700">
+              Are you sure you want to logout?
+            </div>
+            <div className="p-4 flex justify-end gap-2 border-t border-gray-100">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowLogoutConfirm(false);
+                  handleLogout();
+                }}
+                className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
