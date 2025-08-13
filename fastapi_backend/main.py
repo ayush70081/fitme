@@ -7,6 +7,7 @@ from slowapi.errors import RateLimitExceeded
 import os
 import logging
 from dotenv import load_dotenv
+from contextlib import asynccontextmanager
 
 from routes.mealplan import router as mealplan_router
 from routes.auth import router as auth_router
@@ -27,10 +28,18 @@ logger = logging.getLogger(__name__)
 # Rate limiter
 limiter = Limiter(key_func=get_remote_address)
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Initialize database on startup
+    await init_db()
+    yield
+    # Place any shutdown cleanup here if needed
+
 app = FastAPI(
     title="Fitness Tracker API",
     description="FastAPI backend for Fitness Tracker with AI-powered meal planning",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Add rate limiting
@@ -49,19 +58,7 @@ app.add_middleware(
 # Security middleware
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 
-# Initialize database
-@app.on_event("startup")
-async def startup_event():
-    await init_db()
-    
-    # Debug JWT configuration at startup
-    import os
-    jwt_secret = os.getenv("JWT_SECRET", "DEFAULT")
-    logger.info(f"🔐 JWT SECRET DEBUG:")
-    logger.info(f"   Length: {len(jwt_secret)}")
-    logger.info(f"   First 30 chars: {jwt_secret[:30]}...")
-    logger.info(f"   Last 15 chars: ...{jwt_secret[-15:]}")
-    logger.info(f"   Full secret: {jwt_secret}")  # TEMPORARY - for debugging only
+# Database initialization moved to lifespan handler
 
 # Include routers
 app.include_router(mealplan_router, prefix="/api/mealplan", tags=["mealplan"])

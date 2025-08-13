@@ -51,9 +51,6 @@ export const AuthProvider = ({ children }) => {
       // Fetch full user profile to get extended fields
       const userProfile = await dispatch(getCurrentUser()).unwrap();
       
-      console.log('Login result:', result);
-      console.log('User profile result:', userProfile);
-      
       // Check if profile is complete
       if (!userProfile.profileCompleted) {
         return { success: true, onboarding: true };
@@ -61,7 +58,7 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true };
     } catch (error) {
-      console.error('Login error:', error);
+      // Avoid logging detailed auth errors to console in production
       return { success: false, message: error };
     }
   };
@@ -81,7 +78,7 @@ export const AuthProvider = ({ children }) => {
         return { success: false, message: 'First name and last name are required' };
       }
 
-      console.log('Attempting registration with:', { email, firstName, lastName });
+      // Avoid logging PII
       
       const result = await dispatch(registerUser({ 
         email, 
@@ -95,18 +92,18 @@ export const AuthProvider = ({ children }) => {
         await dispatch(getCurrentUser()).unwrap();
       }
       
-      console.log('✅ AuthContext registration result:', result);
+      // Avoid logging tokens/user payloads
       
       // Check if email verification is required
       if (result.requiresEmailVerification) {
-        console.log('✅ Email verification required, returning flag');
+        // Email verification required
         return { success: true, requiresEmailVerification: true };
       }
       
-      console.log('✅ No email verification required, going to onboarding');
+      // Proceed to onboarding
       return { success: true, onboarding: true };
     } catch (error) {
-      console.error('Registration error in AuthContext:', error);
+      // Avoid verbose logging of registration errors
       return { success: false, message: error };
     }
   };

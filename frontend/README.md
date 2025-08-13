@@ -1,12 +1,62 @@
-# React + Vite
+# Frontend (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the React (Vite) client for the Fitness Tracker application.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Node.js 16+
+- npm
 
-## Expanding the ESLint configuration
+## Setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1) Install dependencies
+```bash
+npm install
+```
+
+2) Environment variables
+
+Copy the example and edit values as needed:
+```bash
+cp env.example .env
+```
+
+Common variables:
+- `VITE_API_URL`          Backend (Express) base URL, e.g. http://localhost:5000/api
+- `VITE_FASTAPI_URL`      FastAPI base URL, e.g. http://localhost:8000/api
+- `VITE_GEMINI_API_KEY`   Gemini API key used by the client for workout generation
+
+3) Run the dev server
+```bash
+npm run dev
+```
+Default dev server: http://localhost:5173
+
+## Scripts
+
+```bash
+npm run dev       # start Vite dev server
+npm run build     # production build
+npm run preview   # preview production build locally
+npm run lint      # run eslint
+```
+
+## Authentication
+
+- Access and refresh tokens are stored in localStorage (`fitme_token`, `fitme_refresh_token`).
+- `AuthContext` initializes auth state and fetches the current user when a token exists.
+
+## API Clients
+
+- `src/services/api.js` holds axios instances for Express and FastAPI backends.
+- Authorization headers are automatically set from localStorage tokens.
+
+## Gemini Integration (Workout Generation)
+
+- Frontend uses the Gemini API directly with `VITE_GEMINI_API_KEY`.
+- Client logic retries transient overload/rate-limit errors and falls back across models.
+- If all attempts fail, a demo workout plan is shown.
+
+## Build Output
+
+Vite builds to `frontend/dist/`. Configure your hosting to serve that directory.

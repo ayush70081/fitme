@@ -20,11 +20,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 # JWT configuration - Compatible with Express backend
-# First check what the environment variable actually contains
 raw_jwt_secret = os.getenv("JWT_SECRET")
-logger.info(f"🔍 Environment variable check:")
-logger.info(f"   Raw JWT_SECRET from env: {repr(raw_jwt_secret)}")
-logger.info(f"   JWT_SECRET exists: {raw_jwt_secret is not None}")
 
 # Use the same JWT secret as Express backend for consistency
 # Both backends must use the same secret for JWT token compatibility
@@ -32,12 +28,7 @@ SECRET_KEY = raw_jwt_secret or "your-fallback-secret-key"
 ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "30"))
 
-# Debug logging for JWT configuration
-logger.info(f"🔐 Final JWT Configuration:")
-logger.info(f"   SECRET_KEY: {SECRET_KEY}")
-logger.info(f"   SECRET_KEY length: {len(SECRET_KEY)}")
-logger.info(f"   ALGORITHM: {ALGORITHM}")
-logger.info(f"   EXPIRE_MINUTES: {ACCESS_TOKEN_EXPIRE_MINUTES}")
+# Avoid logging sensitive JWT configuration in production
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash"""
@@ -70,18 +61,9 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     try:
         # Extract token from credentials
         token = credentials.credentials
-        logger.info(f"🔑 Attempting to decode token: {token[:20]}...")
-        logger.info(f"🔑 Full token length: {len(token)}")
-        logger.info(f"🔑 Using SECRET_KEY: {SECRET_KEY[:10]}...{SECRET_KEY[-10:]}")
-        logger.info(f"🔑 Algorithm: {ALGORITHM}")
         
         # Decode token without verification to see payload
-        try:
-            import jwt as jwt_module
-            unverified = jwt_module.decode(token, options={"verify_signature": False})
-            logger.info(f"Unverified token payload: {unverified}")
-        except Exception as e:
-            logger.warning(f"Could not decode token without verification: {e}")
+        # Do not log unverified token payloads or secrets
         
         # Try to decode JWT token (Express backend format first)
         payload = None
@@ -94,15 +76,15 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
                 issuer='fitness-tracker-api',
                 audience='fitness-tracker-client'
             )
-            logger.info("Successfully decoded Express backend token")
+            # Decoded Express backend token
         except JWTError as e:
-            logger.warning(f"Express format failed: {e}, trying FastAPI format")
+            logger.debug("Express token format decode failed; trying FastAPI format")
             try:
                 # Try FastAPI format (without issuer/audience)
                 payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-                logger.info("Successfully decoded FastAPI token")
+                # Decoded FastAPI token
             except JWTError as e2:
-                logger.error(f"Both token formats failed. Express error: {e}, FastAPI error: {e2}")
+                logger.error("Both token formats failed")
                 raise credentials_exception
         
         # Get user identifier from token
@@ -119,7 +101,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             logger.error(f"Invalid token type: {token_type}")
             raise credentials_exception
         
-        logger.info(f"Token contains user_id: {user_id}, email: {email}, type: {token_type}")
+        # Avoid logging token contents
         
     except JWTError as e:
         logger.error(f"JWT decode error: {e}")
@@ -130,7 +112,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     
     # Enhanced user lookup with detailed logging
     user_doc = None
-    logger.info(f"🔍 Searching for user - ID: {user_id}, Email: {email}")
+    logger.debug("Searching for user by id/email")
     
     # Try to find user by ID first (Express format)
     if user_id:
@@ -138,34 +120,32 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             from bson import ObjectId
             if ObjectId.is_valid(user_id):
                 query = {"_id": ObjectId(user_id)}
-                logger.info(f"🔍 Searching by ObjectId: {query}")
+                logger.debug("Searching by ObjectId")
                 user_doc = await users_collection.find_one(query)
                 if user_doc:
-                    logger.info(f"✅ Found user by ID: {user_id}")
+                    logger.debug("Found user by ID")
                 else:
-                    logger.warning(f"❌ No user found with ID: {user_id}")
+                    logger.debug("No user found with ID")
             else:
-                logger.warning(f"❌ Invalid ObjectId format: {user_id}")
+                logger.debug("Invalid ObjectId format")
         except Exception as e:
-            logger.error(f"❌ Error finding user by ID: {e}")
+            logger.error(f"Error finding user by ID: {e}")
     
     # Fallback to email search
     if not user_doc and email:
         try:
             query = {"email": email}
-            logger.info(f"🔍 Searching by email: {query}")
+            logger.debug("Searching by email")
             user_doc = await users_collection.find_one(query)
             if user_doc:
-                logger.info(f"✅ Found user by email: {email}")
-                logger.info(f"📋 User data: {user_doc.get('first_name', 'N/A')} {user_doc.get('last_name', 'N/A')}")
+                logger.debug("Found user by email")
             else:
-                logger.warning(f"❌ No user found with email: {email}")
+                logger.debug("No user found with email")
         except Exception as e:
-            logger.error(f"❌ Error finding user by email: {e}")
+            logger.error(f"Error finding user by email: {e}")
     
     if user_doc is None:
-        logger.warning(f"⚠️ User not found in FastAPI database for user_id: {user_id}, email: {email}")
-        logger.info(f"🔄 Creating temporary user object from JWT token data")
+        logger.debug("User not found in FastAPI database; creating temporary user object from JWT token data")
         
         # Since the JWT token is valid and issued by our Express backend,
         # create a temporary user object with the token data
@@ -195,7 +175,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
                 is_verified=True
             )
             
-            logger.info(f"✅ Created temporary user object for: {temp_user.email}")
+            logger.debug("Created temporary user object")
             return temp_user
         except Exception as e:
             logger.error(f"❌ Error creating temporary user: {e}")

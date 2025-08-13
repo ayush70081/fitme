@@ -326,27 +326,4 @@ export const mealPlanUtils = {
   }
 };
 
-// Save plan to backend
-export async function savePlan(plan, token) {
-  const res = await fetch('/api/mealplan/save', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(plan)
-  });
-  return res.json();
-}
-
-// Load saved plan from backend
-export async function getSavedPlan(token) {
-  const res = await fetch('/api/mealplan/saved', {
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  });
-  return res.json();
-}
-
 export default mealPlanAPI;

@@ -84,26 +84,7 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
     }));
   };
 
-  // Get user's profile completeness
-  const getProfileCompleteness = () => {
-    if (!user) return 0;
-    
-    const requiredFields = [
-      'fitnessGoals', 'activityLevel', 'fitnessExperience', 
-      'preferredWorkouts', 'workoutFrequency', 'workoutDuration',
-      'height', 'weight'
-    ];
-    
-    const completedFields = requiredFields.filter(field => {
-      const value = user[field];
-      return value && value !== '' && (!Array.isArray(value) || value.length > 0);
-    });
-    
-    return Math.round((completedFields.length / requiredFields.length) * 100);
-  };
-
-  const profileCompleteness = getProfileCompleteness();
-  const isProfileComplete = profileCompleteness >= 70;
+  
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
@@ -116,26 +97,7 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
       </div>
 
 
-      {/* Profile Completeness */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">Profile Completeness</span>
-          <span className="text-sm font-bold text-gray-900">{profileCompleteness}%</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className={`h-2 rounded-full transition-all duration-300 ${
-              profileCompleteness >= 70 ? 'bg-green-500' : 'bg-yellow-500'
-            }`}
-            style={{ width: `${profileCompleteness}%` }}
-          ></div>
-        </div>
-        {!isProfileComplete && (
-          <p className="text-sm text-gray-600 mt-2">
-            Complete your profile for better AI recommendations. Visit your Profile page to add missing information.
-          </p>
-        )}
-      </div>
+      {/* Profile completeness progress UI intentionally removed */}
 
       {/* User Profile Summary */}
       {user && (

@@ -17,15 +17,8 @@ const register = async (req, res) => {
   try {
     const { email, password, firstName, lastName, username } = req.body;
 
-    // Debug logging
-    console.log('Registration request received:', {
-      email,
-      firstName,
-      lastName,
-      username,
-      passwordLength: password ? password.length : 0,
-      body: req.body
-    });
+    // Minimal logging; avoid printing PII or raw bodies
+    console.log('Registration request received for:', email);
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });

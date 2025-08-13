@@ -28,12 +28,12 @@ if (!GEMINI_API_KEY) {
 const genAI = apiKeyValid ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
 
 // Get the model instance
-const getModel = () => {
+const getModel = (modelName = "gemini-1.5-flash") => {
   if (!genAI) {
     throw new Error('Gemini API not initialized. Please check your API key.');
   }
   return genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
+    model: modelName,
     generationConfig: {
       temperature: 0.7,
       topP: 0.9,
@@ -42,34 +42,71 @@ const getModel = () => {
   });
 };
 
-// Generate workout plan using Gemini API
+// Transient error detection for retries (503 overload, rate limits, network)
+const shouldRetry = (error) => {
+  const msg = (error && (error.message || error.toString())) || '';
+  return (
+    /503|overloaded|quota|rate\s*limit|temporarily unavailable/i.test(msg) ||
+    (typeof error.code === 'number' && error.code === 503)
+  );
+};
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Generate workout plan using Gemini API with retry and model fallback
 export const generateWorkoutPlanWithGemini = async (userProfile) => {
   try {
-    const model = getModel();
-    
-    // Create a comprehensive prompt with user data
     const prompt = createWorkoutPrompt(userProfile);
-    
-    console.log('Generating workout plan with Gemini API...');
-    console.log('User profile:', userProfile);
-    
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    
-    console.log('Raw Gemini response:', text);
-    
-    // Parse the JSON response
-    const workoutPlan = parseWorkoutResponse(text);
-    
-    console.log('Parsed workout plan:', workoutPlan);
-    
-    return {
-      workoutPlan,
-      isAIGenerated: true,
-      isDemoMode: false
-    };
-    
+    const MODEL_CANDIDATES = [
+      'gemini-2.0-flash',
+      'gemini-1.5-flash-8b',
+      'gemini-1.5-flash'
+    ];
+    let lastError = null;
+
+    for (const modelName of MODEL_CANDIDATES) {
+      try {
+        console.log(`Generating workout plan with model: ${modelName}`);
+        const model = getModel(modelName);
+
+        // Up to 3 attempts per model with backoff
+        const ATTEMPTS = 3;
+        for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
+          try {
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            const text = response.text();
+            console.log('Raw Gemini response:', text);
+
+            const workoutPlan = parseWorkoutResponse(text);
+            console.log('Parsed workout plan:', workoutPlan);
+
+            return {
+              workoutPlan,
+              isAIGenerated: true,
+              isDemoMode: false
+            };
+          } catch (err) {
+            lastError = err;
+            if (shouldRetry(err) && attempt < ATTEMPTS) {
+              const delay = 500 * Math.pow(2, attempt - 1) + Math.floor(Math.random() * 250);
+              console.warn(`Transient error on attempt ${attempt}/${ATTEMPTS} for ${modelName}. Retrying in ${delay}ms...`, err?.message || err);
+              await sleep(delay);
+              continue;
+            }
+            // Non-retryable or out of attempts: break to try next model
+            break;
+          }
+        }
+      } catch (e) {
+        lastError = e;
+        // Try next model
+        continue;
+      }
+    }
+
+    // If all models/attempts failed, fall back to demo
+    throw lastError || new Error('All model attempts failed');
   } catch (error) {
     console.error('Error generating workout plan with Gemini:', error);
     
@@ -78,7 +115,7 @@ export const generateWorkoutPlanWithGemini = async (userProfile) => {
       workoutPlan: getDemoWorkoutPlan(userProfile),
       isAIGenerated: false,
       isDemoMode: true,
-      message: 'Gemini API unavailable - showing demo workout plan'
+      message: 'Gemini overloaded or unavailable - showing demo workout plan'
     };
   }
 };

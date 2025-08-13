@@ -143,26 +143,7 @@ class MealPlanPersistence {
         plan = this.getCurrentPlan() || this.getAutoSavedPlan();
       }
       // If not found locally, fetch from backend
-      if (!plan) {
-        const token = localStorage.getItem('fitme_token');
-        if (token) {
-          const res = await fetch('/api/mealplan/saved', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          const data = await res.json();
-          if (data.success && data.data) {
-            plan = {
-              id: data.data.id || 'backend',
-              name: 'Loaded from backend',
-              meals: data.data.meals,
-              savedAt: data.data.created_at || new Date().toISOString(),
-              isRestored: true
-            };
-            // Update localStorage for future loads
-            localStorage.setItem(this.getKey(STORAGE_KEYS.CURRENT_PLAN), JSON.stringify(plan.meals));
-          }
-        }
-      }
+      // No backend fetch here: FastAPI saves on generation; listing is handled via dedicated UI flows
       if (plan) {
         // Determine meals shape (plan may already be just meals)
         const mealsOnly = plan?.meals ? plan.meals : plan;
@@ -394,10 +375,7 @@ class MealPlanPersistence {
     try {
       this.syncInProgress = true;
       const token = localStorage.getItem('fitme_token');
-      
-      if (!token) {
-        throw new Error('No authentication token');
-      }
+      if (!token) throw new Error('No authentication token');
 
       // Convert to backend format
       const backendPlan = {
@@ -408,24 +386,8 @@ class MealPlanPersistence {
         preferences: {}
       };
 
-      // Try to save to backend
-      const baseUrlRaw = import.meta.env.VITE_FASTAPI_URL || 'http://localhost:8000';
-      const baseUrl = (baseUrlRaw || '').replace(/\/$/, '');
-      const apiUrl = baseUrl.includes('/api') ? `${baseUrl}/mealplan/save` : `${baseUrl}/api/mealplan/save`;
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(backendPlan)
-      });
-
-      if (response.ok) {
-        // Mark as synced
-        plan.synced = true;
-        this.updateSyncStatus(plan.id, true);
-      }
+      // No explicit save endpoint in FastAPI; saving occurs during generation
+      // Mark as unsynced; UI remains fully functional with local saves
 
     } catch (error) {
       console.warn('Backend sync failed:', error);

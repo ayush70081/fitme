@@ -1,6 +1,6 @@
-# Fitness Tracker Backend API
+# Fitness Tracker Backend (Express)
 
-A robust Node.js/Express backend API for fitness tracking with authentication and user management.
+Node.js/Express API for authentication, users, and workouts.
 
 ## Tech Stack
 
@@ -33,21 +33,17 @@ cp env.example .env
 # Then edit .env with your actual values
 ```
 
-4. **Test the setup (optional):**
+4. **Run development server:**
 ```bash
-node test-server.js
+npm run dev
 ```
 
-5. **Start the server:**
+5. **Production:**
 ```bash
-# Development mode with auto-restart
-npm run dev
-
-# Or production mode
 npm start
 ```
 
-The server will be available at `http://localhost:5000`
+Server default: `http://localhost:5000`
 
 ## API Endpoints
 
@@ -102,7 +98,6 @@ curl -X GET http://localhost:5000/api/auth/me \
 
 - User registration and authentication
 - Profile management with fitness data
-- BMI, BMR, TDEE calculations
 - Secure password hashing
 - JWT token authentication
 - Input validation and sanitization
@@ -146,7 +141,7 @@ curl -X GET http://localhost:5000/api/auth/me \
    CLIENT_URL=http://localhost:3000
    ```
 
-4. **MongoDB Atlas Setup:**
+4. **MongoDB Setup:**
    - Create a MongoDB Atlas account at [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas)
    - Create a new cluster
    - Create a database user

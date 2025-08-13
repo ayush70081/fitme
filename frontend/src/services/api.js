@@ -30,7 +30,7 @@ const setToken = (token) => {
     // Update Authorization header for future requests on both instances
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     fastapi.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    console.log('Token set on both API instances:', token.substring(0, 20) + '...');
+    // Avoid logging tokens to console
   }
 };
 const removeToken = () => {
