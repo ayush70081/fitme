@@ -19,10 +19,46 @@ import userStorage from '../utils/userScopedStorage';
 
 const Progress = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('week');
-  const [selectedMetric, setSelectedMetric] = useState('workouts');
+  const [selectedMetric, setSelectedMetric] = useState('calories');
+  const [selectedIntakeMetric, setSelectedIntakeMetric] = useState('calories'); // calories | protein | carbs | fat
   const { user } = useAuth();
   const [workoutStats, setWorkoutStats] = useState(null);
   const [weeklyData, setWeeklyData] = useState({ weight: [], calories: [], workouts: [] });
+  const [periodData, setPeriodData] = useState({ weight: [], calories: [], workouts: [], eatenCalories: [], eatenProtein: [], eatenCarbs: [], eatenFat: [] });
+
+  const exportSvgAsPng = (svgElement, fileName) => {
+    try {
+      const serializer = new XMLSerializer();
+      let source = serializer.serializeToString(svgElement);
+      if (!source.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
+        source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+      }
+      if (!source.match(/^<svg[^>]+xmlns:xlink="http:\/\/www\.w3\.org\/1999\/xlink"/)) {
+        source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+      }
+      const svgData = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(source);
+      const image = new Image();
+      const width = parseInt(svgElement.getAttribute('width') || (svgElement.viewBox && svgElement.viewBox.baseVal.width) || 1200, 10);
+      const height = parseInt(svgElement.getAttribute('height') || (svgElement.viewBox && svgElement.viewBox.baseVal.height) || 600, 10);
+      image.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext('2d');
+        context.fillStyle = '#ffffff';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0);
+        const png = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = png;
+        link.click();
+      };
+      image.src = svgData;
+    } catch (err) {
+      console.error('Export failed', err);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -38,18 +74,118 @@ const Progress = () => {
     return () => { isMounted = false; };
   }, []);
 
-  // Build dynamic weekly data from user history (workouts) and user-scoped nutrition (eaten)
-  const rebuildWeeklyData = useCallback(() => {
+  // Build dynamic data for different time periods
+  const buildPeriodData = useCallback((period) => {
     const history = Array.isArray(user?.workoutHistory) ? user.workoutHistory : [];
-    const days = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (6 - i));
-      d.setHours(0, 0, 0, 0);
-      return d;
-    });
+    let days = [];
+    let formatLabel;
+    let ymdKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-    const formatDay = (d) => d.toLocaleDateString(undefined, { weekday: 'short' });
-    const ymdKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    switch (period) {
+      case 'week':
+        days = Array.from({ length: 7 }, (_, i) => {
+          const today = new Date();
+          const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+          const mondayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Days since Monday
+          const d = new Date(today);
+          d.setDate(today.getDate() - mondayOffset + i);
+          d.setHours(0, 0, 0, 0);
+          return d;
+        });
+        formatLabel = (d) => d.toLocaleDateString(undefined, { weekday: 'short' });
+        break;
+      
+      case 'month':
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+        
+        // Get first day of month and find the Monday of that week
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+        
+        // Find the Monday of the week containing the first day of the month
+        const firstMonday = new Date(firstDayOfMonth);
+        const dayOfWeek = firstDayOfMonth.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        const mondayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Days since Monday
+        firstMonday.setDate(firstDayOfMonth.getDate() - mondayOffset);
+        
+        // Generate weeks that contain days of this month
+        days = [];
+        let currentWeekStart = new Date(firstMonday);
+        let weekNumber = 1;
+        
+        while (currentWeekStart <= lastDayOfMonth) {
+          const weekEnd = new Date(currentWeekStart);
+          weekEnd.setDate(currentWeekStart.getDate() + 6);
+          
+          // Check if this week contains any days from the current month
+          if (weekEnd >= firstDayOfMonth && currentWeekStart <= lastDayOfMonth) {
+            days.push(new Date(currentWeekStart));
+            weekNumber++;
+          }
+          
+          currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+        }
+        
+        formatLabel = (d, index) => {
+          if (period === 'month') {
+            const weekStart = new Date(d);
+            const weekEnd = new Date(d);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            
+            // Adjust start and end dates to only show days within the current month
+            const firstDayOfMonth = new Date(year, month, 1);
+            const lastDayOfMonth = new Date(year, month + 1, 0);
+            
+            const actualStart = weekStart < firstDayOfMonth ? firstDayOfMonth : weekStart;
+            const actualEnd = weekEnd > lastDayOfMonth ? lastDayOfMonth : weekEnd;
+            
+            const startDay = actualStart.getDate();
+            const endDay = actualEnd.getDate();
+            const monthName = actualStart.toLocaleDateString(undefined, { month: 'short' });
+            
+            // Handle case where week spans across months
+            if (actualStart.getMonth() !== actualEnd.getMonth()) {
+              const endMonthName = actualEnd.toLocaleDateString(undefined, { month: 'short' });
+              return `${monthName} ${startDay} - ${endMonthName} ${endDay}`;
+            }
+            
+            return `${monthName} ${startDay}-${endDay}`;
+          }
+          return d.toLocaleDateString(undefined, { weekday: 'short' });
+        };
+        ymdKey = (d) => {
+          const weekStart = new Date(d);
+          const weekEnd = new Date(d);
+          weekEnd.setDate(weekStart.getDate() + 6);
+          return `${year}-${String(month + 1).padStart(2, '0')}-W${weekStart.getTime()}`;
+        };
+        break;
+      
+      case 'quarter':
+        days = Array.from({ length: 4 }, (_, i) => {
+          const d = new Date(new Date().getFullYear(), i * 3, 1); // First month of each quarter
+          d.setHours(0, 0, 0, 0);
+          return d;
+        });
+        formatLabel = (d) => `Q${Math.floor(d.getMonth() / 3) + 1}`;
+        ymdKey = (d) => `${d.getFullYear()}-Q${Math.floor(d.getMonth() / 3) + 1}`;
+        break;
+      
+      case 'year':
+        days = Array.from({ length: 12 }, (_, i) => {
+          const d = new Date(new Date().getFullYear(), i, 1);
+          d.setHours(0, 0, 0, 0);
+          return d;
+        });
+        formatLabel = (d) => d.toLocaleDateString(undefined, { month: 'short' });
+        ymdKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        break;
+      
+      default:
+        return { weight: [], calories: [], workouts: [], eatenCalories: [], eatenProtein: [], eatenCarbs: [], eatenFat: [] };
+    }
 
     // Workouts map (burned)
     const workoutMap = days.reduce((acc, d) => {
@@ -61,14 +197,79 @@ const Progress = () => {
       if (!w.completedAt) return;
       const d = new Date(w.completedAt);
       d.setHours(0, 0, 0, 0);
-      const key = ymdKey(d);
+      let key;
+      
+      if (period === 'quarter') {
+        key = `${d.getFullYear()}-Q${Math.floor(d.getMonth() / 3) + 1}`;
+      } else if (period === 'year') {
+        key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      } else {
+        key = ymdKey(d);
+      }
+      
       if (workoutMap[key]) {
         workoutMap[key].workouts += 1;
         workoutMap[key].burned += parseInt(w.caloriesBurned || 0, 10);
       }
     });
 
-    // Nutrition map (eaten) from user-scoped cumulativeNutrition
+    const weightArray = days.map((d, index) => ({
+      day: formatLabel(d, index),
+      value: user?.weight ?? 0,
+      target: user?.goalWeight ?? null,
+    }));
+
+    // Use BURNED calories for the chart (from workout history)
+    const caloriesArray = days.map((d, i) => {
+      let key;
+      if (period === 'quarter') {
+        key = `${d.getFullYear()}-Q${Math.floor(d.getMonth() / 3) + 1}`;
+      } else if (period === 'year') {
+        key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      } else if (period === 'month') {
+        // For month view, aggregate weekly data
+        const weekStart = new Date(d);
+        const weekEnd = new Date(d);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        
+        const relevantWorkouts = history.filter(w => {
+          if (!w.completedAt) return false;
+          const workoutDate = new Date(w.completedAt);
+          return workoutDate >= weekStart && workoutDate <= weekEnd;
+        });
+        
+        const totalBurned = relevantWorkouts.reduce((sum, w) => sum + parseInt(w.caloriesBurned || 0, 10), 0);
+        return { day: formatLabel(d, i), value: totalBurned };
+      } else {
+        key = ymdKey(d);
+      }
+      
+      if (period !== 'month') {
+        return { day: formatLabel(d, i), value: workoutMap[key]?.burned || 0 };
+      }
+    }).filter(Boolean); // Remove undefined values
+
+    const workoutsArray = days.map((d, i) => {
+      if (period === 'month') {
+        // For month view, aggregate weekly data
+        const weekStart = new Date(d);
+        const weekEnd = new Date(d);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        
+        const relevantWorkouts = history.filter(w => {
+          if (!w.completedAt) return false;
+          const workoutDate = new Date(w.completedAt);
+          return workoutDate >= weekStart && workoutDate <= weekEnd;
+        });
+        
+        return { day: formatLabel(d, i), value: relevantWorkouts.length };
+      } else {
+        const key = ymdKey(d);
+        return { day: formatLabel(d, i), value: workoutMap[key]?.workouts || 0 };
+      }
+    });
+
+    // Nutrition (from storage)
     let nutrition = {};
     try {
       nutrition = JSON.parse(userStorage.getItem('cumulativeNutrition') || '{}');
@@ -76,43 +277,134 @@ const Progress = () => {
       nutrition = {};
     }
 
-    const weightArray = days.map((d) => ({
-      day: formatDay(d),
-      value: user?.weight ?? 0,
-      target: user?.goalWeight ?? null,
-    }));
+    const aggregateNutrition = (date, keyBuilder) => {
+      // Returns totals for calories, protein, carbs, fat for given period bucket
+      if (period === 'quarter') {
+        const relevantDays = Object.keys(nutrition).filter(nk => {
+          const nd = new Date(nk);
+          const q = Math.floor(nd.getMonth() / 3) + 1;
+          return nd.getFullYear() === date.getFullYear() && q === (Math.floor(date.getMonth() / 3) + 1);
+        });
+        return relevantDays.reduce((acc, k) => {
+          const v = nutrition[k] || {};
+          acc.calories += v.calories || 0;
+          acc.protein += v.protein || 0;
+          acc.carbs += v.carbs || 0;
+          acc.fat += v.fat || 0;
+          return acc;
+        }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+      }
 
-    // Use eaten calories for the chart (aligns with nutrition progress)
-    const caloriesArray = days.map((d) => {
-      const key = ymdKey(d);
-      const eaten = nutrition[key]?.calories || 0;
-      return { day: formatDay(d), value: eaten };
+      if (period === 'year') {
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const relevantDays = Object.keys(nutrition).filter(nk => nk.startsWith(key));
+        const totals = relevantDays.reduce((acc, k) => {
+          const v = nutrition[k] || {};
+          acc.calories += v.calories || 0;
+          acc.protein += v.protein || 0;
+          acc.carbs += v.carbs || 0;
+          acc.fat += v.fat || 0;
+          return acc;
+        }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+        const denom = Math.max(1, relevantDays.length);
+        return {
+          calories: Math.round(totals.calories / denom),
+          protein: Math.round(totals.protein / denom),
+          carbs: Math.round(totals.carbs / denom),
+          fat: Math.round(totals.fat / denom),
+        };
+      }
+
+      if (period === 'month') {
+        const weekStart = new Date(date);
+        const weekEnd = new Date(date);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        const relevantDays = Object.keys(nutrition).filter(nk => {
+          const nd = new Date(nk);
+          return nd >= weekStart && nd <= weekEnd;
+        });
+        return relevantDays.reduce((acc, k) => {
+          const v = nutrition[k] || {};
+          acc.calories += v.calories || 0;
+          acc.protein += v.protein || 0;
+          acc.carbs += v.carbs || 0;
+          acc.fat += v.fat || 0;
+          return acc;
+        }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+      }
+
+      // week/day
+      const key = ymdKey(date);
+      const v = nutrition[key] || {};
+      return {
+        calories: v.calories || 0,
+        protein: v.protein || 0,
+        carbs: v.carbs || 0,
+        fat: v.fat || 0,
+      };
+    };
+
+    const eatenCaloriesArray = days.map((d, i) => {
+      const totals = aggregateNutrition(d);
+      return { day: formatLabel(d, i), value: totals.calories };
+    });
+    const eatenProteinArray = days.map((d, i) => {
+      const totals = aggregateNutrition(d);
+      return { day: formatLabel(d, i), value: totals.protein };
+    });
+    const eatenCarbsArray = days.map((d, i) => {
+      const totals = aggregateNutrition(d);
+      return { day: formatLabel(d, i), value: totals.carbs };
+    });
+    const eatenFatArray = days.map((d, i) => {
+      const totals = aggregateNutrition(d);
+      return { day: formatLabel(d, i), value: totals.fat };
     });
 
-    const workoutsArray = days.map((d) => {
-      const key = ymdKey(d);
-      return { day: formatDay(d), value: workoutMap[key]?.workouts || 0 };
-    });
-
-    setWeeklyData({ weight: weightArray, calories: caloriesArray, workouts: workoutsArray });
+    return { 
+      weight: weightArray, 
+      calories: caloriesArray, 
+      workouts: workoutsArray, 
+      eatenCalories: eatenCaloriesArray,
+      eatenProtein: eatenProteinArray,
+      eatenCarbs: eatenCarbsArray,
+      eatenFat: eatenFatArray,
+    };
   }, [user]);
+
+  // Build dynamic weekly data from user history (workouts and burned calories)
+  const rebuildWeeklyData = useCallback(() => {
+    const weekData = buildPeriodData('week');
+    setWeeklyData(weekData);
+  }, [buildPeriodData]);
+
+  // Build data for selected period
+  const rebuildPeriodData = useCallback(() => {
+    const data = buildPeriodData(selectedPeriod);
+    setPeriodData(data);
+  }, [buildPeriodData, selectedPeriod]);
 
   useEffect(() => {
     rebuildWeeklyData();
   }, [rebuildWeeklyData]);
 
-  // Refresh when nutrition data updates (add to routine, etc.)
   useEffect(() => {
-    const handler = () => rebuildWeeklyData();
-    window.addEventListener('nutritionDataUpdated', handler);
+    rebuildPeriodData();
+  }, [rebuildPeriodData]);
+
+  // Refresh when workout-related events fire
+  useEffect(() => {
+    const handler = () => {
+      rebuildWeeklyData();
+      rebuildPeriodData();
+    };
     window.addEventListener('dailyTasksUpdated', handler);
     window.addEventListener('workoutStatsUpdated', handler);
     return () => {
-      window.removeEventListener('nutritionDataUpdated', handler);
       window.removeEventListener('dailyTasksUpdated', handler);
       window.removeEventListener('workoutStatsUpdated', handler);
     };
-  }, [rebuildWeeklyData]);
+  }, [rebuildWeeklyData, rebuildPeriodData]);
 
   // weeklyData is built dynamically above from user history
 
@@ -132,102 +424,55 @@ const Progress = () => {
 
   const getMonthlyWorkoutCount = () => {
     const now = new Date();
-    const m = now.getMonth();
-    const y = now.getFullYear();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    
     return workoutHistory.filter(w => {
-      const d = new Date(w.completedAt);
-      return d.getMonth() === m && d.getFullYear() === y;
+      if (!w.completedAt) return false;
+      const completedAt = new Date(w.completedAt);
+      return completedAt >= startOfMonth && completedAt <= endOfMonth;
     }).length;
   };
 
   const monthlyWorkouts = getMonthlyWorkoutCount();
-
-  const midByFreq = {
-    '2-3': 2.5,
-    '3-4': 3.5,
-    '4-5': 4.5,
-    '5-6': 5.5,
-    'daily': 7
-  };
-  // Approx weeks in a month
-  const weeks = 4;
-  const workoutsPerWeek = midByFreq[user?.workoutFrequency || '3-4'] || 3.5;
-  const monthlyWorkoutTarget = Math.round(workoutsPerWeek * weeks);
-  const monthlyWorkoutProgress = monthlyWorkoutTarget > 0 ? Math.min(100, Math.round((monthlyWorkouts / monthlyWorkoutTarget) * 100)) : 0;
-
-  const bodyMeasurements = [
-    { part: 'Chest', current: 42, previous: 43, unit: 'in' },
-    { part: 'Waist', current: 34, previous: 36, unit: 'in' },
-    { part: 'Arms', current: 15, previous: 14.5, unit: 'in' },
-    { part: 'Thighs', current: 24, previous: 25, unit: 'in' }
-  ];
-
-  const performanceMetrics = [
-    { 
-      name: 'Strength Progress', 
-      current: 85, 
-      target: 100, 
-      unit: '%',
-      trend: 'up',
-      change: '+12%'
-    },
-    { 
-      name: 'Cardio Endurance', 
-      current: 78, 
-      target: 90, 
-      unit: '%',
-      trend: 'up',
-      change: '+8%'
-    },
-    { 
-      name: 'Flexibility', 
-      current: 65, 
-      target: 80, 
-      unit: '%',
-      trend: 'up',
-      change: '+5%'
-    },
-    { 
-      name: 'Overall Fitness', 
-      current: 76, 
-      target: 90, 
-      unit: '%',
-      trend: 'up',
-      change: '+10%'
-    }
-  ];
-
-  // Removed Achievements, Personal Bests, and Workout Consistency sections
+  const monthlyWorkoutTarget = user?.workoutFrequency ? parseInt(user.workoutFrequency) * 4 : 12; // Assume 4 weeks per month
+  const monthlyWorkoutProgress = monthlyWorkoutTarget > 0 ? Math.round((monthlyWorkouts / monthlyWorkoutTarget) * 100) : 0;
 
   // Animation variants
   const pageVariant = {
-    hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.7, when: 'beforeChildren', staggerChildren: 0.12 } }
-  };
-  const sectionVariant = {
-    hidden: { opacity: 0, y: 30 },
-    visible: (i = 0) => ({
-      opacity: 1,
-      y: 0,
-      transition: { delay: i * 0.15, duration: 0.7, type: 'spring', stiffness: 60 }
-    })
-  };
-  const cardContainerVariant = {
-    hidden: {},
-    visible: {
-      transition: { staggerChildren: 0.12 }
-    }
-  };
-  const cardVariant = {
-    hidden: { opacity: 0, y: 20, scale: 0.95 },
-    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, type: 'spring', stiffness: 80 } }
-  };
-  const hoverCard = {
-    hover: { y: -6, scale: 1.03, boxShadow: '0 8px 32px 0 rgba(236,72,153,0.12)' }
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.5 } }
   };
 
-  // Animated Progress Bar
-  const AnimatedProgressBar = ({ value, max, color }) => (
+  const sectionVariant = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (custom) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: custom * 0.1, duration: 0.5 }
+    })
+  };
+
+  const cardContainerVariant = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariant = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  };
+
+  const hoverCard = {
+    hover: { y: -5, transition: { duration: 0.2 } }
+  };
+
+  const ProgressBar = ({ value, max, color }) => (
     <motion.div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
       <motion.div
         className={color + " h-2 rounded-full"}
@@ -237,6 +482,22 @@ const Progress = () => {
       />
     </motion.div>
   );
+
+  const intakeColor = (metric) => {
+    switch (metric) {
+      case 'protein': return '#ef4444';
+      case 'carbs': return '#f59e0b';
+      case 'fat': return '#a855f7';
+      default: return '#10b981'; // calories
+    }
+  };
+
+  const intakeYAxisLabel = selectedIntakeMetric === 'calories' ? 'Calories (kcal)' : `${selectedIntakeMetric.charAt(0).toUpperCase() + selectedIntakeMetric.slice(1)} (g)`;
+  const intakeDataKey = selectedIntakeMetric === 'calories' ? 'eatenCalories' : selectedIntakeMetric === 'protein' ? 'eatenProtein' : selectedIntakeMetric === 'carbs' ? 'eatenCarbs' : 'eatenFat';
+  const intakeTitle = selectedIntakeMetric === 'calories' ? 'Eaten Calories Progress' : `Eaten ${selectedIntakeMetric.charAt(0).toUpperCase() + selectedIntakeMetric.slice(1)} Progress`;
+  const intakeSubtitle = selectedPeriod === 'month'
+    ? (selectedIntakeMetric === 'calories' ? 'Track your weekly calorie intake' : `Track your weekly ${selectedIntakeMetric} intake`)
+    : (selectedIntakeMetric === 'calories' ? 'Track your daily calorie intake over time' : `Track your daily ${selectedIntakeMetric} intake over time`);
 
   return (
     <motion.div
@@ -270,9 +531,6 @@ const Progress = () => {
                 <option value="quarter">This Quarter</option>
                 <option value="year">This Year</option>
               </select>
-              <button className="flex items-center gap-2 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors">
-                Export
-              </button>
             </div>
           </div>
         </motion.div>
@@ -289,10 +547,10 @@ const Progress = () => {
               icon: <Target className="w-6 h-6 text-blue-600" />,
               bg: 'bg-blue-100',
               cardBg: 'bg-blue-50',
-              value: `${monthlyProgress.currentWeight} lbs`,
+              value: `${monthlyProgress.currentWeight} kg`,
               label: 'Current Weight',
               note: (monthlyProgress.targetWeight && monthlyProgress.currentWeight)
-                ? `${Math.sign(monthlyProgress.targetWeight - monthlyProgress.currentWeight) >= 0 ? '' : '+'}${(monthlyProgress.currentWeight - monthlyProgress.targetWeight).toFixed(1)} lbs from goal`
+                ? `${Math.sign(monthlyProgress.targetWeight - monthlyProgress.currentWeight) >= 0 ? '' : '+'}${(monthlyProgress.currentWeight - monthlyProgress.targetWeight).toFixed(1)} kg from goal`
                 : '—'
             },
             {
@@ -358,13 +616,13 @@ const Progress = () => {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">
                   {selectedMetric === 'weight' && 'Weight Progress'}
-                  {selectedMetric === 'calories' && 'Calories (Eaten) Progress'}
+                  {selectedMetric === 'calories' && 'Calories Burned Progress'}
                   {selectedMetric === 'workouts' && 'Workouts Progress'}
                 </h3>
                 <p className="text-sm text-gray-600">
                   {selectedMetric === 'weight' && 'Your weight journey over time'}
-                  {selectedMetric === 'calories' && 'Calories eaten per day'}
-                  {selectedMetric === 'workouts' && 'Workouts completed per day'}
+                  {selectedMetric === 'calories' && selectedPeriod === 'month' ? 'Calories burned per week' : 'Calories burned per day'}
+                  {selectedMetric === 'workouts' && selectedPeriod === 'month' ? 'Workouts completed per week' : 'Workouts completed per day'}
                 </p>
               </div>
               <select
@@ -373,35 +631,57 @@ const Progress = () => {
                 className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 focus:border-transparent"
               >
                 <option value="weight">Weight</option>
-                <option value="calories">Calories</option>
+                <option value="calories">Calories Burned</option>
                 <option value="workouts">Workouts</option>
               </select>
             </div>
             <ResponsiveContainer width="100%" height={260}>
-              <LineChart data={weeklyData[selectedMetric]} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
+              <LineChart data={periodData[selectedMetric]} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="day"
                   stroke="#8884d8"
                   tickMargin={12}
-                  label={{ value: 'Day', position: 'insideBottom', offset: -20, fill: '#64748b' }}
+                  label={{ 
+                    value: selectedPeriod === 'quarter' ? 'Quarter' : selectedPeriod === 'year' ? 'Month' : selectedPeriod === 'month' ? 'Week' : 'Day', 
+                    position: 'insideBottom', 
+                    offset: -20, 
+                    fill: '#64748b' 
+                  }}
                 />
                 <YAxis
                   stroke="#8884d8"
                   allowDecimals={selectedMetric !== 'workouts'}
                   width={selectedMetric === 'workouts' ? 80 : 70}
                   label={{
-                    value: selectedMetric === 'weight' ? 'Weight (lbs)' : selectedMetric === 'calories' ? 'Calories (kcal)' : 'Workouts (count)',
+                    value: selectedMetric === 'weight' ? 'Weight (kg)' : selectedMetric === 'calories' ? 'Calories (kcal)' : 'Workouts (count)',
                     angle: -90,
                     position: 'outsideLeft',
                     offset: 8,
                     fill: '#64748b'
                   }}
                 />
-                <Tooltip formatter={(value) => {
-                  if (selectedMetric === 'calories') return [`${value} kcal`, 'Value'];
+                <Tooltip 
+                  labelFormatter={(label) => {
+                    if (selectedPeriod === 'quarter') {
+                      const map = { Q1: 'Jan-Mar', Q2: 'Apr-Jun', Q3: 'Jul-Sep', Q4: 'Oct-Dec' };
+                      const range = map[label] || null;
+                      return range ? `${label} (${range})` : label;
+                    }
+                    if (selectedPeriod === 'month' && label.includes('-')) {
+                      // Show full week range in tooltip
+                      return `Week: ${label}`;
+                    }
+                    return label;
+                  }}
+                  formatter={(value, name) => {
+                  if (selectedMetric === 'calories') return [`${value} kcal`, 'Calories Burned'];
                   if (selectedMetric === 'workouts') return [value, 'Workouts'];
-                  return [`${value} lbs`, 'Weight'];
+                  if (selectedMetric === 'weight') {
+                    if (name === 'target') return [`${value} kg`, 'Goal Weight'];
+                    return [`${value} kg`, 'Current Weight'];
+                  }
+                  return [`${value} kg`, 'Weight'];
                 }} />
                 <Line type="monotone" dataKey="value" name={selectedMetric}
                   stroke={selectedMetric === 'calories' ? '#f97316' : selectedMetric === 'workouts' ? '#22c55e' : '#ec4899'}
@@ -415,13 +695,92 @@ const Progress = () => {
                 )}
               </LineChart>
             </ResponsiveContainer>
-            {/* Removed static stats row and progress bar */}
           </motion.div>
 
-          {/* Performance Metrics section removed as requested */}
+          {/* Eaten Intake Chart (Calories / Protein / Carbs / Fat) */}
+          <motion.div
+            variants={sectionVariant}
+            initial="hidden"
+            animate="visible"
+            custom={3}
+            className="bg-white rounded-2xl shadow-sm p-6"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">{intakeTitle}</h3>
+                <p className="text-sm text-gray-600">{intakeSubtitle}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <select
+                  value={selectedIntakeMetric}
+                  onChange={(e) => setSelectedIntakeMetric(e.target.value)}
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                >
+                  <option value="calories">Calories</option>
+                  <option value="protein">Protein</option>
+                  <option value="carbs">Carbs</option>
+                  <option value="fat">Fat</option>
+                </select>
+              </div>
+            </div>
+            <ResponsiveContainer width="100%" height={260}>
+              <LineChart data={periodData[intakeDataKey]} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="day"
+                  stroke="#8884d8"
+                  tickMargin={12}
+                  label={{ 
+                    value: selectedPeriod === 'quarter' ? 'Quarter' : selectedPeriod === 'year' ? 'Month' : selectedPeriod === 'month' ? 'Week' : 'Day', 
+                    position: 'insideBottom', 
+                    offset: -20, 
+                    fill: '#64748b' 
+                  }}
+                />
+                <YAxis
+                  stroke="#8884d8"
+                  allowDecimals={true}
+                  width={80}
+                  label={{
+                    value: intakeYAxisLabel,
+                    angle: -90,
+                    position: 'outsideLeft',
+                    offset: 8,
+                    fill: '#64748b'
+                  }}
+                />
+                <Tooltip 
+                  labelFormatter={(label) => {
+                    if (selectedPeriod === 'quarter') {
+                      const map = { Q1: 'Jan-Mar', Q2: 'Apr-Jun', Q3: 'Jul-Sep', Q4: 'Oct-Dec' };
+                      const range = map[label] || null;
+                      return range ? `${label} (${range})` : label;
+                    }
+                    if (selectedPeriod === 'month' && label.includes('-')) {
+                      // Show full week range in tooltip
+                      return `Week: ${label}`;
+                    }
+                    return label;
+                  }}
+                  formatter={(value) => [
+                    selectedIntakeMetric === 'calories' ? `${value} kcal` : `${value} g`,
+                    selectedIntakeMetric.charAt(0).toUpperCase() + selectedIntakeMetric.slice(1)
+                  ]}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  name={selectedIntakeMetric}
+                  stroke={intakeColor(selectedIntakeMetric)}
+                  strokeWidth={3}
+                  dot={{ r: 5, fill: intakeColor(selectedIntakeMetric), stroke: '#fff', strokeWidth: 2 }}
+                  activeDot={{ r: 7 }}
+                  animationDuration={1200}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </motion.div>
         </motion.div>
-
-        {/* Weekly Activity and Body Measurements sections removed as requested */}
 
         {/* Goals Progress */}
         <motion.div
@@ -448,11 +807,11 @@ const Progress = () => {
                 </div>
                 <span className="text-xs text-gray-500 capitalize">{fitnessGoal || 'general-fitness'}</span>
               </div>
-              <div className="text-sm text-gray-700 mb-2">{monthlyProgress.currentWeight} lbs {monthlyProgress.targetWeight ? `→ ${monthlyProgress.targetWeight} lbs` : ''}</div>
+              <div className="text-sm text-gray-700 mb-2">{monthlyProgress.currentWeight} kg {monthlyProgress.targetWeight ? `→ ${monthlyProgress.targetWeight} kg` : ''}</div>
               <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                 <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${Math.min(100, Math.max(0, monthlyProgress.targetWeight && monthlyProgress.startWeight ? Math.round(((monthlyProgress.startWeight - monthlyProgress.currentWeight) / (monthlyProgress.startWeight - monthlyProgress.targetWeight)) * 100) : 0))}%` }} />
               </div>
-              <div className="mt-1 text-xs text-gray-500">{monthlyProgress.targetWeight ? `${Math.abs(monthlyProgress.currentWeight - monthlyProgress.targetWeight).toFixed(1)} lbs from target` : 'Set a goal weight to track progress'}</div>
+              <div className="mt-1 text-xs text-gray-500">{monthlyProgress.targetWeight ? `${Math.abs(monthlyProgress.currentWeight - monthlyProgress.targetWeight).toFixed(1)} kg from target` : 'Set a goal weight to track progress'}</div>
             </div>
 
             {/* Monthly workouts tile */}
@@ -487,8 +846,6 @@ const Progress = () => {
             </div>
           </div>
         </motion.div>
-
-        {/* Sections removed: Achievements, Personal Bests, Workout Consistency */}
       </div>
     </motion.div>
   );

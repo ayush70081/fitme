@@ -59,7 +59,7 @@ export default function Sidebar({ isExpanded = false, isMobile = false, onClose 
               FitMe+
             </div>
           ) : (
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-gray-900 font-bold mx-auto">
+            <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-bold mx-auto">
               F
             </div>
           )}

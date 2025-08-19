@@ -1,7 +1,7 @@
 // src/pages/Dashboard.jsx
 import CalorieOverview from '../components/Dash_Components/CalorieOverview';
 import DailyRoutine from '../components/Dash_Components/DailyRoutine';
-import FitnessGrowthChart from '../components/Dash_Components/FitnessGrowthChart';
+import EatenCaloriesChart from '../components/Dash_Components/EatenCaloriesChart';
 import FoodOverview from '../components/Dash_Components/FoodOverview';
 import WorkoutOverviewCard from '../components/Dash_Components/WorkoutOverviewCard';
 import { useEffect, useState } from 'react';
@@ -77,7 +77,8 @@ const Dashboard = () => {
 
           <WeeklySummaryCard summary={weeklySummary} />
 
-          <FitnessGrowthChart />
+          {/* Replace FitnessGrowthChart with eaten calories chart */}
+          <EatenCaloriesChart />
         </div>
       </div>
     </div>
