@@ -29,7 +29,7 @@ const Logout = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <div className="text-center">
         <div className="mb-6">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto"></div>
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Logging out...</h1>
         <p className="text-gray-600">Please wait while we sign you out securely.</p>
