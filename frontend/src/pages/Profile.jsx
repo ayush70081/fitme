@@ -170,6 +170,37 @@ const Profile = () => {
   console.log('Initial profile data name:', initialProfileData.name);
 
   const [profileData, setProfileData] = useState(initialProfileData);
+  const [isSaveDisabled, setIsSaveDisabled] = useState(false);
+
+  // Required fields when editing the profile
+  const REQUIRED_FIELDS = ['name', 'dateOfBirth', 'gender', 'location', 'height', 'weight', 'fitnessGoal', 'activityLevel'];
+  const fieldLabelMap = {
+    name: 'Full name',
+    dateOfBirth: 'Date of birth',
+    gender: 'Gender',
+    location: 'Location',
+    height: 'Height',
+    weight: 'Current weight',
+    fitnessGoal: 'Primary fitness goal',
+    activityLevel: 'Activity level'
+  };
+
+  // Simple per-field validator used for inline errors
+  const validateField = (field, value) => {
+    if (REQUIRED_FIELDS.includes(field)) {
+      if (value == null || (typeof value === 'string' && value.trim() === '')) {
+        return `${fieldLabelMap[field]} is required`;
+      }
+    }
+    if (field === 'name' && typeof value === 'string' && value.trim() !== '') {
+      const nameRegex = /^[A-Za-z\s]+$/;
+      const trimmed = value.trim();
+      if (!nameRegex.test(trimmed) || trimmed.length < 2 || trimmed.length > 50) {
+        return 'First name must be 2-50 letters (A-Z only)';
+      }
+    }
+    return null;
+  };
 
   // Sync profile data with user data changes
   useEffect(() => {
@@ -319,21 +350,43 @@ const Profile = () => {
       ...prev,
       [field]: value
     }));
-    // Clear inline error for this field on change
+    // Inline validate and update error messages live
     setFieldErrors(prev => {
-      if (prev[field]) {
-        const { [field]: _removed, ...rest } = prev;
-        return rest;
+      const next = { ...prev };
+      const msg = validateField(field, value);
+      if (msg) next[field] = msg; else delete next[field];
+      // Also clear mapped backend error aliases for name
+      if (field === 'name' && next.name && !msg) {
+        delete next.name;
       }
-      // Map backend field names to UI field for name
-      if ((field === 'name') && prev.name) {
-        const { name: _n, ...rest } = prev;
-        return rest;
-      }
-      return prev;
+      return next;
     });
     setFormError(null);
   };
+
+  // Keep the Save Changes button disabled when required fields are empty or errors exist
+  useEffect(() => {
+    if (!isEditing) {
+      setIsSaveDisabled(false);
+      return;
+    }
+    const hasRequiredEmpties = REQUIRED_FIELDS.some((f) => {
+      const v = profileData[f];
+      return v == null || (typeof v === 'string' && v.trim() === '');
+    });
+    // Dynamic required fields based on goal selection
+    let dynamicMissing = false;
+    const goal = profileData.fitnessGoal;
+    if (goal === 'weight-loss' || goal === 'weight-gain') {
+      dynamicMissing = dynamicMissing || (profileData.goalWeight == null || `${profileData.goalWeight}`.trim() === '');
+    } else if (goal === 'muscle-gain') {
+      dynamicMissing = dynamicMissing || (profileData.targetMuscleGain == null || `${profileData.targetMuscleGain}`.trim() === '');
+    } else if (goal === 'strength') {
+      dynamicMissing = dynamicMissing || (profileData.currentStrengthLevel == null || `${profileData.currentStrengthLevel}`.trim() === '');
+    }
+    const hasErrors = Object.keys(fieldErrors || {}).length > 0;
+    setIsSaveDisabled(hasRequiredEmpties || dynamicMissing || hasErrors);
+  }, [profileData, fieldErrors, isEditing]);
 
   // Map backend validation errors to UI field names and show inline
   const applyBackendFieldErrors = (err) => {
@@ -619,6 +672,27 @@ const Profile = () => {
       const nameParts = trimmedName.split(/\s+/).filter(Boolean);
       const firstName = nameParts[0] || '';
       const lastNameCandidate = nameParts.length > 1 ? nameParts.slice(1).join(' ') : null;
+
+      // Required field checks
+      if (!trimmedName) nextErrors.name = 'Full name is required';
+      if (!profileData.dateOfBirth) nextErrors.dateOfBirth = 'Date of birth is required';
+      if (!profileData.gender) nextErrors.gender = 'Gender is required';
+      if (!profileData.location) nextErrors.location = 'Location is required';
+      if (!profileData.height) nextErrors.height = 'Height is required';
+      if (!profileData.weight) nextErrors.weight = 'Current weight is required';
+      if (!profileData.fitnessGoal) nextErrors.fitnessGoal = 'Primary fitness goal is required';
+      if (!profileData.activityLevel) nextErrors.activityLevel = 'Activity level is required';
+
+      // Dynamic required per goal
+      if (profileData.fitnessGoal === 'weight-loss' || profileData.fitnessGoal === 'weight-gain') {
+        if (!profileData.goalWeight) nextErrors.goalWeight = 'Goal weight is required';
+      }
+      if (profileData.fitnessGoal === 'muscle-gain') {
+        if (!profileData.targetMuscleGain) nextErrors.targetMuscleGain = 'Target muscle gain is required';
+      }
+      if (profileData.fitnessGoal === 'strength') {
+        if (!profileData.currentStrengthLevel) nextErrors.currentStrengthLevel = 'Current strength level is required';
+      }
 
       // Frontend validations for basic fields
       const nameRegex = /^[A-Za-z\s]+$/;
@@ -982,18 +1056,23 @@ const Profile = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Primary Fitness Goal</label>
             {isEditing ? (
-              <select
-                value={profileData.fitnessGoal}
-                onChange={(e) => handleInputChange('fitnessGoal', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
-              >
-                <option value="">Select goal</option>
-                <option value="weight-loss">Lose Weight</option>
-                <option value="weight-gain">Gain Weight</option>
-                <option value="muscle-gain">Build Muscle</option>
-                <option value="strength">Improve Strength</option>
-                <option value="general-fitness">Stay Fit / Maintain</option>
-              </select>
+              <>
+                <select
+                  value={profileData.fitnessGoal}
+                  onChange={(e) => handleInputChange('fitnessGoal', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
+                >
+                  <option value="">Select goal</option>
+                  <option value="weight-loss">Lose Weight</option>
+                  <option value="weight-gain">Gain Weight</option>
+                  <option value="muscle-gain">Build Muscle</option>
+                  <option value="strength">Improve Strength</option>
+                  <option value="general-fitness">Stay Fit / Maintain</option>
+                </select>
+                {fieldErrors.fitnessGoal && (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.fitnessGoal}</p>
+                )}
+              </>
             ) : (
               <p className="text-gray-900 capitalize">{getDisplayFitnessGoal(profileData.fitnessGoal)}</p>
             )}
@@ -1001,18 +1080,23 @@ const Profile = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Activity Level</label>
             {isEditing ? (
-              <select
-                value={profileData.activityLevel}
-                onChange={(e) => handleInputChange('activityLevel', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
-              >
-                <option value="">Select activity level</option>
-                <option value="sedentary">Sedentary</option>
-                <option value="lightly-active">Lightly Active</option>
-                <option value="moderately-active">Moderately Active</option>
-                <option value="very-active">Very Active</option>
-                <option value="extremely-active">Extremely Active</option>
-              </select>
+              <>
+                <select
+                  value={profileData.activityLevel}
+                  onChange={(e) => handleInputChange('activityLevel', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#EADFD0] focus:border-[#EADFD0]"
+                >
+                  <option value="">Select activity level</option>
+                  <option value="sedentary">Sedentary</option>
+                  <option value="lightly-active">Lightly Active</option>
+                  <option value="moderately-active">Moderately Active</option>
+                  <option value="very-active">Very Active</option>
+                  <option value="extremely-active">Extremely Active</option>
+                </select>
+                {fieldErrors.activityLevel && (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.activityLevel}</p>
+                )}
+              </>
             ) : (
               <p className="text-gray-900 capitalize">{getDisplayActivityLevel(profileData.activityLevel)}</p>
             )}
@@ -1418,7 +1502,7 @@ const Profile = () => {
                       </button>
                       <button
                         onClick={handleSave}
-                        disabled={saving}
+                        disabled={saving || isSaveDisabled}
                         className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                       >
                         <Save className="w-4 h-4" />

@@ -62,9 +62,9 @@ export default function WeeklySummaryCard({ summary }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Stat label="Workouts" value={thisWeek.workouts} delta={delta.workouts} variant="workouts" />
-        <Stat label="Minutes" value={thisWeek.minutes} delta={delta.minutes} variant="minutes" />
-        <Stat label="Calories" value={thisWeek.calories} delta={delta.calories} variant="calories" />
+        <Stat label="Workouts Completed" value={thisWeek.workouts} delta={delta.workouts} variant="workouts" />
+        <Stat label="Avg Workout Time" value={thisWeek.minutes} delta={delta.minutes} variant="minutes" />
+        <Stat label="Calories Burned" value={thisWeek.calories} delta={delta.calories} variant="calories" />
       </div>
     </div>
   );

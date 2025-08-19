@@ -110,9 +110,7 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
       <div className="bg-[#F5EFE6] px-4 py-3 border-b border-[#EADFD0] rounded-t-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-black rounded-lg flex items-center justify-center">
-              <FiZap className="w-3 h-3 text-white" />
-            </div>
+            <FiZap className="w-5 h-5 text-gray-900" />
             <h3 className="text-base font-semibold text-gray-900">AI Meal Planner</h3>
             {persistenceStatus.hasAutoSave && (
               <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
@@ -121,13 +119,7 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
             )}
           </div>
           
-          <div className="flex items-center gap-1">
-            {persistenceStatus.savedPlansCount > 0 && (
-              <span className="text-xs text-gray-600">
-                {persistenceStatus.savedPlansCount}/{persistenceStatus.maxPlans} saved
-              </span>
-            )}
-          </div>
+
         </div>
       </div>
 

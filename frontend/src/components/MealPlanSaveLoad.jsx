@@ -100,7 +100,7 @@ const MealPlanSaveLoad = ({ currentPlan, onPlanLoaded, isVisible, onClose }) => 
         <div className="p-4 overflow-y-auto max-h-[60vh]">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-base font-semibold text-gray-900">Saved Plans</h3>
-            <span className="text-xs text-gray-500">{savedPlans.length}/5</span>
+            <span className="text-xs text-gray-500">{savedPlans.length} saved</span>
           </div>
           
           {savedPlans.length === 0 ? (
