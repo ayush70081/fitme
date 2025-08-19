@@ -9,7 +9,8 @@ import {
   Key,
   FileDown,
   AlertTriangle,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  HelpCircle
 } from 'lucide-react';
 import { useToast } from '../hooks/useToast';
 import { authAPI, userAPI } from '../services/api';
@@ -174,21 +175,25 @@ const Settings = () => {
             </div>
           </SettingCard>
 
-          {/* Data Management */}
+          {/* Password Recovery */}
           <SettingCard
-            icon={FileDown}
-            title="Data Management"
-            description="Control your personal data and account information"
+            icon={HelpCircle}
+            title="Password Recovery"
+            description="Reset your password if you've forgotten it or need assistance"
           >
             <div className="space-y-6">
-              {/* Export Data */}
+              {/* Forgot Password */}
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <h4 className="text-base font-semibold text-gray-900">Export Your Data</h4>
-                  <p className="text-sm text-gray-500 mt-1">Download a copy of all your fitness data, workouts, and progress</p>
+                  <h4 className="text-base font-semibold text-gray-900">Forgot Password</h4>
+                  <p className="text-sm text-gray-500 mt-1">Reset your password via email if you can't remember it</p>
                 </div>
-                <ActionButton variant="secondary" icon={Download}>
-                  Export Data
+                <ActionButton 
+                  variant="secondary" 
+                  icon={HelpCircle}
+                  onClick={() => window.location.href = '/forgot-password?from=settings'}
+                >
+                  Reset Password
                 </ActionButton>
               </div>
             </div>

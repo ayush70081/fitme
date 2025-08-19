@@ -7,6 +7,10 @@ import { authAPI } from '../services/api';
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Check if user came from settings page
+  const searchParams = new URLSearchParams(location.search);
+  const fromSettings = searchParams.get('from') === 'settings';
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
@@ -101,9 +105,12 @@ const ForgotPassword = () => {
     <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#FAF7F2' }}>
       <div className="w-full max-w-md">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-4">
-          <Link to="/login" className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors duration-200">
+          <Link 
+            to={fromSettings ? "/dashboard/settings" : "/login"} 
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors duration-200"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Login
+            {fromSettings ? "Back to Settings" : "Back to Login"}
           </Link>
         </motion.div>
 
