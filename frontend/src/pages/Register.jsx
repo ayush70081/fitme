@@ -329,13 +329,13 @@ const Register = () => {
             {/* Terms and Conditions */}
             <div className="text-sm text-gray-600">
               By creating an account, you agree to our{' '}
-              <Link to="/terms" className="text-gray-900 hover:opacity-80 underline">
+              <span className="text-gray-900 underline cursor-default">
                 Terms of Service
-              </Link>{' '}
+              </span>{' '}
               and{' '}
-              <Link to="/privacy" className="text-gray-900 hover:opacity-80 underline">
+              <span className="text-gray-900 underline cursor-default">
                 Privacy Policy
-              </Link>
+              </span>
             </div>
 
             {/* Submit Button */}

@@ -10,13 +10,12 @@ const HeroSection = () => {
         <div className="flex-1 text-center md:text-left">
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-snug">
-            Harmonize your <br />
-            <span className="text-gray-300">well-being with zero excuses.</span>
+            Build the Body <br />
+            <span className="text-gray-300">You've Always Wanted</span>
           </h1>
 
           <p className="mt-4 text-gray-300 text-sm sm:text-base md:text-lg">
-            Access your GP services online through Patient Access, freeing up
-            valuable time for the things that truly matter in your life.
+            Get personalized workout plans, nutrition guidance, and AI coaching to reach your fitness goals faster than ever before. Join thousands who've transformed their lives with FitMe.
           </p>
 
           <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">

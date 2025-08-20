@@ -499,7 +499,8 @@ const Progress = () => {
       variants={pageVariant}
       initial="hidden"
       animate="visible"
-      className="min-h-screen bg-gray-50 p-4 sm:p-6"
+      className="min-h-screen p-4 sm:p-6"
+      style={{ backgroundColor: '#FAF7F2' }}
     >
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
@@ -767,70 +768,7 @@ const Progress = () => {
           </motion.div>
         </motion.div>
 
-        {/* Goals Progress */}
-        <motion.div
-          variants={sectionVariant}
-          initial="hidden"
-          animate="visible"
-          custom={7}
-          className="bg-white rounded-2xl shadow-sm p-6"
-        >
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-            <h3 className="text-xl font-semibold text-gray-900">Goals Progress</h3>
-              <p className="text-sm text-gray-600">Personalized progress based on your profile</p>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Weight/Goal tile */}
-            <div className="p-4 rounded-lg border border-gray-200 bg-blue-50">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-blue-100 rounded-md"><Target className="w-4 h-4 text-blue-600" /></div>
-                  <h4 className="text-sm font-semibold text-gray-900">Weight Goal</h4>
-                </div>
-                <span className="text-xs text-gray-500 capitalize">{fitnessGoal || 'general-fitness'}</span>
-              </div>
-              <div className="text-sm text-gray-700 mb-2">{monthlyProgress.currentWeight} kg {monthlyProgress.targetWeight ? `→ ${monthlyProgress.targetWeight} kg` : ''}</div>
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${Math.min(100, Math.max(0, monthlyProgress.targetWeight && monthlyProgress.startWeight ? Math.round(((monthlyProgress.startWeight - monthlyProgress.currentWeight) / (monthlyProgress.startWeight - monthlyProgress.targetWeight)) * 100) : 0))}%` }} />
-              </div>
-              <div className="mt-1 text-xs text-gray-500">{monthlyProgress.targetWeight ? `${Math.abs(monthlyProgress.currentWeight - monthlyProgress.targetWeight).toFixed(1)} kg from target` : 'Set a goal weight to track progress'}</div>
-            </div>
-
-            {/* Monthly workouts tile */}
-            <div className="p-4 rounded-lg border border-gray-200 bg-green-50">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-green-100 rounded-md"><Activity className="w-4 h-4 text-green-600" /></div>
-                  <h4 className="text-sm font-semibold text-gray-900">Monthly Workouts</h4>
-                </div>
-                <span className="text-xs text-gray-500">Target: {monthlyWorkoutTarget}</span>
-              </div>
-              <div className="text-sm text-gray-700 mb-2">{monthlyWorkouts} completed</div>
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                <div className="bg-green-500 h-2 rounded-full" style={{ width: `${monthlyWorkoutProgress}%` }} />
-              </div>
-              <div className="mt-1 text-xs text-gray-500">{monthlyWorkoutProgress}% complete (based on your frequency)</div>
-            </div>
-
-            {/* Streak tile */}
-            <div className="p-4 rounded-lg border border-gray-200 bg-orange-50">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-orange-100 rounded-md"><Zap className="w-4 h-4 text-orange-600" /></div>
-                  <h4 className="text-sm font-semibold text-gray-900">Streak</h4>
-                </div>
-              </div>
-              <div className="text-sm text-gray-700 mb-2">Current: {user?.currentStreak ?? 0} days • Longest: {user?.longestStreak ?? 0} days</div>
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                <div className="bg-orange-500 h-2 rounded-full" style={{ width: `${Math.min(100, Math.round(((user?.currentStreak ?? 0) / Math.max(1, user?.longestStreak ?? 1)) * 100))}%` }} />
-              </div>
-              <div className="mt-1 text-xs text-gray-500">Compare current streak to your best</div>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </motion.div>
   );

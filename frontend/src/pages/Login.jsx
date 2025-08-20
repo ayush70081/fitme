@@ -510,13 +510,13 @@ const Login = () => {
         >
           <p className="text-xs text-gray-500">
             Having trouble? Check our{' '}
-            <Link to="/help" className="text-gray-900 hover:opacity-80">
+            <span className="text-gray-900 cursor-default">
               help center
-            </Link>{' '}
+            </span>{' '}
             or{' '}
-            <Link to="/contact" className="text-gray-900 hover:opacity-80">
+            <span className="text-gray-900 cursor-default">
               contact support
-            </Link>
+            </span>
           </p>
         </motion.div>
 
