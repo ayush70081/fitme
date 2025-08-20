@@ -513,7 +513,7 @@ const Progress = () => {
         >
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Progress Tracking</h1>
+              <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
               <p className="text-gray-600 mt-2">Monitor your fitness journey and celebrate your achievements.</p>
             </div>
             <div className="flex gap-3">

@@ -119,9 +119,8 @@ const Settings = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex items-center gap-3 mb-2">
-            <SettingsIcon className="w-6 h-6 text-gray-900" />
-            <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+          <div className="mb-2">
+            <h1 className="text-3xl font-bold text-gray-900">Account & Security</h1>
           </div>
           <p className="text-gray-600">Manage your account security and preferences.</p>
         </motion.div>

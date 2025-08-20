@@ -24,7 +24,7 @@ const AiCoach = () => {
     {
       id: 1,
       type: 'bot',
-      content: `Hello ${user?.firstName || 'there'}! 👋 I'm your AI Fitness Coach. I'm here to help you with workout routines, nutrition advice, healthy recipes, fitness goals, and any questions about using FitMe+. How can I assist you today?`,
+      content: `Hello ${user?.firstName || 'there'}! 👋 I'm your Fitness AI. I'm here to help you with workout routines, nutrition advice, healthy recipes, fitness goals, and any questions about using FitMe+. How can I assist you today?`,
       timestamp: new Date()
     }
   ]);
@@ -225,7 +225,7 @@ const AiCoach = () => {
       {
         id: 1,
         type: 'bot',
-        content: `Hello ${user?.firstName || 'there'}! 👋 I'm your AI Fitness Coach. I'm here to help you with workout routines, nutrition advice, healthy recipes, fitness goals, and any questions about using FitMe+. How can I assist you today?`,
+        content: `Hello ${user?.firstName || 'there'}! 👋 I'm your Fitness AI. I'm here to help you with workout routines, nutrition advice, healthy recipes, fitness goals, and any questions about using FitMe+. How can I assist you today?`,
         timestamp: new Date()
       }
     ]);
@@ -310,7 +310,7 @@ const AiCoach = () => {
             <div className="flex items-center gap-4">
               <Bot className="w-8 h-8 text-gray-900" />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">AI Fitness Coach</h1>
+                <h1 className="text-3xl font-bold text-gray-900">Fitness AI</h1>
                 <p className="text-gray-600 mt-1">Your personal AI assistant for fitness and wellness</p>
               </div>
             </div>
@@ -368,7 +368,7 @@ const AiCoach = () => {
                 <div className="flex items-center gap-3">
                   <Bot className="w-6 h-6 text-gray-900" />
                   <div>
-                    <h3 className="font-semibold text-gray-900">AI Fitness Coach</h3>
+                    <h3 className="font-semibold text-gray-900">Fitness AI</h3>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       <span className="text-sm text-gray-500">Online and ready to help</span>

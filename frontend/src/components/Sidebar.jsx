@@ -5,24 +5,24 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import {
-  Home,
+  LayoutDashboard,
   Dumbbell,
-  Apple,
-  Brain,
-  BarChart2,
-  Settings,
+  Utensils,
+  Sparkles,
+  Target,
+  Lock,
   User,
   LogOut,
 } from 'lucide-react';
 
 const navItems = [
-  { label: 'Dashboard', icon: Home, path: '/dashboard' },
+  { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { label: 'Workouts', icon: Dumbbell, path: '/dashboard/workouts' },
-  { label: 'Nutrition', icon: Apple, path: '/dashboard/nutrition' },
-  { label: 'AI Coach', icon: Brain, path: '/dashboard/ai-coach' },
-  { label: 'Progress', icon: BarChart2, path: '/dashboard/progress' },
-  { label: 'Settings', icon: Settings, path: '/dashboard/settings' },
-  { label: 'Profile', icon: User, path: '/dashboard/profile' },
+  { label: 'Smart Meals', icon: Utensils, path: '/dashboard/nutrition' },
+  { label: 'Fitness AI', icon: Sparkles, path: '/dashboard/ai-coach' },
+  { label: 'Analytics', icon: Target, path: '/dashboard/progress' },
+  { label: 'Account & Security', icon: Lock, path: '/dashboard/settings' },
+  { label: 'My Profile', icon: User, path: '/dashboard/profile' },
 ];
 
 export default function Sidebar({ isExpanded = false, isMobile = false, onClose }) {
