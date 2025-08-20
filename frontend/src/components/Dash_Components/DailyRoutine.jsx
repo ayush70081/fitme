@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from 'react-dom';
 import userStorage from "../../utils/userScopedStorage";
 
 // Helper to get today's date in YYYY-MM-DD format
@@ -208,7 +209,7 @@ const DailyRoutine = () => {
   };
 
   return (
-    <div className={`relative w-full max-w-md mx-auto p-4 ${showModal ? "backdrop-blur-sm" : ""}`}>
+    <div className={`relative w-full max-w-md mx-auto p-4`}>
       <div className={`transition-all ${showModal ? "pointer-events-none" : ""}`}>
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Daily Routine Overview</h2>
 
@@ -288,77 +289,81 @@ const DailyRoutine = () => {
         </div>
       </div>
 
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-            <h3 className="text-lg font-medium text-gray-800 mb-4">Add New Task at {selectedTime}</h3>
-            <div className="space-y-4">
-              <input
-                type="text"
-                name="category"
-                value={newTask.category}
-                onChange={handleInputChange}
-                placeholder="Category (e.g., Breakfast)"
-                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <input
-                type="text"
-                name="name"
-                value={newTask.name}
-                onChange={handleInputChange}
-                placeholder="Task Name (e.g., Oatmeal)"
-                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <input
-                type="number"
-                name="calories"
-                value={newTask.calories}
-                onChange={handleInputChange}
-                placeholder="Calories (e.g., 280)"
-                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <input
-                type="number"
-                name="protein"
-                value={newTask.protein}
-                onChange={handleInputChange}
-                placeholder="Protein in grams (optional)"
-                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <input
-                type="number"
-                name="carbs"
-                value={newTask.carbs}
-                onChange={handleInputChange}
-                placeholder="Carbs in grams (optional)"
-                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <input
-                type="number"
-                name="fat"
-                value={newTask.fat}
-                onChange={handleInputChange}
-                placeholder="Fat in grams (optional)"
-                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <div className="flex space-x-2">
-                <button
-                  onClick={addTask}
-                  className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-all"
-                >
-                  Add Task
-                </button>
-                <button
-                  onClick={closeModal}
-                  className="flex-1 bg-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-400 transition-all"
-                >
-                  Cancel
-                </button>
+      {/* Modal (Portal to avoid clipping) */}
+      {showModal && createPortal(
+        (
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={closeModal} />
+            <div className="relative bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
+              <h3 className="text-lg font-medium text-gray-800 mb-4">Add New Task at {selectedTime}</h3>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  name="category"
+                  value={newTask.category}
+                  onChange={handleInputChange}
+                  placeholder="Category (e.g., Breakfast)"
+                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                  type="text"
+                  name="name"
+                  value={newTask.name}
+                  onChange={handleInputChange}
+                  placeholder="Task Name (e.g., Oatmeal)"
+                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                  type="number"
+                  name="calories"
+                  value={newTask.calories}
+                  onChange={handleInputChange}
+                  placeholder="Calories (e.g., 280)"
+                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                  type="number"
+                  name="protein"
+                  value={newTask.protein}
+                  onChange={handleInputChange}
+                  placeholder="Protein in grams (optional)"
+                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                  type="number"
+                  name="carbs"
+                  value={newTask.carbs}
+                  onChange={handleInputChange}
+                  placeholder="Carbs in grams (optional)"
+                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                  type="number"
+                  name="fat"
+                  value={newTask.fat}
+                  onChange={handleInputChange}
+                  placeholder="Fat in grams (optional)"
+                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <div className="flex space-x-2">
+                  <button
+                    onClick={addTask}
+                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-all"
+                  >
+                    Add Task
+                  </button>
+                  <button
+                    onClick={closeModal}
+                    className="flex-1 bg-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-400 transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        ),
+        document.body
       )}
     </div>
   );
