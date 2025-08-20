@@ -6,7 +6,6 @@ import {
   Trash2,
   ChevronRight,
   Shield,
-  Key,
   FileDown,
   AlertTriangle,
   Settings as SettingsIcon,
@@ -14,7 +13,6 @@ import {
 } from 'lucide-react';
 import { useToast } from '../hooks/useToast';
 import { authAPI, userAPI } from '../services/api';
-import PasswordChangeModal from '../components/PasswordChangeModal';
 import DeleteAccountModal from '../components/DeleteAccountModal';
 import { useDispatch } from 'react-redux';
 import { logoutUser } from '../store/authSlice';
@@ -23,7 +21,6 @@ const Settings = () => {
   const [settings, setSettings] = useState({
     twoFactorAuth: false,
   });
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { showToast } = useToast();
   const dispatch = useDispatch();
@@ -35,25 +32,7 @@ const Settings = () => {
     }));
   };
 
-  const handlePasswordChange = async (passwordData) => {
-    try {
-      const response = await authAPI.changePassword({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword,
-        confirmNewPassword: passwordData.confirmNewPassword
-      });
-
-      showToast({
-        type: 'success',
-        message: 'Password updated successfully!'
-      });
-
-      setIsPasswordModalOpen(false);
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to update password';
-      throw new Error(errorMessage);
-    }
-  };
+  // Change Password functionality removed per request
 
   const handleDeleteAccount = async (currentPassword) => {
     try {
@@ -149,31 +128,6 @@ const Settings = () => {
 
         {/* Settings Grid */}
         <div className="space-y-6">
-          {/* Security Settings */}
-          <SettingCard
-            icon={Shield}
-            title="Security"
-            description="Protect your account with additional security measures"
-          >
-            <div className="space-y-6">
-              {/* Security Options */}
-              <p className="text-sm text-gray-600">Manage your security settings below.</p>
-              {/* Change Password */}
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <h4 className="text-base font-semibold text-gray-900">Password</h4>
-                  <p className="text-sm text-gray-500 mt-1">Update your account password regularly for security</p>
-                </div>
-                <ActionButton 
-                  variant="secondary" 
-                  icon={Key}
-                  onClick={() => setIsPasswordModalOpen(true)}
-                >
-                  Change Password
-                </ActionButton>
-              </div>
-            </div>
-          </SettingCard>
 
           {/* Password Recovery */}
           <SettingCard
@@ -232,13 +186,6 @@ const Settings = () => {
           </p>
         </motion.div>
       </div>
-
-      {/* Password Change Modal */}
-      <PasswordChangeModal
-        isOpen={isPasswordModalOpen}
-        onClose={() => setIsPasswordModalOpen(false)}
-        onSubmit={handlePasswordChange}
-      />
 
       <DeleteAccountModal
         isOpen={isDeleteModalOpen}

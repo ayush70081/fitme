@@ -95,36 +95,7 @@ const FAQSection = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      {/* bg-gradient-to-r from-pink-100 to-pink-200 rounded-3xl px-6 py-10 my-10 max-w-5xl mx-4 md:mx-auto */}
-      <div className="mt-10 max-w-2xl mx-auto bg-[#F5EFE6] rounded-2xl shadow-lg px-6 py-8 text-center border border-[#EADFD0]">
-        <div className="flex justify-center mb-3 -space-x-3">
-          <img
-            src="https://randomuser.me/api/portraits/men/42.jpg"
-            className="w-9 h-9 rounded-full border-2 border-white"
-            alt=""
-          />
-          <img
-            src="https://randomuser.me/api/portraits/women/39.jpg"
-            className="w-9 h-9 rounded-full border-2 border-white"
-            alt=""
-          />
-          <img
-            src="https://randomuser.me/api/portraits/men/56.jpg"
-            className="w-9 h-9 rounded-full border-2 border-white"
-            alt=""
-          />
-        </div>
-        <h3 className="text-lg font-semibold text-gray-800">
-          Still have questions?
-        </h3>
-        <p className="text-sm text-gray-500 mt-1 mb-4">
-          Our support team is here to help you out!
-        </p>
-        <button className="bg-black text-white px-5 py-2 rounded-md hover:bg-gray-900 transition">
-          Get in Touch
-        </button>
-      </div>
+      
     </section>
   );
 };

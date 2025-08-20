@@ -23,8 +23,8 @@ const Progress = () => {
   const [selectedIntakeMetric, setSelectedIntakeMetric] = useState('calories'); // calories | protein | carbs | fat
   const { user } = useAuth();
   const [workoutStats, setWorkoutStats] = useState(null);
-  const [weeklyData, setWeeklyData] = useState({ weight: [], calories: [], workouts: [] });
-  const [periodData, setPeriodData] = useState({ weight: [], calories: [], workouts: [], eatenCalories: [], eatenProtein: [], eatenCarbs: [], eatenFat: [] });
+  const [weeklyData, setWeeklyData] = useState({ calories: [], workouts: [] });
+  const [periodData, setPeriodData] = useState({ calories: [], workouts: [], eatenCalories: [], eatenProtein: [], eatenCarbs: [], eatenFat: [] });
 
   const exportSvgAsPng = (svgElement, fileName) => {
     try {
@@ -184,7 +184,7 @@ const Progress = () => {
         break;
       
       default:
-        return { weight: [], calories: [], workouts: [], eatenCalories: [], eatenProtein: [], eatenCarbs: [], eatenFat: [] };
+        return { calories: [], workouts: [], eatenCalories: [], eatenProtein: [], eatenCarbs: [], eatenFat: [] };
     }
 
     // Workouts map (burned)
@@ -213,11 +213,7 @@ const Progress = () => {
       }
     });
 
-    const weightArray = days.map((d, index) => ({
-      day: formatLabel(d, index),
-      value: user?.weight ?? 0,
-      target: user?.goalWeight ?? null,
-    }));
+
 
     // Use BURNED calories for the chart (from workout history)
     const caloriesArray = days.map((d, i) => {
@@ -361,10 +357,9 @@ const Progress = () => {
       return { day: formatLabel(d, i), value: totals.fat };
     });
 
-    return { 
-      weight: weightArray, 
-      calories: caloriesArray, 
-      workouts: workoutsArray, 
+    return {
+      calories: caloriesArray,
+      workouts: workoutsArray,
       eatenCalories: eatenCaloriesArray,
       eatenProtein: eatenProteinArray,
       eatenCarbs: eatenCarbsArray,
@@ -615,12 +610,10 @@ const Progress = () => {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">
-                  {selectedMetric === 'weight' && 'Weight Progress'}
                   {selectedMetric === 'calories' && 'Calories Burned Progress'}
                   {selectedMetric === 'workouts' && 'Workouts Progress'}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {selectedMetric === 'weight' && 'Your weight journey over time'}
                   {selectedMetric === 'calories' && selectedPeriod === 'month' ? 'Calories burned per week' : 'Calories burned per day'}
                   {selectedMetric === 'workouts' && selectedPeriod === 'month' ? 'Workouts completed per week' : 'Workouts completed per day'}
                 </p>
@@ -630,7 +623,6 @@ const Progress = () => {
                 onChange={(e) => setSelectedMetric(e.target.value)}
                 className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 focus:border-transparent"
               >
-                <option value="weight">Weight</option>
                 <option value="calories">Calories Burned</option>
                 <option value="workouts">Workouts</option>
               </select>
@@ -654,7 +646,7 @@ const Progress = () => {
                   allowDecimals={selectedMetric !== 'workouts'}
                   width={selectedMetric === 'workouts' ? 80 : 70}
                   label={{
-                    value: selectedMetric === 'weight' ? 'Weight (kg)' : selectedMetric === 'calories' ? 'Calories (kcal)' : 'Workouts (count)',
+                    value: selectedMetric === 'calories' ? 'Calories (kcal)' : 'Workouts (count)',
                     angle: -90,
                     position: 'outsideLeft',
                     offset: 8,
@@ -677,22 +669,15 @@ const Progress = () => {
                   formatter={(value, name) => {
                   if (selectedMetric === 'calories') return [`${value} kcal`, 'Calories Burned'];
                   if (selectedMetric === 'workouts') return [value, 'Workouts'];
-                  if (selectedMetric === 'weight') {
-                    if (name === 'target') return [`${value} kg`, 'Goal Weight'];
-                    return [`${value} kg`, 'Current Weight'];
-                  }
-                  return [`${value} kg`, 'Weight'];
+                  return [value, name];
                 }} />
                 <Line type="monotone" dataKey="value" name={selectedMetric}
-                  stroke={selectedMetric === 'calories' ? '#f97316' : selectedMetric === 'workouts' ? '#22c55e' : '#ec4899'}
+                  stroke={selectedMetric === 'calories' ? '#f97316' : '#22c55e'}
                   strokeWidth={3}
-                  dot={{ r: 5, fill: selectedMetric === 'calories' ? '#f97316' : selectedMetric === 'workouts' ? '#22c55e' : '#ec4899', stroke: '#fff', strokeWidth: 2 }}
+                  dot={{ r: 5, fill: selectedMetric === 'calories' ? '#f97316' : '#22c55e', stroke: '#fff', strokeWidth: 2 }}
                   activeDot={{ r: 7 }}
                   animationDuration={1200}
                 />
-                {selectedMetric === 'weight' && (
-                  <Line type="monotone" dataKey="target" name="target" stroke="#ef4444" strokeDasharray="5 5" strokeWidth={2} dot={false} animationDuration={1200} />
-                )}
               </LineChart>
             </ResponsiveContainer>
           </motion.div>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { FaCalendarAlt, FaUtensils, FaDumbbell, FaChartLine } from "react-icons/fa";
 import { BiBot } from "react-icons/bi";
 import fit from '../../assets/fit_couple_white.jpg';
@@ -78,9 +79,12 @@ const FeatureTab = () => {
           <p className="text-gray-300 text-sm leading-relaxed">
             {features[activeIndex].description}
           </p>
-          <button className="mt-4 bg-white text-black px-5 py-2 rounded-md font-medium hover:opacity-90 transition">
+          <Link
+            to="/register"
+            className="mt-4 bg-white text-black px-5 py-2 rounded-md font-medium hover:opacity-90 transition inline-block text-center"
+          >
             Learn More
-          </button>
+          </Link>
         </div>
 
         {/* Right - Image */}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import fit from '../../assets/fit_couple_white.jpg';
 
 const HeroSection = () => {
@@ -19,12 +20,18 @@ const HeroSection = () => {
           </p>
 
           <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-            <button className="w-full sm:w-auto duration-200 border border-white bg-white text-black font-medium px-6 py-2 rounded-md hover:bg-[#1a1a2e] hover:text-white">
+            <Link
+              to="/login"
+              className="w-full sm:w-auto duration-200 border border-white bg-white text-black font-medium px-6 py-2 rounded-md hover:bg-[#1a1a2e] hover:text-white text-center"
+            >
               Sign In
-            </button>
-            <button className="w-full sm:w-auto duration-200 border border-white font-medium px-6 py-2 rounded-md hover:bg-white hover:text-black">
+            </Link>
+            <Link
+              to="/register"
+              className="w-full sm:w-auto duration-200 border border-white font-medium px-6 py-2 rounded-md hover:bg-white hover:text-black text-center"
+            >
               Register Now!
-            </button>
+            </Link>
           </div>
 
         </div>
