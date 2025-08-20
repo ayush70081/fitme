@@ -48,7 +48,13 @@ const DailyRoutine = () => {
     "10:00 AM",
     "11:00 AM",
     "12:00 PM",
+    "2:00 PM",
+    "4:00 PM",
+    "6:00 PM",
     "7:00 PM",
+    "8:00 PM",
+    "9:00 PM",
+    "10:00 PM",
   ];
 
   // Helper to parse time string (e.g., '8:00 PM') to minutes since midnight
@@ -209,9 +215,9 @@ const DailyRoutine = () => {
   };
 
   return (
-    <div className={`relative w-full max-w-md mx-auto p-4`}>
-      <div className={`transition-all ${showModal ? "pointer-events-none" : ""}`}>
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Daily Routine Overview</h2>
+    <div className="bg-green-50 rounded-xl shadow-sm p-4">
+      <div className="transition-all">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Daily Routine</h2>
 
         {/* Timeline */}
         <div className="space-y-2">

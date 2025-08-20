@@ -58,8 +58,11 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true };
     } catch (error) {
-      // Avoid logging detailed auth errors to console in production
-      return { success: false, message: error };
+      // Return full error details when available (e.g., errorCode, timeRemaining, suggestions)
+      if (error && typeof error === 'object') {
+        return { success: false, ...error };
+      }
+      return { success: false, message: String(error) };
     }
   };
 

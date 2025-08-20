@@ -53,10 +53,10 @@ export default function WeeklySummaryCard({ summary }) {
   const delta = safeSummary.delta || { workouts: 0, minutes: 0, calories: 0 };
 
   return (
-    <div className="w-full rounded-2xl p-4 shadow-sm bg-emerald-50 ring-1 ring-emerald-100">
+    <div className="bg-white rounded-xl shadow-sm p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-gray-900">Weekly Summary</h2>
-        <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/60 text-gray-600">
+        <span className="text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
           This week vs last
         </span>
       </div>

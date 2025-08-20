@@ -29,7 +29,8 @@ export const loginUser = createAsyncThunk(
       }
     } catch (error) {
       const errorData = apiUtils.handleError(error);
-      return rejectWithValue(errorData.message);
+      // Propagate full error details so UI can show errorCode/timeRemaining/suggestions
+      return rejectWithValue(errorData);
     }
   }
 );

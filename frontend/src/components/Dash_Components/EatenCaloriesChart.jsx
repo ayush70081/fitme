@@ -31,7 +31,7 @@ const EatenCaloriesChart = () => {
   }, []);
 
   return (
-    <div className="bg-white rounded-2xl shadow p-4">
+    <div className="bg-white rounded-xl shadow-sm p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-gray-900">Eaten Calories (Current Week)</h2>
       </div>

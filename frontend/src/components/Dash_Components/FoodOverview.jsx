@@ -57,17 +57,17 @@ const FoodOverview = () => {
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl shadow-md font-sans pb-4">
+    <div className="bg-white rounded-xl shadow-sm p-4">
       {/* Header */}
-      <h2 className="text-lg font-semibold text-black px-4 pt-4">Today's Meals</h2>
+      <h2 className="text-lg font-semibold text-black mb-3">Today's Meals</h2>
 
       {/* Combined subcard */}
-      <div className="bg-green-100 rounded-2xl mx-4 mt-2 divide-y divide-green-200">
+      <div className="bg-green-50 rounded-xl divide-y divide-green-200">
         {meals.map((meal) => (
           <div
             key={meal.type}
             onClick={() => handleNavigate(meal.type)}
-            className="flex justify-between items-start px-4 py-3 cursor-pointer hover:bg-green-200 transition-colors rounded-2xl"
+            className="flex justify-between items-start px-3 py-3 cursor-pointer hover:bg-green-100 transition-colors first:rounded-t-xl last:rounded-b-xl"
           >
             <div>
               <h3 className="text-md font-semibold text-black">{meal.type}</h3>

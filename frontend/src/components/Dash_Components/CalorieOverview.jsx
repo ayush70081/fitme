@@ -81,12 +81,12 @@ const CalorieOverview = ({ caloriesBurned = 0 }) => {
   const progress = Math.min((left / total) * circumference, circumference);
 
   return (
-    <div className="w-full bg-white rounded-2xl shadow-md font-sans p-4">
+    <div className="bg-white rounded-xl shadow-sm p-4">
       {/* Header */}
-      <h2 className="text-lg font-semibold text-black mb-2">Calories</h2>
+      <h2 className="text-lg font-semibold text-black mb-3">Calories</h2>
 
-      {/* Subcard */}
-      <div className="bg-pink-200 rounded-2xl p-4 space-y-3">
+      {/* Content */}
+      <div className="bg-pink-50 rounded-xl p-4 space-y-3">
         {/* Circular progress bar */}
         <div className="flex justify-center">
           <div className="relative w-32 h-32">
@@ -126,7 +126,7 @@ const CalorieOverview = ({ caloriesBurned = 0 }) => {
         {/* Eaten & Burned */}
         <div className="flex justify-evenly text-sm gap-8">
   {/* Eaten */}
-  <div className="border-l-4 border-black pl-3">
+  <div className="pl-3">
     <p className="font-medium text-gray-700 text-left">Eaten</p>
     <div className="flex items-center justify-center font-semibold text-black text-sm mt-1">
       <Flame className="w-4 h-4 mr-1" /> {eaten}
@@ -135,7 +135,7 @@ const CalorieOverview = ({ caloriesBurned = 0 }) => {
   </div>
 
   {/* Burned */}
-  <div className="border-l-4 border-black pl-3">
+  <div className="pl-3">
     <p className="font-medium text-gray-700 text-left">Burned</p>
     <div className="flex items-center justify-center font-semibold text-black text-sm mt-1">
       <Flame className="w-4 h-4 mr-1" /> {burned}

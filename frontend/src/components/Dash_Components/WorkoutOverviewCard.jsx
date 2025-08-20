@@ -12,7 +12,7 @@ const WorkoutOverviewCard = ({ totalWorkouts = 0, avgWorkout = 0, totalCaloriesB
   };
 
   return (
-    <div className="w-80 bg-white rounded-2xl shadow-md p-4 font-sans">
+    <div className="bg-white rounded-xl shadow-sm p-4">
       {/* Header Row: Workouts + Start Now */}
       <div className="flex justify-between items-center mb-3">
         <h2 className="text-lg font-semibold text-black">Workouts</h2>
@@ -25,7 +25,7 @@ const WorkoutOverviewCard = ({ totalWorkouts = 0, avgWorkout = 0, totalCaloriesB
       </div>
 
       {/* Dynamic Stats */}
-      <div className="bg-pink-200 rounded-2xl p-4 space-y-2">
+      <div className="bg-pink-50 rounded-xl p-4 space-y-2">
         <div className="flex justify-between text-sm">
           <p className="text-gray-700 font-medium">Total Workouts</p>
           <p className="text-black font-semibold text-right">{totalWorkouts}</p>
