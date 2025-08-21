@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { Menu, X, User, LogOut, Settings, ChevronDown } from 'lucide-react';
 
-const navItems = ['home', 'why us', 'features','plans' ,'FAQs'];
+const navItems = ['home', 'features', 'testimonials', 'plans', 'FAQs'];
 
 const Navbar = () => {
   const [activeTab, setActiveTab] = useState('home');
