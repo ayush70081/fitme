@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiTrash2, FiClock, FiUsers, FiX, FiDownload, FiFolder, FiAlertTriangle } from 'react-icons/fi';
+import { FiTrash2, FiClock, FiUsers, FiX, FiUpload, FiFolder, FiAlertTriangle } from 'react-icons/fi';
 import mealPlanPersistence from '../services/mealPlanPersistence';
 import { useToast } from '../hooks/useToast';
 
@@ -143,7 +143,7 @@ const MealPlanSaveLoad = ({ currentPlan, onPlanLoaded, isVisible, onClose }) => 
                         className="p-2 text-gray-900 hover:bg-[#FFF7EF] rounded-lg transition-colors"
                         title="Load this plan"
                       >
-                        <FiDownload className="w-4 h-4" />
+                        <FiUpload className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeletePlan(plan.id, typeof plan.name === 'string' ? plan.name : 'Untitled Plan')}

@@ -112,11 +112,6 @@ const DailyMealPlanGenerator = ({ onPlanGenerated, currentDayPlan, currentPlan, 
           <div className="flex items-center gap-2">
             <FiZap className="w-5 h-5 text-gray-900" />
             <h3 className="text-base font-semibold text-gray-900">AI Meal Planner</h3>
-            {persistenceStatus.hasAutoSave && (
-              <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
-                Auto-saved
-              </span>
-            )}
           </div>
           
 
