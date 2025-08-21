@@ -25,7 +25,7 @@ const WorkoutOverviewCard = ({ totalWorkouts = 0, avgWorkout = 0, totalCaloriesB
       </div>
 
       {/* Dynamic Stats */}
-      <div className="bg-pink-50 rounded-xl p-4 space-y-2">
+      <div className="bg-pink-100 rounded-xl p-4 space-y-2">
         <div className="flex justify-between text-sm">
           <p className="text-gray-700 font-medium">Total Workouts</p>
           <p className="text-black font-semibold text-right">{totalWorkouts}</p>

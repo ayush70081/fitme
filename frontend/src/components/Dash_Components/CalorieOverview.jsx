@@ -86,7 +86,7 @@ const CalorieOverview = ({ caloriesBurned = 0 }) => {
       <h2 className="text-lg font-semibold text-black mb-3">Calories</h2>
 
       {/* Content */}
-      <div className="bg-pink-50 rounded-xl p-4 space-y-3">
+      <div className="bg-pink-100 rounded-xl p-4 space-y-3">
         {/* Circular progress bar */}
         <div className="flex justify-center">
           <div className="relative w-32 h-32">

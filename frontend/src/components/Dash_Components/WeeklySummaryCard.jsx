@@ -7,15 +7,15 @@ const Stat = ({ label, value, delta, variant = 'workouts' }) => {
 
   const variantStyles = {
     workouts: {
-      tile: 'bg-blue-50',
+      tile: 'bg-blue-100',
       iconWrap: 'bg-blue-100 text-blue-600',
     },
     minutes: {
-      tile: 'bg-indigo-50',
+      tile: 'bg-indigo-100',
       iconWrap: 'bg-indigo-100 text-indigo-600',
     },
     calories: {
-      tile: 'bg-rose-50',
+      tile: 'bg-rose-100',
       iconWrap: 'bg-rose-100 text-rose-600',
     },
   };

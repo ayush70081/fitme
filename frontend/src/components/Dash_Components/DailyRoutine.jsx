@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from 'react-dom';
+import { Trash2 } from 'lucide-react';
 import userStorage from "../../utils/userScopedStorage";
 
 // Helper to get today's date in YYYY-MM-DD format
@@ -67,9 +68,9 @@ const DailyRoutine = () => {
     return hours * 60 + minutes;
   };
 
-  // Collect all unique times from tasks
+  // Collect all unique times from tasks, but limit to prevent overflow
   const taskTimes = tasks.map(task => task.time).filter(Boolean);
-  const allTimesSet = new Set([...defaultTimeSlots, ...taskTimes]);
+  const allTimesSet = new Set([...defaultTimeSlots.slice(0, 8), ...taskTimes]); // Limit to 8 default slots
   const allTimesSorted = Array.from(allTimesSet).sort((a, b) => parseTimeToMinutes(a) - parseTimeToMinutes(b));
 
   // When tasks change, save with today's date
@@ -161,6 +162,11 @@ const DailyRoutine = () => {
     }
   };
 
+  const deleteTask = (taskIndex) => {
+    const updatedTasks = tasks.filter((_, index) => index !== taskIndex);
+    setTasks(updatedTasks);
+  };
+
   const toggleTaskCompletion = (index) => {
     const updatedTasks = [...tasks];
     const task = updatedTasks[index];
@@ -215,17 +221,17 @@ const DailyRoutine = () => {
   };
 
   return (
-    <div className="bg-green-50 rounded-xl shadow-sm p-4">
-      <div className="transition-all">
+    <div className="bg-green-100 rounded-xl shadow-sm p-4 w-full flex flex-col h-full">
+      <div className="flex flex-col flex-1 min-h-0">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Daily Routine</h2>
 
         {/* Timeline */}
-        <div className="space-y-2">
+        <div className="space-y-2 flex-1 overflow-hidden">
           {allTimesSorted.map((time, index) => {
             const taskAtTime = tasks.find((task) => task.time === time);
 
             return (
-              <div key={index} className="flex items-center">
+              <div key={index} className="flex items-center py-1">
                 {/* Time Label */}
                 <div className="w-20 text-sm text-gray-600">{time}</div>
 
@@ -233,11 +239,9 @@ const DailyRoutine = () => {
                 <div className="flex-1">
                   {taskAtTime ? (
                     <div
-                      className={`flex items-center justify-between p-3 rounded-lg shadow-sm ${taskAtTime.color} transition-all ${
-                        taskAtTime.completed ? "opacity-50" : ""
-                      }`}
+                      className={`group relative flex items-center justify-between p-3 rounded-lg shadow-sm ${taskAtTime.color} transition-all`}
                     >
-                      <div className="flex items-center space-x-2">
+                      <div className={`flex items-center space-x-2 ${taskAtTime.completed ? "opacity-50" : ""}`}>
                         <input
                           type="checkbox"
                           checked={taskAtTime.completed}
@@ -262,14 +266,25 @@ const DailyRoutine = () => {
                           )}
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600">{taskAtTime.calories} kcal</p>
+                      <div className="flex items-center space-x-2">
+                        <p className={`text-sm text-gray-600 ${taskAtTime.completed ? "opacity-50" : ""}`}>{taskAtTime.calories} kcal</p>
+                        {/* Delete button - only visible on hover */}
+                        <button
+                          onClick={() => deleteTask(tasks.indexOf(taskAtTime))}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
+                          title="Delete task"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex items-center justify-between">
-                      <div className="flex-1 h-px bg-gray-300"></div>
+                      <div className="flex-1 h-px bg-gray-200"></div>
                       <button
-                        className="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none"
+                        className="ml-2 text-green-600 hover:text-green-800 focus:outline-none transition-colors duration-200 hover:bg-green-50 rounded-full p-1"
                         onClick={() => openModal(time)}
+                        title="Add meal or activity"
                       >
                         <svg
                           className="h-5 w-5"
@@ -293,6 +308,15 @@ const DailyRoutine = () => {
             );
           })}
         </div>
+        
+        {/* Footer message when no tasks are added */}
+        {tasks.length === 0 && (
+          <div className="mt-4 pt-3 border-t border-green-200">
+            <p className="text-center text-xs text-gray-500 italic">
+              Click the + buttons to add meals and activities
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Modal (Portal to avoid clipping) */}

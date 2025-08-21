@@ -62,7 +62,7 @@ const FoodOverview = () => {
       <h2 className="text-lg font-semibold text-black mb-3">Today's Meals</h2>
 
       {/* Combined subcard */}
-      <div className="bg-green-50 rounded-xl divide-y divide-green-200">
+      <div className="bg-green-100 rounded-xl divide-y divide-green-200">
         {meals.map((meal) => (
           <div
             key={meal.type}

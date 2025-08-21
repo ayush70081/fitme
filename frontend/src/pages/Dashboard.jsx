@@ -51,7 +51,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen w-full p-4" style={{ backgroundColor: '#FAF7F2' }}>
       {/* Main layout */}
-      <div className="flex flex-col gap-4 lg:flex-row h-full w-full">
+      <div className="flex flex-col gap-4 lg:flex-row min-h-[calc(100vh-2rem)] w-full">
         {/* Left column */}
         <div className="w-full lg:w-[30%] space-y-4">
           <FoodOverview />
@@ -59,7 +59,7 @@ const Dashboard = () => {
         </div>
 
         {/* Middle column */}
-        <div className="w-full lg:w-[30%]">
+        <div className="w-full lg:w-[30%] flex">
           <DailyRoutine />
         </div>
 
