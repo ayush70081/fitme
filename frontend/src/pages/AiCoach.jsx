@@ -11,7 +11,7 @@ import {
   Target,
   TrendingUp,
   Clock,
-  RefreshCw,
+  Trash2,
   ChefHat,
   AlertCircle
 } from 'lucide-react';
@@ -20,14 +20,44 @@ import { aiCoachAPI } from '../services/api';
 
 const AiCoach = () => {
   const { user } = useAuth();
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      type: 'bot',
-      content: `Hello ${user?.firstName || 'there'}! 👋 I'm your Fitness AI. I'm here to help you with workout routines, nutrition advice, healthy recipes, fitness goals, and any questions about using FitMe+. How can I assist you today?`,
-      timestamp: new Date()
+  
+  // Load messages from localStorage or use default
+  const getInitialMessages = () => {
+    try {
+      const savedMessages = localStorage.getItem('aicoach_messages');
+      if (savedMessages) {
+        const parsed = JSON.parse(savedMessages);
+        // Ensure we have valid messages and convert timestamp strings back to Date objects
+        if (parsed.length > 0) {
+          const messagesWithDates = parsed.map(msg => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp)
+          }));
+          return messagesWithDates;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading saved messages:', error);
+      // Clear corrupted data
+      localStorage.removeItem('aicoach_messages');
     }
-  ]);
+    
+    // Return default welcome message
+    return [
+      {
+        id: 1,
+        type: 'bot',
+        content: `Hello ${user?.firstName || 'there'}! 👋 I'm your Fitness AI. I'm here to help you with workout routines, nutrition advice, healthy recipes, fitness goals, and any questions about using FitMe+. How can I assist you today?`,
+        timestamp: new Date()
+      }
+    ];
+  };
+
+  const [messages, setMessages] = useState(() => {
+    const initialMessages = getInitialMessages();
+    console.log('Initial messages loaded:', initialMessages);
+    return initialMessages;
+  });
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [suggestedQuestions, setSuggestedQuestions] = useState([]);
@@ -58,6 +88,22 @@ const AiCoach = () => {
     
     return cleaned;
   };
+
+  // Save messages to localStorage whenever messages change
+  useEffect(() => {
+    try {
+      // Only save if we have valid messages
+      if (messages && messages.length > 0) {
+        const messagesToSave = messages.map(msg => ({
+          ...msg,
+          timestamp: msg.timestamp instanceof Date ? msg.timestamp.toISOString() : msg.timestamp
+        }));
+        localStorage.setItem('aicoach_messages', JSON.stringify(messagesToSave));
+      }
+    } catch (error) {
+      console.error('Error saving messages:', error);
+    }
+  }, [messages]);
 
   // Fetch personalized suggestions on component mount
   useEffect(() => {
@@ -221,21 +267,37 @@ const AiCoach = () => {
   };
 
   const clearChat = () => {
-    setMessages([
+    const defaultMessages = [
       {
         id: 1,
         type: 'bot',
         content: `Hello ${user?.firstName || 'there'}! 👋 I'm your Fitness AI. I'm here to help you with workout routines, nutrition advice, healthy recipes, fitness goals, and any questions about using FitMe+. How can I assist you today?`,
         timestamp: new Date()
       }
-    ]);
+    ];
+    
+    setMessages(defaultMessages);
     setShowRecipes(false);
     setCurrentRecipes(null);
     setError(null);
+    
+    // Clear from localStorage
+    try {
+      localStorage.removeItem('aicoach_messages');
+    } catch (error) {
+      console.error('Error clearing saved messages:', error);
+    }
   };
 
   const formatTime = (timestamp) => {
-    return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    try {
+      // Ensure timestamp is a Date object
+      const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return '';
+    }
   };
 
   const RecipeCard = ({ recipe }) => (
@@ -300,29 +362,18 @@ const AiCoach = () => {
   return (
     <div className="min-h-screen p-4 sm:p-6" style={{ backgroundColor: '#FAF7F2' }}>
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
+        {/* Page Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6"
+          className="mb-6"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Bot className="w-8 h-8 text-gray-900" />
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Fitness AI</h1>
-                <p className="text-gray-600 mt-1">Your personal AI assistant for fitness and wellness</p>
-              </div>
+          <div className="flex items-center gap-4">
+            <Bot className="w-8 h-8 text-gray-900" />
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Fitness AI</h1>
+              <p className="text-gray-600 mt-1">Your personal AI assistant for fitness and wellness</p>
             </div>
-            <motion.button
-              onClick={clearChat}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Clear Chat
-            </motion.button>
           </div>
         </motion.div>
 
@@ -365,15 +416,27 @@ const AiCoach = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col h-[600px]">
               {/* Chat Header */}
               <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center gap-3">
-                  <Bot className="w-6 h-6 text-gray-900" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Fitness AI</h3>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm text-gray-500">Online and ready to help</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Bot className="w-6 h-6 text-gray-900" />
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Fitness AI</h3>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-sm text-gray-500">Online and ready to help</span>
+                      </div>
                     </div>
                   </div>
+                  <motion.button
+                    onClick={clearChat}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    title="Clear chat history"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Clear Chat
+                  </motion.button>
                 </div>
               </div>
 

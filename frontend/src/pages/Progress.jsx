@@ -629,7 +629,7 @@ const Progress = () => {
               </select>
             </div>
             <ResponsiveContainer width="100%" height={260}>
-              <LineChart data={periodData[selectedMetric]} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
+              <LineChart data={periodData[selectedMetric]} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="day"
@@ -638,19 +638,19 @@ const Progress = () => {
                   label={{ 
                     value: selectedPeriod === 'quarter' ? 'Quarter' : selectedPeriod === 'year' ? 'Month' : selectedPeriod === 'month' ? 'Week' : 'Day', 
                     position: 'insideBottom', 
-                    offset: -20, 
+                    offset: -40, 
                     fill: '#64748b' 
                   }}
                 />
                 <YAxis
                   stroke="#8884d8"
                   allowDecimals={selectedMetric !== 'workouts'}
-                  width={selectedMetric === 'workouts' ? 80 : 70}
+                  width={90}
                   label={{
                     value: selectedMetric === 'calories' ? 'Calories (kcal)' : 'Workouts (count)',
                     angle: -90,
-                    position: 'outsideLeft',
-                    offset: 8,
+                    position: 'insideLeft',
+                    style: { textAnchor: 'middle' },
                     fill: '#64748b'
                   }}
                 />
@@ -710,7 +710,7 @@ const Progress = () => {
               </div>
             </div>
             <ResponsiveContainer width="100%" height={260}>
-              <LineChart data={periodData[intakeDataKey]} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
+              <LineChart data={periodData[intakeDataKey]} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="day"
@@ -719,19 +719,19 @@ const Progress = () => {
                   label={{ 
                     value: selectedPeriod === 'quarter' ? 'Quarter' : selectedPeriod === 'year' ? 'Month' : selectedPeriod === 'month' ? 'Week' : 'Day', 
                     position: 'insideBottom', 
-                    offset: -20, 
+                    offset: -40, 
                     fill: '#64748b' 
                   }}
                 />
                 <YAxis
                   stroke="#8884d8"
                   allowDecimals={true}
-                  width={80}
+                  width={90}
                   label={{
                     value: intakeYAxisLabel,
                     angle: -90,
-                    position: 'outsideLeft',
-                    offset: 8,
+                    position: 'insideLeft',
+                    style: { textAnchor: 'middle' },
                     fill: '#64748b'
                   }}
                 />

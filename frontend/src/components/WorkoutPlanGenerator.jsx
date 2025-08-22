@@ -274,7 +274,15 @@ const WorkoutPlanGenerator = ({ onPlanGenerated, onError }) => {
             <h4 className="text-sm font-semibold text-blue-900 mb-1">How it works</h4>
             <ul className="text-sm text-blue-800 space-y-1">
               <li>• AI analyzes your profile, goals, and preferences</li>
-              <li>• Generates a personalized 3-day workout plan</li>
+              <li>• Generates a personalized {(() => {
+                const freq = user?.workoutFrequency;
+                if (freq === '2-3') return '3-day';
+                if (freq === '3-4') return '4-day';
+                if (freq === '4-5') return '5-day';
+                if (freq === '5-6') return '6-day';
+                if (freq === 'daily') return '7-day';
+                return '3-day';
+              })()} workout plan</li>
               <li>• Includes detailed exercise descriptions and form tips</li>
               <li>• Adapts difficulty based on your experience level</li>
               <li>• Provides calorie estimates and progression tracking</li>
